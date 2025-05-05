@@ -58,10 +58,12 @@ def desenhar_linhas_de_centro(pos_lcs):
     for lc in pos_lcs:
         acad.model.AddLine(APoint(lc[0], lc[1]), APoint(lc[2], lc[3]))
     
+
 pedir_lcs()
 pedir_angSecoes(len(lcs))
 pos_lcs = definir_linhas_de_centro(lcs, angs_in)
 desenhar_linhas_de_centro(pos_lcs)
+
 
 
 # def pedir_angParedes():
@@ -74,3 +76,5 @@ desenhar_linhas_de_centro(pos_lcs)
 #     prumos.append(prumo_esq)
 #     prumo_dir = int(input(f'Digite o angulo da extremidade direita: '))
 #     prumos.append(prumo_dir)
+
+
