@@ -63,7 +63,7 @@ pedir_lcs()
 pedir_angSecoes(len(lcs))
 pos_lcs = definir_linhas_de_centro(lcs, angs_in)
 desenhar_linhas_de_centro(pos_lcs)
-
+print(pos_lcs)
 
 
 # def pedir_angParedes():
