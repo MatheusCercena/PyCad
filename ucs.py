@@ -1,8 +1,9 @@
 from sympy import symbols, Eq, solve
 from math import sqrt, pow
 
-x, y, b = symbols('x y b')
 pos_lcs = [[0, 0, 1000, 0], [1000, 0, 2879.3852415718166, -684.0402866513374], [2879.3852415718166, -684.0402866513374, 5000.70558513146, -2805.36063021098]]
+
+x, y, b = symbols('x y b')
 
 def definir_linha_perpendicular(pos_lcs):
     '''
@@ -29,9 +30,8 @@ def definir_linha_perpendicular(pos_lcs):
     coord_c2 = ini_reta_perp[0] + vetor_AC2[0], ini_reta_perp[1] + vetor_AC2[1]
     return coord_c1[0], coord_c1[1], coord_c2[0], coord_c2[1]
 
-
-
 def def_eq_reta(secao):
+
     valor_m = (secao[3] - secao[1]) / (secao[2] - secao[0])
     y_f = secao[3]
     x_f = secao[2]
@@ -39,68 +39,36 @@ def def_eq_reta(secao):
     valor_b = solve(eq_b, b)[0]
 
     return Eq(y, valor_m*x + valor_b)
-
-def verificar_se_intercepta_x(secao1, secao2, interseccao):
+   
+def verificar_se_intercepta(secao, interseccao):
     '''
-    secao1 = seção
-    secao2 = linha guia perpendicular
+    secao = seção que se quer saber se intercepta a linha guia
+    interseccao = dicionario com chaves x e y
+    A funcao verifica se os eixos x e y da secao interceptam a guia e retorna true ou false
     '''
-
-    intervalo_1_x = sorted([secao1[0], secao1[2]])
-    intervalo_1_y = sorted([secao1[1], secao1[3]])
-    intervalo_2_x = sorted([secao2[0], secao2[2]])
-    intervalo_2_y = sorted([secao2[1], secao2[3]])
-    interseccao = sorted(interseccao.values())
-
-    condicao1 = intervalo_1_x[0] <= interseccao[0] <= intervalo_1_x[1]
-    condicao2 = intervalo_1_y[0] <= interseccao[0] <= intervalo_1_y[1]
-    condicao3 = intervalo_2_x[0] <= interseccao[1] <= intervalo_2_x[1]
-    condicao4 = intervalo_2_y[0] <= interseccao[1] <= intervalo_2_y[1]
-
-    if condicao1 and condicao2 and condicao3 and condicao4 == True: 
-        return True
-    else:
-        return False
+    intervalo_x = sorted([secao[0], secao[2]])
+    intervalo_y = sorted([secao[1], secao[3]])
     
-def verificar_se_intercepta(secao1, secao2, interseccao):
-    '''
-    seção = seção
-    guia = linha guia perpendicular
-    '''
-    intervalo_1_x = sorted([secao1[0], secao1[2]])
-    intervalo_1_y = sorted([secao1[1], secao1[3]])
-    intervalo_2_x = sorted([secao2[0], secao2[2]])
-    intervalo_2_y = sorted([secao2[1], secao2[3]])
-    interseccao = sorted(interseccao.values())
+    condicao1 = intervalo_x[0] <= interseccao[x] <= intervalo_x[1]
+    condicao2 = intervalo_y[0] <= interseccao[y] <= intervalo_y[1]
 
-    condicao1 = intervalo_1_x[0] <= interseccao[0] <= intervalo_1_x[1]
-    condicao2 = intervalo_1_y[0] <= interseccao[1] <= intervalo_1_y[1]
-    condicao3 = intervalo_2_x[0] <= interseccao[0] <= intervalo_2_x[1]
-    condicao4 = intervalo_2_y[0] <= interseccao[1] <= intervalo_2_y[1]
-
-    if condicao1 and condicao2 and condicao3 and condicao4 == True: 
+    if condicao1 and condicao2 == True: 
         return True
     else:
         return False
 
+def descobrir_secao_principal(pos_lcs):
+    '''
+    descobre a linha de centro principal dentro de uma lista de linhas de centro (pos_lcs)
+    '''
+    coord_c = definir_linha_perpendicular(pos_lcs)
 
-s1 = [0, 0, 1, 2]
-s2 = [2, 0, 0, 1]
-    
-# interseccao = solve((def_eq_reta(s1), def_eq_reta(s2)), (x, y))
-# print(verificar_se_intercepta_x(s1, s2, interseccao))
-# print(interseccao)
+    for secao in range(0, len(pos_lcs)):
+        interseccao = solve((def_eq_reta(pos_lcs[secao]), def_eq_reta(coord_c)), (x, y))
+        verificacao = verificar_se_intercepta(pos_lcs[secao], interseccao)
+        if verificacao == True: 
+            return secao
+        else:
+            continue
 
-
-
-coord_c = definir_linha_perpendicular(pos_lcs)
-
-interseccao = solve((def_eq_reta(pos_lcs[2]), def_eq_reta(coord_c)), (x, y))
-v = verificar_se_intercepta(pos_lcs[2], coord_c, interseccao)
-
-print(interseccao)
-print(v)
-
-# for linha_de_centro in pos_lcs:
-#     interseccao = solve((def_eq_reta(pos_lcs[0]), def_eq_reta(coord_c)), (x, y))
-#     verificar_se_intercepta_x(linha_de_centro, s2, interseccao)
+print(descobrir_secao_principal(pos_lcs))
