@@ -60,58 +60,52 @@ def redesenhar_linhas_de_centro(lcs, angs_in, sec_princ):
     return: retorna as posições definidas para cada linha de centro.
     '''
     lista_de_LCs = lcs
+    #desenha a seção principal a partir de (0, 0)
     linha = acad.model.AddLine(APoint(0, 0), APoint(lcs[sec_princ], 0))
     inicio = linha.StartPoint
     final = linha.EndPoint
     angs = 0
-    #fazer if pra conferir o angulo
-    for l in range(sec_princ + 1, len(lista_de_LCs)):
-        linha = acad.model.AddLine(APoint(final[0], final[1]), APoint(final[0] + lista_de_LCs[l], final[1]))
-        linha.Rotate(APoint(final[0], final[1]), radians(angs_in[l-1] + angs))
-        angs += angs_in[l-1]
+    coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
+    lista_de_LCs[sec_princ] = coord_linhas
+ 
+    #desenha as seções depois da seção principal, SE existirem | se a seção principal for 0 e só tiver uma seção, ignora
+    if sec_princ < len(lcs)-1:
+        for l in range(sec_princ + 1, len(lista_de_LCs)):
+            linha = acad.model.AddLine(APoint(final[0], final[1]), APoint(final[0] + lista_de_LCs[l], final[1]))
+            linha.Rotate(APoint(final[0], final[1]), radians(angs_in[l-1] + angs))
+            angs += angs_in[l-1]
+            inicio = linha.StartPoint
+            final = linha.EndPoint
+            
+            coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
+            lista_de_LCs[l] = coord_linhas
+    
+    #desenha as seções antes da seção principal, SE existirem
+    if sec_princ >= 1:
+        linha = acad.model.AddLine(APoint(0 - lcs[sec_princ-1], 0), APoint(0, 0))
+        linha.Rotate(APoint(0, 0), radians(angs_in[sec_princ-1] * -1))
         inicio = linha.StartPoint
         final = linha.EndPoint
-        
+        angs = angs_in[sec_princ-1]
         coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
-        lista_de_LCs.append(coord_linhas)
+        lista_de_LCs[sec_princ-1] = coord_linhas
 
-    if sec_princ < len(lcs)-1:
-        for c in range(sec_princ+1, len(lcs)):
-            pos_xi = pos_xf
-            pos_yi = pos_yf
-            pos_xf += cos(radians(angs_in[c-1] + ang_in))*lcs[c]
-            pos_yf += sin(radians(angs_in[c-1] + ang_in))*lcs[c]
-            ang_in += angs_in[c-1]
-            lc = [pos_xi, pos_yi, pos_xf, pos_yf]
-            lista_de_LCs[c] = lc
-
-    if sec_princ >= 1:
-
-        pos_xi = cos(radians(angs_in[sec_princ-1]))*lcs[sec_princ-1]*-1
-        pos_yi = -sin(radians(angs_in[sec_princ-1]))*lcs[sec_princ-1]*-1
-        pos_xf = 0
-        pos_yf = 0
-        lc = [pos_xi, pos_yi, pos_xf, pos_yf]
-        lista_de_LCs[sec_princ-1] = lc
-
-        ang_in = angs_in[sec_princ-1]
-
-    if sec_princ >= 2:
-        for c in reversed(range(sec_princ-1)):
-            # pos_xf = pos_xi
-            # pos_yf = pos_yi
-            # pos_xi = cos(radians(angs_in[c] + ang_in))*lcs[c]*-1
-            # pos_yi = -sin(radians(angs_in[c] + ang_in))*lcs[c]*-1
-            # ang_in += angs_in[c-1]
-            # lc = [pos_xi, pos_yi, pos_xf, pos_yf]
-            # lista_de_LCs[c] = lc  
-            pos_In_x = pos_xi
-            pos_In_y = pos_yi
-            pos_Fi_x = pos_xi-lcs[c]
-            pos_Fi_y = pos_yi
-            lc = [pos_In_x, pos_In_y, pos_Fi_x, pos_Fi_y]
-            s1 = acad.model.AddLine(APoint(lc[0], lc[1]), APoint(lc[2], lc[3]))
-            s1.Rotate(APoint(lc[0], lc[1]), radians(angs_in[c]+ang_in))
+        if sec_princ >= 2:
+            for c in reversed(range(sec_princ-1)):
+                # pos_xf = pos_xi
+                # pos_yf = pos_yi
+                # pos_xi = cos(radians(angs_in[c] + ang_in))*lcs[c]*-1
+                # pos_yi = -sin(radians(angs_in[c] + ang_in))*lcs[c]*-1
+                # ang_in += angs_in[c-1]
+                # lc = [pos_xi, pos_yi, pos_xf, pos_yf]
+                # lista_de_LCs[c] = lc  
+                pos_In_x = pos_xi
+                pos_In_y = pos_yi
+                pos_Fi_x = pos_xi-lcs[c]
+                pos_Fi_y = pos_yi
+                lc = [pos_In_x, pos_In_y, pos_Fi_x, pos_Fi_y]
+                s1 = acad.model.AddLine(APoint(lc[0], lc[1]), APoint(lc[2], lc[3]))
+                s1.Rotate(APoint(lc[0], lc[1]), radians(angs_in[c]+ang_in))
 
     print(lista_de_LCs)
     return lista_de_LCs
