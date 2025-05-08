@@ -1,6 +1,6 @@
 from pyautocad import Autocad, APoint
 from math import radians, sin, cos
-from find_main_section import descobrir_secao_principal
+from old.find_main_section_old import descobrir_secao_principal
 
 acad = Autocad(create_if_not_exists=True)
 
@@ -31,51 +31,49 @@ def definir_linhas_de_centro(lcs, angs_in):
     angs_in: do tipo list(), com os angulos internos entre cada linha de centro. Note que angs_in[0] equivale ao angulo entre lcs[0] e lcs[1]\n
     return: retorna as posições definidas para cada linha de centro.
     '''
-    lista_de_LCs = lcs
-    linha = acad.model.AddLine(APoint(0, 0), APoint(lcs[0], 0))
-    inicio = linha.StartPoint
-    final = linha.EndPoint
-    angs = 0
+    lista_de_LCs = []
+    pos_xi = 0
+    pos_yi = 0
+    pos_xf = lcs[0]
+    pos_yf = 0
+    lc = [pos_xi, pos_yi, pos_xf, pos_yf]
+    lista_de_LCs.append(lc)
+    ang_in = 0
 
-    for l in range(1, len(lista_de_LCs)):
-        linha = acad.model.AddLine(APoint(final[0], final[1]), APoint(final[0] + lista_de_LCs[l], final[1]))
-        linha.Rotate(APoint(final[0], final[1]), radians(angs_in[l-1] + angs))
-        angs += angs_in[l-1]
-        inicio = linha.StartPoint
-        final = linha.EndPoint
-        
-        coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
-        lista_de_LCs.append(coord_linhas)
-
-    for l in lista_de_LCs:
-        l.Delete()
+    for c in range(1, len(lcs)):
+        pos_xi = pos_xf
+        pos_yi = pos_yf
+        pos_xf += cos(radians(angs_in[c-1] + ang_in))*lcs[c]
+        pos_yf += sin(radians(angs_in[c-1] + ang_in))*lcs[c]
+        ang_in += angs_in[c-1]
+        lc = [pos_xi, pos_yi, pos_xf, pos_yf]
+        lista_de_LCs.append(lc)
 
     return lista_de_LCs
 
-def redesenhar_linhas_de_centro(lcs, angs_in, sec_princ):
+def definir_linhas_de_centro_reduzida(lcs, angs_in):
+    pass
+
+def readequar_linhas_de_centro(lcs, pos_lcs, angs_in, sec_princ):
     '''
     Define as posições iniciais e finais nos eixos x e y para cada uma das linhas de centro entregues no parametro lcs.\n
     lcs: do tipo list(), com as linhas de centro a serem definidas\n
     angs_in: do tipo list(), com os angulos internos entre cada linha de centro. Note que angs_in[0] equivale ao angulo entre lcs[0] e lcs[1]\n
     return: retorna as posições definidas para cada linha de centro.
     '''
-    lista_de_LCs = lcs
-    linha = acad.model.AddLine(APoint(0, 0), APoint(lcs[sec_princ], 0))
-    inicio = linha.StartPoint
-    final = linha.EndPoint
-    angs = 0
-    #fazer if pra conferir o angulo
-    for l in range(sec_princ + 1, len(lista_de_LCs)):
-        linha = acad.model.AddLine(APoint(final[0], final[1]), APoint(final[0] + lista_de_LCs[l], final[1]))
-        linha.Rotate(APoint(final[0], final[1]), radians(angs_in[l-1] + angs))
-        angs += angs_in[l-1]
-        inicio = linha.StartPoint
-        final = linha.EndPoint
-        
-        coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
-        lista_de_LCs.append(coord_linhas)
+    print(pos_lcs)
+    print(sec_princ)
+    lista_de_LCs = pos_lcs
+    pos_xi = 0
+    pos_yi = 0
+    pos_xf = lcs[sec_princ]
+    pos_yf = 0
+    lc = [pos_xi, pos_yi, pos_xf, pos_yf]
+    lista_de_LCs[sec_princ] = lc
 
-    if sec_princ < len(lcs)-1:
+    ang_in = 0
+
+    if sec_princ < len(pos_lcs)-1:
         for c in range(sec_princ+1, len(lcs)):
             pos_xi = pos_xf
             pos_yi = pos_yf
@@ -113,6 +111,7 @@ def redesenhar_linhas_de_centro(lcs, angs_in, sec_princ):
             s1 = acad.model.AddLine(APoint(lc[0], lc[1]), APoint(lc[2], lc[3]))
             s1.Rotate(APoint(lc[0], lc[1]), radians(angs_in[c]+ang_in))
 
+
     print(lista_de_LCs)
     return lista_de_LCs
 
@@ -125,13 +124,12 @@ def desenhar_linhas_de_centro(pos_lcs):
         acad.model.AddLine(APoint(lc[0], lc[1]), APoint(lc[2], lc[3]))
     
 
-
-# pedir_lcs()
-# pedir_angSecoes(len(lcs))
-# pos_lcs = definir_linhas_de_centro(lcs, angs_in)
-# sec_princ = descobrir_secao_principal(pos_lcs)
-# pos_lcs = readequar_linhas_de_centro(lcs, pos_lcs, angs_in, sec_princ)
-# desenhar_linhas_de_centro(pos_lcs)
+pedir_lcs()
+pedir_angSecoes(len(lcs))
+pos_lcs = definir_linhas_de_centro(lcs, angs_in)
+sec_princ = descobrir_secao_principal(pos_lcs)
+pos_lcs = readequar_linhas_de_centro(lcs, pos_lcs, angs_in, sec_princ)
+desenhar_linhas_de_centro(pos_lcs)
 
 
 # def pedir_angParedes():

@@ -1,5 +1,8 @@
 from math import cos, sin, radians
 
+pos_lcs = [[0, 0, 1000, 0], [1000, 0, 2879.3852415718166, -684.0402866513374], [2879.3852415718166, -684.0402866513374, 5000.70558513146, -2805.36063021098]]
+angs_in = [10, 20]
+
 def readequar_linhas_de_centro(lcs, angs_in):
     '''
     Define as posições iniciais e finais nos eixos x e y para cada uma das linhas de centro entregues no parametro lcs.\n
@@ -40,3 +43,6 @@ def readequar_linhas_de_centro(lcs, angs_in):
         ang_in += angs_in[c-1]
         lc = [pos_xi, pos_yi, pos_xf, pos_yf]
         lista_de_LCs[c] = lc
+
+
+

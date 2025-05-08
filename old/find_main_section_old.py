@@ -1,6 +1,7 @@
 from sympy import symbols, Eq, solve
 from math import sqrt, pow
 
+
 x, y, b = symbols('x y b')
 
 def definir_linha_perpendicular(pos_lcs):
@@ -68,3 +69,4 @@ def descobrir_secao_principal(pos_lcs):
             return int(secao)
         else:
             continue
+
