@@ -63,19 +63,23 @@ def redesenhar_linhas_de_centro(lcs, angs_in, sec_princ):
     return: retorna as posições definidas para cada linha de centro.
     '''
     lista_de_LCs = lcs  
+    linhas = []
     #desenha a seção principal a partir de (0, 0)
     linha = acad.model.AddLine(APoint(0, 0), APoint(lista_de_LCs[sec_princ], 0))
+    linha.Layer = 'Linha de Centro'
     inicio = linha.StartPoint
     final = linha.EndPoint
     angs = 0
     coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
     lista_de_LCs[sec_princ] = coord_linhas
+    linhas.append(linha)
  
     #desenha as seções depois da seção principal, SE existirem | se a seção principal for 0 e só tiver uma seção, ignora
     if sec_princ < len(lcs)-1:
         for l in range(sec_princ + 1, len(lista_de_LCs)):
             linha = acad.model.AddLine(APoint(final[0], final[1]), APoint(final[0] + lista_de_LCs[l], final[1]))
             linha.Rotate(APoint(final[0], final[1]), radians(angs_in[l-1] + angs))
+            linha.Layer = 'Linha de Centro'
             angs += angs_in[l-1]
             inicio = linha.StartPoint
             final = linha.EndPoint
@@ -87,6 +91,7 @@ def redesenhar_linhas_de_centro(lcs, angs_in, sec_princ):
     if sec_princ >= 1:
         linha = acad.model.AddLine(APoint(0 - lista_de_LCs[sec_princ-1], 0), APoint(0, 0))
         linha.Rotate(APoint(0, 0), radians(angs_in[sec_princ-1] * -1))
+        linha.Layer = 'Linha de Centro'
         inicio = linha.StartPoint
         final = linha.EndPoint
         angs = angs_in[sec_princ-1]
@@ -97,15 +102,23 @@ def redesenhar_linhas_de_centro(lcs, angs_in, sec_princ):
             for l in reversed(range(sec_princ-1)):
                 linha = acad.model.AddLine(APoint(inicio[0] - lista_de_LCs[l], inicio[1]), APoint(inicio[0], inicio[1]))
                 linha.Rotate(APoint(inicio[0], inicio[1]), radians((angs_in[l] + angs)*-1))
+                linha.Layer = 'Linha de Centro'
                 angs += angs_in[l]
                 inicio = linha.StartPoint
                 final = linha.EndPoint
                 
                 coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
                 lista_de_LCs[l] = coord_linhas
-
     return lista_de_LCs
 
+def offset_trilhos():
+    offset_ext = 20
+    offset_int = 32
+    for linha_de_centro in acad.iter_objects('AcDbLine'):
+        if linha_de_centro.Layer == 'Linha de Centro':
+            perfil_U_ext = linha_de_centro.Offset(offset_ext)
+            perfil_U_int = linha_de_centro.Offset(offset_int)
+    
 pedir_lcs()
 pedir_angSecoes(len(lcs))
 pos_lcs = definir_linhas_de_centro(lcs, angs_in)
@@ -114,7 +127,7 @@ if len(pos_lcs) == 1:
 else:
     sec_princ = descobrir_secao_principal(pos_lcs)
 pos_lcs = redesenhar_linhas_de_centro(lcs, angs_in, sec_princ)
-
+offset_trilhos()
 
 
 # def pedir_angParedes():
