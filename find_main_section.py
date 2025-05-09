@@ -44,6 +44,8 @@ def verificar_se_intercepta(secao, interseccao):
     interseccao = dicionario com chaves x e y
     A funcao verifica se os eixos x e y da secao interceptam a guia e retorna true ou false
     '''
+    print(interseccao)
+    print(secao)
     intervalo_x = sorted([secao[0], secao[2]])
     intervalo_y = sorted([secao[1], secao[3]])
     
@@ -60,7 +62,6 @@ def descobrir_secao_principal(pos_lcs):
     descobre a linha de centro principal dentro de uma lista de linhas de centro (pos_lcs)
     '''
     coord_c = definir_linha_perpendicular(pos_lcs)
-
     for secao in range(0, len(pos_lcs)):
         interseccao = solve((def_eq_reta(pos_lcs[secao]), def_eq_reta(coord_c)), (x, y))
         verificacao = verificar_se_intercepta(pos_lcs[secao], interseccao)

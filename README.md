@@ -5,8 +5,8 @@ DESENHO PRINCIPAL
 1 Armazenar linhas de centro para uso posterior - feito
 2 Desenhar linhas de centro - Feito
 
-3 definir seção principal do layout do projeto de acordo com as linhas de centro definidas
-4 aplicar fator de redefiniçao de posição de linhas de centro para ajustar layout de acordo com seção principal
+3 definir seção principal do layout do projeto de acordo com as linhas de centro definidas - Feito
+4 aplicar fator de redefiniçao de posição de linhas de centro para ajustar layout de acordo com seção principal - Feito
 
 5 Dar offsets e fillets em linhas de centro pra obter trilhos
 6 desenhar linhas dos vidros e leitos individuais 
@@ -18,7 +18,7 @@ DESENHO PRINCIPAL
 MEIO-D0-PROJETO: 
 
 9 adicionar mtext com pivos e altura dos vidros, painel e vao. 
-10 adicionar lindas de sentido de abertura. 
+10 adicionar linhas de sentido de abertura. 
 11 adicionar bolinhas de leito
 12 adicionar passantes/colantes
 13 adicionar angulos entre seções
@@ -37,12 +37,12 @@ LAYOUT:
 21 pegar input com dados de perfis e descrição de onde vao, para adicionar nas observacoes
 22 adicionar informaçoes flutuantes para produção, instalação, transporte, usinagem, etc.
 
------------------
+
 Controle de qualidade:
 
 23 Conferir se fonte está em tamanho adequado
 24 Encaixar informações na folha
-----------------
+
 CADASTRO:
 
 25 Cadastrar tudo no ecg conforme projeto
