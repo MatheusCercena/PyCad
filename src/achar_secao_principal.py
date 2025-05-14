@@ -1,3 +1,7 @@
+"""
+Realiza uma série de calculos sobre a lista de linhas de centro para definir qual delas será a seção principal a ser usada para realocar as seções após estas serem definidas, para desenhar as linhas seguindo um sentido de visualização idealizado.
+"""
+
 from sympy import symbols, Eq, solve
 from math import sqrt, pow
 
@@ -26,10 +30,13 @@ def definir_linha_perpendicular(pos_lcs):
     vetor_AB2_unit = vetor_AB_perp2[0]/vetor_AB2_norm, vetor_AB_perp2[1]/vetor_AB2_norm
     vetor_AC2 = vetor_AB2_unit[0]*comp_AC, vetor_AB2_unit[1]*comp_AC
     coord_c2 = ini_reta_perp[0] + vetor_AC2[0], ini_reta_perp[1] + vetor_AC2[1]
+
     return coord_c1[0], coord_c1[1], coord_c2[0], coord_c2[1]
 
 def def_eq_reta(secao):
-
+    '''
+    define a equação da reta a ser usada para verificar se a seção intercepta a linha perpendicular
+    '''
     valor_m = (secao[3] - secao[1]) / (secao[2] - secao[0])
     y_f = secao[3]
     x_f = secao[2]
@@ -59,13 +66,17 @@ def verificar_se_intercepta(secao, interseccao):
 
 def descobrir_secao_principal(pos_lcs):
     '''
-    descobre a linha de centro principal dentro de uma lista de linhas de centro (pos_lcs)
+    descobre a linha de centro principal dentro de uma lista de linhas de centro (pos_lcs).
     '''
-    coord_c = definir_linha_perpendicular(pos_lcs)
-    for secao in range(0, len(pos_lcs)):
-        interseccao = solve((def_eq_reta(pos_lcs[secao]), def_eq_reta(coord_c)), (x, y))
-        verificacao = verificar_se_intercepta(pos_lcs[secao], interseccao)
-        if verificacao == True: 
-            return int(secao)
-        else:
-            continue
+    # Se houver apenas uma seção, retorna 0 automaticamente
+    if len(pos_lcs) == 1:
+        return 0
+    else:
+        coord_c = definir_linha_perpendicular(pos_lcs)
+        for secao in range(0, len(pos_lcs)):
+            interseccao = solve((def_eq_reta(pos_lcs[secao]), def_eq_reta(coord_c)), (x, y))
+            verificacao = verificar_se_intercepta(pos_lcs[secao], interseccao)
+            if verificacao == True: 
+                return int(secao)
+            else:
+                continue
