@@ -10,6 +10,5 @@ angs_in = pedir_angSecoes(len(lcs))
 pos_lcs = definir_linhas_de_centro(lcs, angs_in)
 sec_princ = descobrir_secao_principal(pos_lcs)
 pos_lcs = redesenhar_linhas_de_centro(lcs, angs_in, sec_princ)
-print(ordem_lcs(lcs, sec_princ))
-offset_perfis_U()
+offset_perfis_U(lcs, sec_princ)
 
