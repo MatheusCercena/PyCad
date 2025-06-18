@@ -27,17 +27,14 @@ def dar_fillet(handle1: int, handle2: int):
 
     with open(dir_lisp, "w") as file:
         file.write(lisp_code.strip())
-    print("Caminho LISP:", repr(os.path.normpath(dir_lisp)))
     caminho_lisp = os.path.normpath(dir_lisp).replace("\\", "\\\\")
-    print(caminho_lisp)
     try:
         acad.SendCommand(f'(load "{caminho_lisp}")\n')
-
     except:
         print('nope')
     sleep(1.5)
     try:
-        acad.SendCommand('(custom_fillet)\n')
+        acad.SendCommand('custom_fillet\n')
     except:
         print('nope2')
 
@@ -46,13 +43,16 @@ def offset_perfis_U():
     offset_ext = 20
     offset_int = 32
     handles = []
-
+    lista = []
     for linha in acad_ModelSpace:
         if linha.EntityName == 'AcDbLine' and linha.Layer == 'Linha de Centro':
-            #método offset sempre retorna uma tupla, então e preciso iterar sobre ela, mesmo que possua apenas 1 elemento
+            lista.append(linha)
+            
+
+        if linha.EntityName == 'AcDbLine' and linha.Layer == 'Linha de Centro':
             linha_ext = linha.Offset(offset_ext)
             linha_int = linha.Offset(-offset_int)
-
+            #método offset sempre retorna uma tupla, então e preciso iterar sobre ela, mesmo que possua apenas 1 elemento
             for linha in linha_ext:
                 linha.Layer = 'Perfil U Externo'
                 handle = linha.Handle
@@ -62,7 +62,6 @@ def offset_perfis_U():
                 linha.Layer = 'Perfil U Interno'
                 handle = linha.Handle
                 handles.append(handle)
-                
-    dar_fillet(handles[0], handles[2])
-
-    dar_fillet(handles[1], handles[3])
+        
+        dar_fillet(handles[0], handles[2])
+        dar_fillet(handles[1], handles[3])

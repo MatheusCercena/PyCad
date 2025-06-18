@@ -93,3 +93,16 @@ def redesenhar_linhas_de_centro(lcs:list, angs_in: list, sec_princ: int):
                 lista_de_LCs[l] = coord_linhas
 
     return lista_de_LCs
+
+def ordem_lcs(lcs, sec_princ):
+    lista = []
+    lista.append(sec_princ)
+    if sec_princ < len(lcs)-1:
+        for c in range(sec_princ + 1, len(lcs)):
+            lista.append(c) 
+    if sec_princ >= 1:
+        lista.append(sec_princ-1) 
+        if sec_princ >= 1:
+            for c in reversed(range(sec_princ-1)):
+                lista.append(c) 
+    return lista
