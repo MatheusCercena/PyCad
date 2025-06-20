@@ -12,3 +12,5 @@ sec_princ = descobrir_secao_principal(pos_lcs)
 pos_lcs = redesenhar_linhas_de_centro(lcs, angs_in, sec_princ)
 offset_perfis_U(lcs, sec_princ)
 
+
+

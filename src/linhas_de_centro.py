@@ -24,7 +24,6 @@ def definir_linhas_de_centro(lcs: list, angs_in: list):
     coord_de_linhas_de_centro.append(coord_linhas)
     linha.Delete()
 
-
     for l in range(1, len(lista_de_LCs)):
         linha = acad.model.AddLine(APoint(final[0], final[1]), APoint(final[0] + lista_de_LCs[l], final[1]))
         linha.Rotate(APoint(final[0], final[1]), radians(angs_in[l-1] + angs))
