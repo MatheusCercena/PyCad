@@ -51,8 +51,6 @@ def verificar_se_intercepta(secao, interseccao):
     interseccao = dicionario com chaves x e y
     A funcao verifica se os eixos x e y da secao interceptam a guia e retorna true ou false
     '''
-    print(interseccao)
-    print(secao)
     intervalo_x = sorted([secao[0], secao[2]])
     intervalo_y = sorted([secao[1], secao[3]])
     

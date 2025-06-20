@@ -30,7 +30,7 @@ def dar_fillet(handle1: int, handle2: int):
         file.write(lisp_code.strip())
     caminho_lisp = os.path.normpath(dir_lisp).replace("\\", "\\\\")
     acad.SendCommand(f'(load "{caminho_lisp}")\n')
-    sleep(1.5)
+    sleep(1)
     acad.SendCommand('custom_fillet\n')
     
 
@@ -38,15 +38,16 @@ def offset_perfis_U(lcs, sec_princ):
     offset_ext = 20
     offset_int = 32
     linhas_original = []
-    ordem_correta =  ordem_lcs(lcs, sec_princ)
-    linhas_ordem_correta = []
+    
+    # ordem_correta =  ordem_lcs(lcs, sec_princ)
+    # linhas_ordem_correta = []
     for linha in acad_ModelSpace:
         if linha.EntityName == 'AcDbLine' and linha.Layer == 'Linha de Centro':
             linhas_original.append(linha)
-    for indice in ordem_correta:
-        linhas_ordem_correta.append(linhas_original[indice])
+    # for indice, valor in enumerate(ordem_correta):
+    #     linhas_ordem_correta.append(linhas_original[valor])
     handles = {'externos': [], 'internos': []}
-    for linha in linhas_ordem_correta:
+    for linha in linhas_original:
         # método .Offset sempre retorna tuplas mesmo que com 1 elemento.
         linha_ext = linha.Offset(offset_ext)
         linha_ext[0].Layer = 'Perfil U Externo'
@@ -57,9 +58,18 @@ def offset_perfis_U(lcs, sec_princ):
         handles['internos'].append(linha_int[0].Handle)
         print(handles)
 
+    linhas_alteradas = []
+    for linha in reversed(handles['externos']):
+        if linha.index < sec_princ:
+            linhas_alteradas.append(linha)
+    linhas_alteradas.append(sec_princ)
+    for handles in handles['externos']:
+        if linha.index > sec_princ:
+            linhas_alteradas.append(linha)
+    linhas_alteradas.append(sec_princ)
+
     for index in range(0, len(handles['externos'])-1):
         dar_fillet(handles['externos'][index], handles['externos'][index+1])
 
     for index in range(0, len(handles['internos'])-1):
         dar_fillet(handles['internos'][index], handles['internos'][index+1])
-
