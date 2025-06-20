@@ -38,7 +38,6 @@ def offset_perfis_U(lcs, sec_princ):
     offset_ext = 20
     offset_int = 32
     linhas_original = []
-    print(ordem_lcs(lcs, sec_princ))
     ordem_correta =  ordem_lcs(lcs, sec_princ)
     linhas_ordem_correta = []
     for linha in acad_ModelSpace:
@@ -46,9 +45,7 @@ def offset_perfis_U(lcs, sec_princ):
             linhas_original.append(linha)
     for indice in ordem_correta:
         linhas_ordem_correta.append(linhas_original[indice])
-
     handles = {'externos': [], 'internos': []}
-    print(linhas_ordem_correta)
     for linha in linhas_ordem_correta:
         # método .Offset sempre retorna tuplas mesmo que com 1 elemento.
         linha_ext = linha.Offset(offset_ext)
@@ -59,9 +56,10 @@ def offset_perfis_U(lcs, sec_princ):
         linha_int[0].Layer = 'Perfil U Interno'
         handles['internos'].append(linha_int[0].Handle)
         print(handles)
-    
+
     for index in range(0, len(handles['externos'])-1):
         dar_fillet(handles['externos'][index], handles['externos'][index+1])
+
     for index in range(0, len(handles['internos'])-1):
         dar_fillet(handles['internos'][index], handles['internos'][index+1])
 
