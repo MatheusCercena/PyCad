@@ -76,3 +76,41 @@ def pedir_prumos():
     prumos.append(prumo_esq)
     prumos.append(prumo_dir)
     return prumos
+
+def definir_juncoes(lcs, angs_in):
+    '''
+    Retorna:
+        0 - vidro-parede
+        1 - passante
+        2 - colante
+        3 - vidro-vidro
+    '''
+    juncoes = []
+    for index in range(0, len(lcs)):
+        esq_dir = []
+        for lado in range(0, 2):
+            if index == 0 and lado == 0: #parede esquerda
+                esq_dir.append(0)
+            elif lado == 0 and juncoes[-1][1] == 1: #se ultimo é passante, este é colante
+                esq_dir.append(2)
+            elif lado == 0 and juncoes[-1][1] == 2: #se ultimo é colante, este é passante
+                esq_dir.append(1)
+            elif lado == 0 and juncoes[-1][1] == 3: #se ultimo é vidro-vidro, este é vidro-vidro
+                esq_dir.append(3)
+            elif len(angs_in) != 0 and index < len(angs_in):
+                if 70 < (angs_in[index] / 2) < 110: #passante-colante
+                    res = input(f'A juncão entre os vidros do lado {index} e {index+1} será passante e colante, qual deseja que seja o passante? Digite "e" para o vidro do lado {index} ou "d" para o vidro do lado {index + 1}: ')
+                    while res not in ['e', 'd']:
+                        res = input(f'A juncão entre os vidros do lado {index} e {index+1} será passante e colante, qual deseja que seja o passante? Digite "e" para o vidro do lado {index} ou "d" para o vidro do lado {index + 1}: ')
+                    if res == 'e': #se esquerda é passante, este é passante
+                        esq_dir.append(1)
+                    if res == 'd': #se direita é passante, este é colante
+                        esq_dir.append(2)
+                else: #vidro-vidro
+                    esq_dir.append(3)
+            else: #parede direita
+                esq_dir.append(0)
+        juncoes.append(esq_dir)
+
+    return juncoes
+
