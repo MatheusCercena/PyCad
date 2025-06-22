@@ -40,8 +40,18 @@ def pedir_angParedes():
     Solicita ao usuário os angulos das extremidades direita e esquerda, e retorna uma lista com os angulos externos no formato: [ang_esq, ang_dir]
     '''
     angs_ex = []
-    ang_esq = float(input(f'Digite o angulo da extremidade esquerda: '))
-    ang_dir = float(input(f'Digite o angulo da extremidade direita: '))
+    while True:
+        try:
+            ang_esq = 90 - float(input(f'Digite o angulo da extremidade esquerda: '))
+            break
+        except:
+            print(f'[ERRO] O campo "angulo parede esquerda" precisa conter apenas numeros: ')
+    while True:
+        try:
+            ang_dir = 90 - float(input(f'Digite o angulo da extremidade direita: '))
+            break
+        except:
+            print(f'[ERRO] O campo "angulo parede direita" precisa conter apenas numeros: ')
     angs_ex.append(ang_esq)
     angs_ex.append(ang_dir)
     return angs_ex
@@ -51,8 +61,18 @@ def pedir_prumos():
     Solicita ao usuário os prumos das extremidades direita e esquerda, e retorna uma lista com os angulos externos no formato: [prumo_esq, prumo_dir]
     '''
     prumos = []
-    prumo_esq = float(input(f'Digite o angulo da extremidade esquerda: '))
+    while True:
+        try:
+            prumo_esq = float(input(f'Digite o angulo da extremidade esquerda: '))
+            break
+        except:
+            print(f'[ERRO] O campo "prumo esquerdo" precisa conter apenas numeros: ')
+    while True:
+        try:
+            prumo_dir = float(input(f'Digite o angulo da extremidade direita: '))
+            break
+        except:
+            print(f'[ERRO] O campo "prumo direita" precisa conter apenas numeros: ')
     prumos.append(prumo_esq)
-    prumo_dir = float(input(f'Digite o angulo da extremidade direita: '))
     prumos.append(prumo_dir)
     return prumos

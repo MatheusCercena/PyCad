@@ -1,0 +1,31 @@
+"""
+Desenha os leitos, através de offsets chamados via COM e fillets por lisp.
+"""
+from pyautocad import Autocad, APoint
+from src.autocad_conn import get_acad
+from math import radians
+from copy import deepcopy
+
+acad, acad_ModelSpace = get_acad()
+acad2 = Autocad(create_if_not_exists=True)
+
+def fazer_parede_esq(lcs, perfil_U_ext, perfil_U_int, angulo):
+    ini = acad.HandleToObject(perfil_U_ext).StartPoint
+    fim = acad.HandleToObject(perfil_U_int).StartPoint
+    linha = acad2.model.AddLine(APoint(ini[0], ini[1]), APoint(fim[0], fim[1]))
+    linha.Rotate(APoint(lcs[0], lcs[1]), radians(angulo * 1))
+    linha.Layer = 'Paredes'
+    return linha.Handle
+
+def fazer_parede_dir(lcs, perfil_U_ext, perfil_U_int, angulo):
+    ini = acad.HandleToObject(perfil_U_ext).EndPoint
+    fim = acad.HandleToObject(perfil_U_int).EndPoint
+    linha = acad2.model.AddLine(APoint(ini[0], ini[1]), APoint(fim[0], fim[1]))
+    linha.Rotate(APoint(lcs[2], lcs[3]), radians(angulo * -1))#ROTATE ESTA DESLOCANDO, PARECE SER ERRO NO APOINT DE ONDE ELE ROTACIONA O ELEMENTO, CORRIGIR
+    linha.Layer = 'Paredes'
+    return linha.Handle
+
+def fillet_paredes(handle_perfil_U_ext, handle_perfil_U_int, handle_parede):
+    acad.SendCommand(f'(c:custom_fillet "{handle_perfil_U_ext}" "{handle_parede}")\n')
+    acad.SendCommand(f'(c:custom_fillet "{handle_parede}" "{handle_perfil_U_int}")\n')
+    

@@ -1,0 +1,14 @@
+'
+Necessário layers com os nomes exatos:
+
+Linha de Centro
+Perfil U Externo
+Perfil U Interno
+Vidro Externo
+Vidro Interno
+Leito Externo
+Leito Interno
+Paredes
+
+'
+

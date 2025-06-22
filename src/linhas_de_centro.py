@@ -4,6 +4,9 @@ Funções para definir as coordenadas das linhas de centro com base nos inputs d
 
 from pyautocad import Autocad, APoint
 from math import radians
+from src.autocad_conn import get_acad
+
+cad, acad_ModelSpace = get_acad()
 
 acad = Autocad(create_if_not_exists=True)
 
@@ -37,12 +40,25 @@ def definir_linhas_de_centro(lcs: list, angs_in: list):
 
     return coord_de_linhas_de_centro
 
+def ordem_lcs(lcs, sec_princ):
+    lista = []
+    lista.append(sec_princ)
+    if sec_princ < len(lcs)-1:
+        for c in range(sec_princ + 1, len(lcs)):
+            lista.append(c) 
+    if sec_princ >= 1:
+        lista.append(sec_princ-1) 
+        if sec_princ >= 1:
+            for c in reversed(range(sec_princ-1)):
+                lista.append(c) 
+    return lista
+
 def redesenhar_linhas_de_centro(lcs:list, angs_in: list, sec_princ: int):
     '''
     Desenha as linhas de centro na instancia de AutoCad e retorna uma lista com as posições iniciais e finais nos eixos x e y para cada uma das linhas de centro entregues no parametro lcs.\n
     lcs: linhas de centro a serem definidas\n
     angs_in: angulos internos entre cada linha de centro. Note que angs_in[0] equivale ao angulo entre lcs[0] e lcs[1]\n
-    return: retorna as posições corrigidas para cada linha de centro de lcs, no formato [[xi1, yi1, xf1, yf1], [xi2, yi2, xf2, yf2], [xin, yin, xfn, yfn]].
+    return: retorna as posições corrigidas para cada linha de centro de lcs, no formato [[xi1, yi1, xf1, yf1], [xi2, yi2, xf2, yf2], [xin, yin, xfn, yfn]] e a lista de handles das linhas de centro.
     '''
     lista_de_LCs = lcs  
     #desenha a seção principal a partir de (0, 0)
@@ -91,17 +107,15 @@ def redesenhar_linhas_de_centro(lcs:list, angs_in: list, sec_princ: int):
                 coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
                 lista_de_LCs[l] = coord_linhas
 
-    return lista_de_LCs
+    novas_lcs = []
+    for linha in acad_ModelSpace:
+        if linha.EntityName == 'AcDbLine' and linha.Layer == 'Linha de Centro':
+            novas_lcs.append(linha)
 
-def ordem_lcs(lcs, sec_princ):
-    lista = []
-    lista.append(sec_princ)
-    if sec_princ < len(lcs)-1:
-        for c in range(sec_princ + 1, len(lcs)):
-            lista.append(c) 
-    if sec_princ >= 1:
-        lista.append(sec_princ-1) 
-        if sec_princ >= 1:
-            for c in reversed(range(sec_princ-1)):
-                lista.append(c) 
-    return lista
+    ordem_desenho = ordem_lcs(novas_lcs, sec_princ)
+    lista = novas_lcs.copy()
+
+    for index, value in enumerate(ordem_desenho):
+        lista[value] = novas_lcs[index]
+    return lista_de_LCs, lista
+
