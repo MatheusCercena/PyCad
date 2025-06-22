@@ -1,6 +1,6 @@
-(defun c:custom_fillet ( / linha1 linha2)
-    (setq linha1 (handent "1227"))
-    (setq linha2 (handent "1229"))
+(defun c:custom_fillet ( h1 h2 / linha1 linha2)
+    (setq linha1 (handent h1))
+    (setq linha2 (handent h2))
     (command "_.fillet" linha1 linha2)
     (princ "
 Comando")

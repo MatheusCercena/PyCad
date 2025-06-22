@@ -6,16 +6,20 @@ import win32com.client
 import os
 from time import sleep
 from src.linhas_de_centro import ordem_lcs
+from copy import deepcopy
 
 # Conecta ao AutoCAD
 acad = win32com.client.Dispatch("AutoCAD.Application").ActiveDocument
 acad_ModelSpace = acad.ModelSpace
 
-def dar_fillet(handle1: int, handle2: int):
+def carregar_comando_fillet():
+    '''
+    Futuramente, caso precise fazer novos comandos, adicionar no lisp_code e corrigir nomes das funcoes para algo como "carregar_comandos_customizados"
+    '''
     lisp_code = f'''
-(defun c:custom_fillet ( / linha1 linha2)
-    (setq linha1 (handent "{handle1}"))
-    (setq linha2 (handent "{handle2}"))
+(defun c:custom_fillet ( h1 h2 / linha1 linha2)
+    (setq linha1 (handent h1))
+    (setq linha2 (handent h2))
     (command "_.fillet" linha1 linha2)
     (princ "\nComando")
     (princ)
@@ -30,11 +34,9 @@ def dar_fillet(handle1: int, handle2: int):
         file.write(lisp_code.strip())
     caminho_lisp = os.path.normpath(dir_lisp).replace("\\", "\\\\")
     acad.SendCommand(f'(load "{caminho_lisp}")\n')
-    sleep(1)
-    acad.SendCommand('custom_fillet\n')
-    
+    sleep(3)
 
-def offset_perfis_U(lcs, sec_princ):
+def offset_perfis_U():
     offset_ext = 20
     offset_int = 32
     linhas = []
@@ -55,29 +57,15 @@ def offset_perfis_U(lcs, sec_princ):
         handles['internos'].append(linha_int[0].Handle)
     return handles
 
-def fillet_perfis_U(handles, sec_princ):
-    #Converter para fillet
-    linhas_externas = []
-    for index, linha in enumerate(reversed(handles['externos'])):
-        if index < sec_princ:
-            linhas_externas.append(linha)
-    linhas_externas.append(handles['externos'][sec_princ])
-    for index, linha in enumerate(handles['externos']):
-        if index > sec_princ:
-            linhas_externas.append(linha)
-    print(linhas_externas)
-    for index in range(0, len(linhas_externas)-1):
-        dar_fillet(linhas_externas[index], linhas_externas[index+1])
+def fillet_perfis_U(handles, ordem: list):
+    linhas_externas = deepcopy(handles['externos'])
+    linhas_internas = deepcopy(handles['internos'])
 
-    #Converter para fillet
-    linhas_internas = []
-    for index, linha in enumerate(reversed(handles['internos'])):
-        if index < sec_princ:
-            linhas_internas.append(linha)
-    linhas_internas.append(handles['internos'][sec_princ])
-    for index, linha in enumerate(handles['internos']):
-        if index > sec_princ:
-            linhas_internas.append(linha)
-    print(linhas_internas)
-    for index in range(0, len(linhas_internas)-1):
-        dar_fillet(linhas_internas[index], linhas_internas[index+1])
+    for index, value in enumerate(ordem):
+        linhas_externas[value] = handles['externos'][index]
+        linhas_internas[value] = handles['internos'][index]
+
+    for index in range(0, len(ordem)-1):
+        acad.SendCommand(f'(c:custom_fillet "{linhas_externas[index]}" "{linhas_externas[index+1]}")\n')
+        acad.SendCommand(f'(c:custom_fillet "{linhas_internas[index]}" "{linhas_internas[index+1]}")\n')
+

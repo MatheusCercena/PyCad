@@ -8,7 +8,7 @@ DESENHO PRINCIPAL
 3 definir seção principal do layout do projeto de acordo com as linhas de centro definidas - Feito
 4 aplicar fator de redefiniçao de posição de linhas de centro para ajustar layout de acordo com seção principal - Feito
 
-5 Dar offsets e fillets em linhas de centro pra obter trilhos
+5 Dar offsets e fillets em linhas de centro pra obter trilhos - Feito
 6 desenhar linhas dos vidros e leitos individuais 
 
 7 puxar cotas dos vidros e leitos individuais 

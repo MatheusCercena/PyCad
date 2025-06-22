@@ -6,7 +6,11 @@ def pedir_linhas_de_centro():
     linhas_de_centro = []
     cont = 1
     while True:
-        lc_secoes = int(input(f'Digite a linha de centro da S{cont}: '))
+        try:
+            lc_secoes = int(input(f'Digite a linha de centro da S{cont}: '))
+        except:
+            print(f'[ERRO] O campo "linha de centro" precisa conter apenas numeros inteiros: ')
+            continue
         linhas_de_centro.append(lc_secoes)
         cont +=1
         res = input('Deseja digitar outra linha de centro? Digite enter para sim ou qualquer tecla para não:')
@@ -21,7 +25,12 @@ def pedir_angSecoes(qntd_secoes: int):
     angs_in = []
     for c in range(0, qntd_secoes-1):
         #inserir o angulo medido no transferidor, sem conversão.
-        ang_sec = float(input(f'Qual o angulo entre a S{c+1} e a S{c+2}: '))
+        while True:
+            try:
+                ang_sec = float(input(f'Qual o angulo entre a S{c+1} e a S{c+2}: ').replace(',', '.'))
+                break
+            except:
+                print(f'[ERRO] O campo "angulo" precisa conter apenas numeros: ')
         ang_sec = 180-ang_sec
         angs_in.append(ang_sec*-1)
     return angs_in
