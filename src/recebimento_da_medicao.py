@@ -18,12 +18,23 @@ def pedir_linhas_de_centro():
             break
     return linhas_de_centro
 
-def pedir_angSecoes(qntd_secoes: int):
+def pedir_quant_vidros(lcs):
+    quant_vidros = []
+    for c in range(0, len(lcs)):
+        try:
+            quant = int(input(f'Digite a quantidade de vidros da S{c+1}: '))
+        except:
+            print(f'[ERRO] O campo "quantidade de vidros" precisa conter apenas numeros inteiros: ')
+            continue
+        quant_vidros.append(quant)
+    return quant_vidros
+
+def pedir_angSecoes(lcs: int):
     '''
     Solicita ao usuário os angulos interno e retorna uma lista com os angulos internos no formato: [ang_1, ang_2, ..., ang_n]
     '''
     angs_in = []
-    for c in range(0, qntd_secoes-1):
+    for c in range(0, len(lcs)-1):
         #inserir o angulo medido no transferidor, sem conversão.
         while True:
             try:
