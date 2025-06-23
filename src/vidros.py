@@ -66,7 +66,10 @@ def medida_dos_vidros(gaps_lcs: list, lcs:list, quant_vidros: list, angs_in: lis
         folga_esq = folgas_juncoes[index][0]
         folga_dir = folgas_juncoes[index][1]
 
-        if index == 0 or len(lcs) == 1:
+        if index == 0 and len(lcs) == 1:
+            folga_ajuste_angulo_esq = gaps_lcs[0]
+            folga_ajuste_angulo_dir = gaps_lcs[1]
+        elif index == 0 and len(lcs) > 1:
             folga_ajuste_angulo_esq = gaps_lcs[0]
             folga_ajuste_angulo_dir = calcular_gaps_vidro_vidro(angs_in[index])
         elif index == (len(lcs) -1):
