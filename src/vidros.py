@@ -104,9 +104,9 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
             elif index == 1 or index == 2:
                 folgas_secao.append(0)
             elif index == 3 and lado == 0:
-                folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[i-1]))
+                folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[index-1]))
             elif index == 3 and lado == 1:
-                folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[i]))
+                folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[index]))
         folgas_secoes.append(folgas_secao)
 
     return folgas_secoes
