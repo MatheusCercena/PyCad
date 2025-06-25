@@ -50,7 +50,7 @@ def offset_vidros(handles_lcs, vidros_sacada, posicao_dos_vidros):
             fim = ponto_na_secao(p1, vetor_unitario, fim_vidro)
 
 def pontos_dos_vidros():
-    
+    #usar folga dos vidros para calcular
     
     pass
 
@@ -71,40 +71,45 @@ def calcular_gaps_vidro_vidro(ang):
     return gap_vidro
 
 def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
+    '''
+    Retorna uma lista com as folgas de cada secao da sacada, de forma que cada elemento é outra lista com 4 elementos, sendo eles:
+    0 - Folga parede esquerdo
+    1 - Folga parede direito
+    2 - Folga ajuste de angulo esquerdo
+    3 - Folga ajuste de angulo direito
+    '''
     folga_parede = float(-12) 
     folga_passante = float(2)
     folga_colante = float(-7)
     folga_vidro_vidro = float(-1) 
     juncoes_secoes = deepcopy(juncoes)
-    folgas_juncoes = []
+    folgas_secoes = []
 
-    for i in range(0, len(juncoes_secoes)):
-        if i == 0:
-            folgas_juncoes.append(folga_parede)
-        elif i == 1:
-            juncoes_secoes[i].append(folga_passante)
-        elif par[index] == 2:
-            juncoes_secoes[i].append(folga_colante)
-        else:
-            juncoes_secoes[i].append(folga_vidro_vidro)
+    for index, secao in enumerate(juncoes_secoes):
+        folgas_secao = []
+        for lado in range(0, 2):
+            if secao[lado] == 0:
+                folgas_secao.append(folga_parede)
+            elif secao[lado] == 1:
+                folgas_secao.append(folga_passante)
+            elif secao[lado] == 2:
+                folgas_secao.append(folga_colante)
+            else:
+                folgas_secao.append(folga_vidro_vidro)
+        for lado in range(0, 2):
+            if index == 0 and lado == 0:
+                folgas_secao.append(gaps_lcs[0]) 
+            elif index == 0 and lado == 1:
+                folgas_secao.append(gaps_lcs[1]) 
+            elif index == 1 or index == 2:
+                folgas_secao.append(0)
+            elif index == 3 and lado == 0:
+                folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[i-1]))
+            elif index == 3 and lado == 1:
+                folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[i]))
+        folgas_secoes.append(folgas_secao)
 
-    for i in range(0, len(juncoes_secoes)):
-        for index in range(0, 2):
-            if par[index] == 0 and index == 0:
-                folgas_ajuste_de_angulo.append(gaps_lcs[0]) 
-            elif par[index] == 0 and index == 1:
-                folgas_ajuste_de_angulo.append(gaps_lcs[1]) 
-            elif par[index] == 1 or par[index] == 2:
-                folgas_ajuste_de_angulo.append(0)
-            elif par[index] == 3 and index == 0:
-                folgas_ajuste_de_angulo.append(calcular_gaps_vidro_vidro(angs_in[i-1]))
-            elif par[index] == 3 and index == 1:
-                folgas_ajuste_de_angulo.append(calcular_gaps_vidro_vidro(angs_in[i]))
-
-        folga_ajuste_angulo_esq = folgas_ajuste_de_angulo[0]
-        folga_ajuste_angulo_dir = folgas_ajuste_de_angulo[1]
-        print(f"Secao: {i} folga_esq: {folga_esq}, folga_dir: {folga_dir}, folga_ajuste_angulo_esq: {folga_ajuste_angulo_esq}, folga_ajuste_angulo_dir: {folga_ajuste_angulo_dir}")
-
+    return folgas_secoes
 
 def medida_dos_vidros(lcs:list, quant_vidros: list, folgas):
     folga_vep = float(3)
@@ -117,11 +122,8 @@ def medida_dos_vidros(lcs:list, quant_vidros: list, folgas):
 
     for i, linha_de_centro in enumerate(lcs):
         medida_com_vidro = linha_de_centro + folga_esq + folga_dir - folga_ajuste_angulo_esq - folga_ajuste_angulo_dir 
-        print(medida_com_vidro)
         medida_com_vidro -= folga_vep*(quant_vidros[i]-1)
-        print(medida_com_vidro)
         vidros_individuais = floor(medida_com_vidro/quant_vidros[i])
-        print(vidros_individuais)
         if quant_vidros[i] > 1:
             medida_ultimo_vidro = int(round((medida_com_vidro - (vidros_individuais*(quant_vidros[i]-1))), 0))
             for vidro in range(quant_vidros[i]-1):
@@ -132,9 +134,3 @@ def medida_dos_vidros(lcs:list, quant_vidros: list, folgas):
         vidros_totais.append(vidros_secao)
 
     return vidros_totais
-
-
-
-
-# SUGESTAO: PEGAR AS COORDENAS DEPOIS DO FILLET DE CIMA, CALCULAR AS LINHAS, DEPOIS APAGAR A LINHA INTEIRA E DESENHAR AS INDIVIDUAIS E DAR OFFSET DE 8 PRA BAIXO
-# DEPOIS, COM A MEDIDA DOS PERFIS E MATERIAIS, COMECAR A COLOCAR NO ECG COM SELENIUM
