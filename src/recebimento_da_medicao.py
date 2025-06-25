@@ -90,7 +90,7 @@ def pedir_prumos():
 
 def definir_juncoes(lcs, angs_in):
     '''
-    Retorna:
+    Retorna uma lista em que cada elemento representa uma secao e cada secao tem 2 elementos com o elemento 0 sendo o tipo de junao do lado esquerdo da secao e o elemento 1 sendo o tipo de juncao do lado direito da secao:
         0 - vidro-parede
         1 - passante
         2 - colante

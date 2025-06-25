@@ -8,7 +8,7 @@ from math import tan, radians, floor, sqrt
 
 acad, acad_ModelSpace = get_acad()
 
-def offset_vidros(handles_lcs):
+def offset_vidros(handles_lcs, vidros_sacada, posicao_dos_vidros):
     # offset_ext = 4
     # offset_int = 4
 
@@ -23,11 +23,10 @@ def offset_vidros(handles_lcs):
     #     handles['internos'].append(linha_int[0].Handle)
     # return handles
 
-    for linha in handles_lcs():
-        linha = acad.doc.HandleToObject("13F0")  # ou obtenha via loop
-
-        p1 = linha.StartPoint  # ponto inicial (x, y, z)
-        p2 = linha.EndPoint    # ponto final
+    for secao in handles_lcs():
+        secao = acad.doc.HandleToObject(secao)  
+        p1 = secao.StartPoint  # ponto inicial (x, y, z)
+        p2 = secao.EndPoint    # ponto final
 
         vetor_linha = (p2[0] - p1[0],p2[1] - p1[1], p2[2] - p1[2])
 
@@ -37,18 +36,23 @@ def offset_vidros(handles_lcs):
 
         vetor_unitario = normalizar(vetor_linha)
 
-        def ponto_ao_longo(ponto_inicial, vetor_unitario, distancia):
-            return (
-                ponto_inicial[0] + vetor_unitario[0]*distancia,
-                ponto_inicial[1] + vetor_unitario[1]*distancia,
-                ponto_inicial[2] + vetor_unitario[2]*distancia
-            )
-        #fazer formula pra ver onde cada vidro comeca e termina
-        inicio = ponto_ao_longo(p1, vetor_unitario, 20)
-        fim = ponto_ao_longo(p1, vetor_unitario, 80)  # 20 + 60
+        def ponto_na_secao(Inicio_secao, vetor_unitario, distancia):
+                return (
+                    Inicio_secao[0] + vetor_unitario[0]*distancia,
+                    Inicio_secao[1] + vetor_unitario[1]*distancia,
+                    Inicio_secao[2] + vetor_unitario[2]*distancia
+                )
+            
+        for vidro in vidros_sacada[secao]:
+            comeco_vidro = posicao_dos_vidros[vidro][0]
+            fim_vidro = posicao_dos_vidros[vidro][1]
+            inicio = ponto_na_secao(p1, vetor_unitario, comeco_vidro)
+            fim = ponto_na_secao(p1, vetor_unitario, fim_vidro)
 
+def pontos_dos_vidros():
+    
+    
     pass
-
 
 def fillet_vidros(handles):
     linhas_externas = deepcopy(handles['externos'])
@@ -66,33 +70,25 @@ def calcular_gaps_vidro_vidro(ang):
     gap_vidro = round((tan(radians(abs(ang/2))) * cat_adj), 2)
     return gap_vidro
 
-def medida_dos_vidros(gaps_lcs: list, lcs:list, quant_vidros: list, angs_in: list, juncoes: list):
+def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
     folga_parede = float(-12) 
-    folga_vep = float(3)
     folga_passante = float(2)
     folga_colante = float(-7)
     folga_vidro_vidro = float(-1) 
-    tipos_juncoes = deepcopy(juncoes)
+    juncoes_secoes = deepcopy(juncoes)
     folgas_juncoes = []
-    vidros_totais = []
 
-    for par in tipos_juncoes:
-        folgas_esq_dir = []
-        for index in range(0, 2):
-            if par[index] == 0:
-                folgas_esq_dir.append(folga_parede)
-            elif par[index] == 1:
-                folgas_esq_dir.append(folga_passante)
-            elif par[index] == 2:
-                folgas_esq_dir.append(folga_colante)
-            else:
-                folgas_esq_dir.append(folga_vidro_vidro)
-        folgas_juncoes.append(folgas_esq_dir)
+    for i in range(0, len(juncoes_secoes)):
+        if i == 0:
+            folgas_juncoes.append(folga_parede)
+        elif i == 1:
+            juncoes_secoes[i].append(folga_passante)
+        elif par[index] == 2:
+            juncoes_secoes[i].append(folga_colante)
+        else:
+            juncoes_secoes[i].append(folga_vidro_vidro)
 
-    for i, par in enumerate(tipos_juncoes):
-        folga_esq = folgas_juncoes[i][0]
-        folga_dir = folgas_juncoes[i][1]
-        folgas_ajuste_de_angulo = []
+    for i in range(0, len(juncoes_secoes)):
         for index in range(0, 2):
             if par[index] == 0 and index == 0:
                 folgas_ajuste_de_angulo.append(gaps_lcs[0]) 
@@ -107,9 +103,20 @@ def medida_dos_vidros(gaps_lcs: list, lcs:list, quant_vidros: list, angs_in: lis
 
         folga_ajuste_angulo_esq = folgas_ajuste_de_angulo[0]
         folga_ajuste_angulo_dir = folgas_ajuste_de_angulo[1]
-        print(f"Lcs: {lcs[i]}, folga_esq: {folga_esq}, folga_dir: {folga_dir}, folga_ajuste_angulo_esq: {folga_ajuste_angulo_esq}, folga_ajuste_angulo_dir: {folga_ajuste_angulo_dir}")
+        print(f"Secao: {i} folga_esq: {folga_esq}, folga_dir: {folga_dir}, folga_ajuste_angulo_esq: {folga_ajuste_angulo_esq}, folga_ajuste_angulo_dir: {folga_ajuste_angulo_dir}")
 
-        medida_com_vidro = lcs[i] + folga_esq + folga_dir - folga_ajuste_angulo_esq - folga_ajuste_angulo_dir 
+
+def medida_dos_vidros(lcs:list, quant_vidros: list, folgas):
+    folga_vep = float(3)
+    folga_esq = folgas[0]
+    folga_dir = folgas[1]
+    folga_ajuste_angulo_esq = folgas[2]
+    folga_ajuste_angulo_dir = folgas[3]
+    vidros_secao = []
+    vidros_totais = []
+
+    for i, linha_de_centro in enumerate(lcs):
+        medida_com_vidro = linha_de_centro + folga_esq + folga_dir - folga_ajuste_angulo_esq - folga_ajuste_angulo_dir 
         print(medida_com_vidro)
         medida_com_vidro -= folga_vep*(quant_vidros[i]-1)
         print(medida_com_vidro)
@@ -118,10 +125,12 @@ def medida_dos_vidros(gaps_lcs: list, lcs:list, quant_vidros: list, angs_in: lis
         if quant_vidros[i] > 1:
             medida_ultimo_vidro = int(round((medida_com_vidro - (vidros_individuais*(quant_vidros[i]-1))), 0))
             for vidro in range(quant_vidros[i]-1):
-                vidros_totais.append(vidros_individuais)
-            vidros_totais.append(medida_ultimo_vidro)
+                vidros_secao.append(vidros_individuais)
+            vidros_secao.append(medida_ultimo_vidro)
         else:
-            vidros_totais.append(vidros_individuais)
+            vidros_secao.append(vidros_individuais)
+        vidros_totais.append(vidros_secao)
+
     return vidros_totais
 
 
