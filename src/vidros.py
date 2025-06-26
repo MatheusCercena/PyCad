@@ -8,6 +8,7 @@ from copy import deepcopy
 from math import tan, radians, floor, sqrt
 
 acad, acad_ModelSpace = get_acad()
+acad2 = Autocad(create_if_not_exists=True)
 
 def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list):
     def normalizar(vetor):
@@ -42,11 +43,14 @@ def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: li
         print(f'Vetores unitario {vetores_unitarios}.')
 
         for index in range(0, len(vidros_sacada[i])):
-            comeco_vidro = posicao_dos_vidros[index][0]
-            fim_vidro = posicao_dos_vidros[index][1]
+            comeco_vidro = posicao_dos_vidros[i][index][0]
+            fim_vidro = posicao_dos_vidros[i][index][1]
+            print(f'ini_linha_de_centro {ini_linha_de_centro}')
+            print(f'vetores_unitarios {vetores_unitarios}')
+            print(f'comeco_vidro {comeco_vidro}')
             inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro)
             fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro)
-            acad.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
+            acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
 
 def fillet_vidros(handles):
     linhas_externas = deepcopy(handles['externos'])

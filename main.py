@@ -45,16 +45,16 @@ if __name__ == "__main__":
 
     folgas = definir_folgas_vidros(juncoes, gaps_lcs, angs_in)
     vidros = medida_dos_vidros(lcs, quant_vidros, folgas)
+    print(f'Vidros sacada = {vidros}')
     cont = 1
     for secao in vidros:
         for medida in secao:
             print(f'V{cont}: {medida}. ', end='')
             cont += 1
     pontos_vidros = pontos_dos_vidros(vidros, folgas)
+    print(f'Pontos vidros = {pontos_vidros}')
     handles_vidros = offset_vidros(handles_lcs, vidros, pontos_vidros)
     fillet_vidros(handles_vidros)
 
     handles_leitos = offset_leitos(handles_lcs)
     fillet_leitos(handles_leitos)
-
-# testar funcionamento em sacadas retas

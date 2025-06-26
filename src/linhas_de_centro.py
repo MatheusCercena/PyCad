@@ -121,13 +121,3 @@ def redesenhar_linhas_de_centro(lcs:list, angs_in: list, sec_princ: int):
 
 import time
 
-def tentar_setar_layer(linha, nome_layer, tentativas=3):
-    for i in range(tentativas):
-        try:
-            linha.Layer = nome_layer
-            return
-        except Exception as e:
-            if i < tentativas - 1:
-                time.sleep(0.3)  # Espera 300ms e tenta de novo
-            else:
-                raise e
