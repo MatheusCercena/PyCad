@@ -9,52 +9,43 @@ from math import tan, radians, floor, sqrt
 
 acad, acad_ModelSpace = get_acad()
 
-def offset_vidros(handles_lcs, vidros_sacada, posicao_dos_vidros):
-    # offset_ext = 4
-    # offset_int = 4
+def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list):
+    def normalizar(vetor):
+        vetor_unitario = sqrt(vetor[0]**2 + vetor[1]**2)
+        vetor_unitario_x = vetor[0]/vetor_unitario
+        vetor_unitario_y = vetor[1]/vetor_unitario
 
-    # handles = {'externos': [], 'internos': []}
-    # for linha in handles_lcs:
-    #     linha_ext = linha.Offset(offset_ext)#.Offset retorna uma tupla
-    #     linha_ext[0].Layer = 'Vidro Externo'
-    #     handles['externos'].append(linha_ext[0].Handle)
+        print(f'Vetor unitario X {vetor_unitario_x}.')
+        print(f'Vetor unitario Y {vetor_unitario_y}.')
+        
+        return (vetor_unitario_x, vetor_unitario_y)
 
-    #     linha_int = linha.Offset(-offset_int)
-    #     linha_int[0].Layer = 'Vidro Interno'
-    #     handles['internos'].append(linha_int[0].Handle)
-    # return handles
+    def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia):
+            return (
+                Inicio_secao[0] + vetor_unitario[0] * distancia,
+                Inicio_secao[1] + vetor_unitario[1] * distancia
+            )
 
-    for i, secao in enumerate(handles_lcs):
-        p1 = tuple(map(float, secao.StartPoint))
-        p2 = tuple(map(float, secao.EndPoint))
+    for i, linha_de_centro in enumerate(handles_lcs):
+        # ini_linha_de_centro = tuple(map(float, linha_de_centro.StartPoint))
+        # fim_linha_de_centro = tuple(map(float, linha_de_centro.EndPoint))
+       
+        ini_linha_de_centro = linha_de_centro.StartPoint  # ponto inicial (x, y, z)
+        fim_linha_de_centro = linha_de_centro.EndPoint    # ponto final
+        print(f'p1 {ini_linha_de_centro}')
+        print(f'p2 {fim_linha_de_centro}')
 
-        # p1 = secao.StartPoint  # ponto inicial (x, y, z)
-        # p2 = secao.EndPoint    # ponto final
+        vetor_linha = (fim_linha_de_centro[0] - ini_linha_de_centro[0], fim_linha_de_centro[1] - ini_linha_de_centro[1])
+        print(f'Vetor linha {vetor_linha}')
 
-        vetor_linha = (p2[0] - p1[0], p2[1] - p1[1])
+        vetores_unitarios = normalizar(vetor_linha)
+        print(f'Vetores unitario {vetores_unitarios}.')
 
-        def normalizar(vetor):
-            print(f'Vetor {vetor}')
-            mag = sqrt(vetor[0]**2 + vetor[1]**2)
-            print(f'mag {mag}')
-            return (vetor[0]/mag, vetor[1]/mag)
-
-        vetor_unitario = normalizar(vetor_linha)
-
-        def ponto_na_secao(Inicio_secao, vetor_unitario, distancia):
-                return (
-                    Inicio_secao[0] + vetor_unitario[0] * distancia,
-                    Inicio_secao[1] + vetor_unitario[1] * distancia
-                )
-            
         for index in range(0, len(vidros_sacada[i])):
             comeco_vidro = posicao_dos_vidros[index][0]
             fim_vidro = posicao_dos_vidros[index][1]
-            print(f'p1 {p1}')
-            print(f'Vetor uni {vetor_unitario}')
-            print(f'Comeco vidro {comeco_vidro}')
-            inicio = ponto_na_secao(p1, vetor_unitario, comeco_vidro)
-            fim = ponto_na_secao(p1, vetor_unitario, fim_vidro)
+            inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro)
+            fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro)
             acad.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
 
 def fillet_vidros(handles):
