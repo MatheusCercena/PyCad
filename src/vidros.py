@@ -2,6 +2,7 @@
 Desenha os vidros, através de offsets chamados via COM e fillets por lisp.
 """
 
+from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
 from copy import deepcopy
 from math import tan, radians, floor, sqrt
@@ -23,36 +24,38 @@ def offset_vidros(handles_lcs, vidros_sacada, posicao_dos_vidros):
     #     handles['internos'].append(linha_int[0].Handle)
     # return handles
 
-    for secao in handles_lcs():
-        secao = acad.doc.HandleToObject(secao)  
-        p1 = secao.StartPoint  # ponto inicial (x, y, z)
-        p2 = secao.EndPoint    # ponto final
+    for i, secao in enumerate(handles_lcs):
+        p1 = tuple(map(float, secao.StartPoint))
+        p2 = tuple(map(float, secao.EndPoint))
 
-        vetor_linha = (p2[0] - p1[0],p2[1] - p1[1], p2[2] - p1[2])
+        # p1 = secao.StartPoint  # ponto inicial (x, y, z)
+        # p2 = secao.EndPoint    # ponto final
+
+        vetor_linha = (p2[0] - p1[0], p2[1] - p1[1])
 
         def normalizar(vetor):
-            mag = sqrt(vetor[0]**2 + vetor[1]**2 + vetor[2]**2)
-            return (vetor[0]/mag, vetor[1]/mag, vetor[2]/mag)
+            print(f'Vetor {vetor}')
+            mag = sqrt(vetor[0]**2 + vetor[1]**2)
+            print(f'mag {mag}')
+            return (vetor[0]/mag, vetor[1]/mag)
 
         vetor_unitario = normalizar(vetor_linha)
 
         def ponto_na_secao(Inicio_secao, vetor_unitario, distancia):
                 return (
-                    Inicio_secao[0] + vetor_unitario[0]*distancia,
-                    Inicio_secao[1] + vetor_unitario[1]*distancia,
-                    Inicio_secao[2] + vetor_unitario[2]*distancia
+                    Inicio_secao[0] + vetor_unitario[0] * distancia,
+                    Inicio_secao[1] + vetor_unitario[1] * distancia
                 )
             
-        for vidro in vidros_sacada[secao]:
-            comeco_vidro = posicao_dos_vidros[vidro][0]
-            fim_vidro = posicao_dos_vidros[vidro][1]
+        for index in range(0, len(vidros_sacada[i])):
+            comeco_vidro = posicao_dos_vidros[index][0]
+            fim_vidro = posicao_dos_vidros[index][1]
+            print(f'p1 {p1}')
+            print(f'Vetor uni {vetor_unitario}')
+            print(f'Comeco vidro {comeco_vidro}')
             inicio = ponto_na_secao(p1, vetor_unitario, comeco_vidro)
             fim = ponto_na_secao(p1, vetor_unitario, fim_vidro)
-
-def pontos_dos_vidros():
-    #usar folga dos vidros para calcular
-    
-    pass
+            acad.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
 
 def fillet_vidros(handles):
     linhas_externas = deepcopy(handles['externos'])
@@ -111,16 +114,37 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
 
     return folgas_secoes
 
-def medida_dos_vidros(lcs:list, quant_vidros: list, folgas):
+def pontos_dos_vidros(vidros, folgas):
     folga_vep = float(3)
-    folga_esq = folgas[0]
-    folga_dir = folgas[1]
-    folga_ajuste_angulo_esq = folgas[2]
-    folga_ajuste_angulo_dir = folgas[3]
-    vidros_secao = []
+    todos_pontos = []
+    for i, linha_de_centro in enumerate(vidros):
+        pos_acumulada = 0
+        pontos_linha_de_centro = []
+        for index, vidro in enumerate(linha_de_centro):
+            pontos = []
+            if index == 0:
+                pos_inicial = folgas[i][0]*-1 + folgas[i][2]*-1
+            if index > 0:
+                pos_inicial = pos_acumulada
+            pos_final = pos_inicial + vidro
+            pos_acumulada = pos_final + folga_vep                
+            pontos.append(pos_inicial)
+            pontos.append(pos_final)
+            pontos_linha_de_centro.append(pontos)
+        todos_pontos.append(pontos_linha_de_centro)
+    return todos_pontos
+
+def medida_dos_vidros(lcs:list, quant_vidros: list, folgas: list):
+    folga_vep = float(3)
     vidros_totais = []
 
     for i, linha_de_centro in enumerate(lcs):
+        folga_esq = folgas[i][0]
+        folga_dir = folgas[i][1]
+        folga_ajuste_angulo_esq = folgas[i][2]
+        folga_ajuste_angulo_dir = folgas[i][3]
+        vidros_secao = []
+
         medida_com_vidro = linha_de_centro + folga_esq + folga_dir - folga_ajuste_angulo_esq - folga_ajuste_angulo_dir 
         medida_com_vidro -= folga_vep*(quant_vidros[i]-1)
         vidros_individuais = floor(medida_com_vidro/quant_vidros[i])

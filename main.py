@@ -3,7 +3,7 @@ from src.recebimento_da_medicao import pedir_linhas_de_centro, pedir_quant_vidro
 from src.linhas_de_centro import definir_linhas_de_centro, redesenhar_linhas_de_centro, ordem_lcs
 from src.perfis_U import offset_perfis_U, fillet_perfis_U
 from src.leitos import offset_leitos, fillet_leitos
-from src.vidros import offset_vidros, fillet_vidros, medida_dos_vidros
+from src.vidros import offset_vidros, fillet_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros
 from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
 from src.comandos import carregar_comandos
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
@@ -43,10 +43,20 @@ if __name__ == "__main__":
         info_cant_dir = infos_cant_ajuste(gap_cant_dir)
         print(f'Info cant dir: {necessidade_cant_dir}')
 
-    vidros = medida_dos_vidros(gaps_lcs, lcs, quant_vidros, angs_in, juncoes)
-    for posicao, medida in enumerate(vidros):
-        print(f'V{posicao+1}: {medida}. ', end='')
-    handles_vidros = offset_vidros(handles_lcs)
+    print(juncoes)
+    print(gaps_lcs)
+    folgas = definir_folgas_vidros(juncoes, gaps_lcs, angs_in)
+    print(folgas)
+    vidros = medida_dos_vidros(lcs, quant_vidros, folgas)
+    print(vidros)
+    cont = 1
+    for secao in vidros:
+        for medida in secao:
+            print(f'V{cont}: {medida}. ', end='')
+            cont += 1
+    pontos_vidros = pontos_dos_vidros(vidros, folgas)
+    print(pontos_vidros)
+    handles_vidros = offset_vidros(handles_lcs, vidros, pontos_vidros)
     fillet_vidros(handles_vidros)
 
     handles_leitos = offset_leitos(handles_lcs)
