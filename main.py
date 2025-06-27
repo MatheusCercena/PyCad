@@ -8,7 +8,6 @@ from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
 from src.comandos import carregar_comandos
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
 
-
 if __name__ == "__main__":
     lcs = pedir_linhas_de_centro()
     quant_vidros = pedir_quant_vidros(lcs)
@@ -53,8 +52,8 @@ if __name__ == "__main__":
             cont += 1
     pontos_vidros = pontos_dos_vidros(vidros, folgas)
     print(f'Pontos vidros = {pontos_vidros}')
-    handles_vidros = offset_vidros(handles_lcs, vidros, pontos_vidros)
-    fillet_vidros(handles_vidros)
+    handles_vidros = offset_vidros(handles_lcs, vidros, pontos_vidros, 8)
+    # fillet_vidros(handles_vidros)
 
-    handles_leitos = offset_leitos(handles_lcs)
-    fillet_leitos(handles_leitos)
+    # handles_leitos = offset_leitos(handles_lcs)
+    # fillet_leitos(handles_leitos)

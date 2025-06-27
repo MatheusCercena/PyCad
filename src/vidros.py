@@ -10,7 +10,7 @@ from math import tan, radians, floor, sqrt
 acad, acad_ModelSpace = get_acad()
 acad2 = Autocad(create_if_not_exists=True)
 
-def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list):
+def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list, espessura_vidro):
     def normalizar(vetor):
         vetor_unitario = sqrt(vetor[0]**2 + vetor[1]**2)
         vetor_unitario_x = vetor[0]/vetor_unitario
@@ -28,11 +28,9 @@ def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: li
             )
 
     for i, linha_de_centro in enumerate(handles_lcs):
-        # ini_linha_de_centro = tuple(map(float, linha_de_centro.StartPoint))
-        # fim_linha_de_centro = tuple(map(float, linha_de_centro.EndPoint))
        
-        ini_linha_de_centro = linha_de_centro.StartPoint  # ponto inicial (x, y, z)
-        fim_linha_de_centro = linha_de_centro.EndPoint    # ponto final
+        ini_linha_de_centro = linha_de_centro.StartPoint
+        fim_linha_de_centro = linha_de_centro.EndPoint
         print(f'p1 {ini_linha_de_centro}')
         print(f'p2 {fim_linha_de_centro}')
 
@@ -51,6 +49,20 @@ def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: li
             inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro)
             fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro)
             acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
+        
+    for linha in acad_ModelSpace:
+        if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
+            ext = linha.Offset(espessura_vidro/2)[0]
+            ext.Layer = 'Vidro Externo'
+            int = linha.Offset(-1*espessura_vidro/2)[0]
+            ext_ini = ext.StartPoint
+            int_ini = int.StartPoint
+            lat_esq = acad2.model.AddLine(APoint(ext_ini[0], ext_ini[1]), APoint(int_ini[0], int_ini[1]))
+            ext_fim = ext.EndPoint
+            int_fim = int.EndPoint
+            lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
+            int.Layer = lat_esq.Layer = lat_dir.Layer = 'Vidro Interno'
+            linha.Delete()
 
 def fillet_vidros(handles):
     linhas_externas = deepcopy(handles['externos'])
