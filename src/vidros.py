@@ -26,9 +26,9 @@ def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: li
                 Inicio_secao[0] + vetor_unitario[0] * distancia,
                 Inicio_secao[1] + vetor_unitario[1] * distancia
             )
-
+    print(f'Handles lcs: handles_lcs')
     for i, linha_de_centro in enumerate(handles_lcs):
-       
+        
         ini_linha_de_centro = linha_de_centro.StartPoint
         fim_linha_de_centro = linha_de_centro.EndPoint
         print(f'p1 {ini_linha_de_centro}')
@@ -130,7 +130,7 @@ def pontos_dos_vidros(vidros, folgas):
         for index, vidro in enumerate(linha_de_centro):
             pontos = []
             if index == 0:
-                pos_inicial = folgas[i][0]*-1 + folgas[i][2]*-1
+                pos_inicial = folgas[i][0]*-1 + folgas[i][2]*-1 #aqui pode ser necessario nao multiplicar por -1 um dos fatores
             if index > 0:
                 pos_inicial = pos_acumulada
             pos_final = pos_inicial + vidro
