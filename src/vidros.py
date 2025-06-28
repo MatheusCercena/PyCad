@@ -94,7 +94,7 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
     folga_vidro_vidro = float(-1) 
     juncoes_secoes = deepcopy(juncoes)
     folgas_secoes = []
-
+    print(f'Juncoes secoes = {juncoes_secoes}')
     for index, secao in enumerate(juncoes_secoes):
         folgas_secao = []
         for lado in range(0, 2):
@@ -107,18 +107,19 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
             else:
                 folgas_secao.append(folga_vidro_vidro)
         for lado in range(0, 2):
-            if index == 0 and lado == 0:
+            if secao[lado] == 0 and lado == 0: #parede esq
                 folgas_secao.append(gaps_lcs[0]) 
-            elif index == 0 and lado == 1:
+            elif secao[lado] == 0 and lado == 1: #parede dir
                 folgas_secao.append(gaps_lcs[1]) 
-            elif index == 1 or index == 2:
+            elif secao[lado] == 1 or secao[lado] == 2: 
                 folgas_secao.append(0)
-            elif index == 3 and lado == 0:
+            elif secao[lado] == 3 and lado == 0: 
+                print(f'Angs in -1{angs_in[index-1]}')
                 folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[index-1]))
-            elif index == 3 and lado == 1:
+            elif secao[lado] == 3 and lado == 1:
                 folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[index]))
         folgas_secoes.append(folgas_secao)
-
+    print(f'Folgas secoes = {folgas_secoes}')
     return folgas_secoes
 
 def pontos_dos_vidros(vidros, folgas):
@@ -130,7 +131,7 @@ def pontos_dos_vidros(vidros, folgas):
         for index, vidro in enumerate(linha_de_centro):
             pontos = []
             if index == 0:
-                pos_inicial = folgas[i][0]*-1 + folgas[i][2]*-1 #aqui pode ser necessario nao multiplicar por -1 um dos fatores
+                pos_inicial = folgas[i][0]*-1 + folgas[i][2] #aqui pode ser necessario nao multiplicar por -1 um dos fatores
             if index > 0:
                 pos_inicial = pos_acumulada
             pos_final = pos_inicial + vidro

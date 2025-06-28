@@ -118,6 +118,3 @@ def redesenhar_linhas_de_centro(lcs:list, angs_in: list, sec_princ: int):
     for index, value in enumerate(ordem_desenho):
         lista[value] = novas_lcs[index]
     return lista_de_LCs, lista
-
-import time
-
