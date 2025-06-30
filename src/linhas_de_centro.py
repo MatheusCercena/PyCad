@@ -60,6 +60,7 @@ def redesenhar_linhas_de_centro(lcs:list, angs_in: list, sec_princ: int):
     angs_in: angulos internos entre cada linha de centro. Note que angs_in[0] equivale ao angulo entre lcs[0] e lcs[1]\n
     return: retorna as posições corrigidas para cada linha de centro de lcs, no formato [[xi1, yi1, xf1, yf1], [xi2, yi2, xf2, yf2], [xin, yin, xfn, yfn]] e a lista de handles das linhas de centro.
     '''
+    
     lista_de_LCs = lcs.copy() 
     #desenha a seção principal a partir de (0, 0)
     linha = acad.model.AddLine(APoint(0, 0), APoint(lista_de_LCs[sec_princ], 0))

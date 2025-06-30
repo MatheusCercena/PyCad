@@ -46,17 +46,18 @@ def def_eq_reta(secao):
 
     return Eq(y, valor_m*x + valor_b)
    
-def verificar_se_intercepta(secao, interseccao):
+def verificar_se_intercepta(secao: list, interseccao: dict):
     '''
     secao = seção que se quer saber se intercepta a linha guia
     interseccao = dicionario com chaves x e y
     A funcao verifica se os eixos x e y da secao interceptam a guia e retorna true ou false
     '''
-    intervalo_x = sorted([secao[0], secao[2]])
-    intervalo_y = sorted([secao[1], secao[3]])
     
-    condicao1 = intervalo_x[0] <= interseccao[x] <= intervalo_x[1]
-    condicao2 = intervalo_y[0] <= interseccao[y] <= intervalo_y[1]
+    intervalo_x = sorted([round(secao[0], 30), round(secao[2], 30)])
+    intervalo_y = sorted([round(secao[1], 30), round(secao[3], 30)])
+    
+    condicao1 = intervalo_x[0] <= round(interseccao[x], 30) <= intervalo_x[1]
+    condicao2 = intervalo_y[0] <= round(interseccao[y], 30) <= intervalo_y[1]
 
     if condicao1 and condicao2 == True: 
         return True
@@ -72,8 +73,14 @@ def descobrir_secao_principal(pos_lcs):
         return 0
     else:
         coord_c = definir_linha_perpendicular(pos_lcs)
+        print(f'pos_lcs = {pos_lcs}')
         for secao in range(0, len(pos_lcs)):
+            
+            print(f'eq reta 1: {def_eq_reta(pos_lcs[secao])}')
+            print(f'eq reta 2: {def_eq_reta(coord_c)}')
             interseccao = solve((def_eq_reta(pos_lcs[secao]), def_eq_reta(coord_c)), (x, y))
+            print(f' interseccao {interseccao}')
+            print(f'Pos Lcs secao {pos_lcs[secao]}')
             # verificar se intercepta / solve ou def eq reta esta dando problema, verificar
             verificacao = verificar_se_intercepta(pos_lcs[secao], interseccao)
             if verificacao == True: 

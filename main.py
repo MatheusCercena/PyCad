@@ -57,3 +57,5 @@ if __name__ == "__main__":
 
     # handles_leitos = offset_leitos(handles_lcs)
     # fillet_leitos(handles_leitos)
+
+#fazer-funcao para converter float pra arredondar float pra 30 casas decimais
