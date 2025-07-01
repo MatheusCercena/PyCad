@@ -10,49 +10,46 @@ from math import tan, radians, floor, sqrt
 acad, acad_ModelSpace = get_acad()
 acad2 = Autocad(create_if_not_exists=True)
 
-def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list, espessura_vidro):
-    def normalizar(vetor):
-        vetor_unitario = sqrt(vetor[0]**2 + vetor[1]**2)
-        vetor_unitario_x = vetor[0]/vetor_unitario
-        vetor_unitario_y = vetor[1]/vetor_unitario
+def normalizar(vetor):
+    vetor_unitario = sqrt(vetor[0]**2 + vetor[1]**2)
+    vetor_unitario_x = vetor[0]/vetor_unitario
+    vetor_unitario_y = vetor[1]/vetor_unitario
+    
+    return (vetor_unitario_x, vetor_unitario_y)
 
-        print(f'Vetor unitario X {vetor_unitario_x}.')
-        print(f'Vetor unitario Y {vetor_unitario_y}.')
-        
-        return (vetor_unitario_x, vetor_unitario_y)
+def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia):
+        return (
+            Inicio_secao[0] + vetor_unitario[0] * distancia,
+            Inicio_secao[1] + vetor_unitario[1] * distancia
+        )
 
-    def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia):
-            return (
-                Inicio_secao[0] + vetor_unitario[0] * distancia,
-                Inicio_secao[1] + vetor_unitario[1] * distancia
-            )
-    print(f'Handles lcs: handles_lcs')
+def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list):
     for i, linha_de_centro in enumerate(handles_lcs):
         
         ini_linha_de_centro = linha_de_centro.StartPoint
         fim_linha_de_centro = linha_de_centro.EndPoint
-        print(f'p1 {ini_linha_de_centro}')
-        print(f'p2 {fim_linha_de_centro}')
 
         vetor_linha = (fim_linha_de_centro[0] - ini_linha_de_centro[0], fim_linha_de_centro[1] - ini_linha_de_centro[1])
-        print(f'Vetor linha {vetor_linha}')
-
         vetores_unitarios = normalizar(vetor_linha)
-        print(f'Vetores unitario {vetores_unitarios}.')
 
         for index in range(0, len(vidros_sacada[i])):
             comeco_vidro = posicao_dos_vidros[i][index][0]
             fim_vidro = posicao_dos_vidros[i][index][1]
-            print(f'ini_linha_de_centro {ini_linha_de_centro}')
-            print(f'vetores_unitarios {vetores_unitarios}')
-            print(f'comeco_vidro {comeco_vidro}')
             inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro)
             fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro)
             acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
-        
+
+def remover_guias():
+    for linha in acad_ModelSpace:
+        if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
+            linha.Delete()
+
+def offset_vidros(espessura_vidro):
+    handles_vidros = []
     for linha in acad_ModelSpace:
         if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
             ext = linha.Offset(espessura_vidro/2)[0]
+            handles_vidros.append(ext.Handle)
             ext.Layer = 'Vidro Externo'
             int = linha.Offset(-1*espessura_vidro/2)[0]
             ext_ini = ext.StartPoint
@@ -62,15 +59,7 @@ def offset_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: li
             int_fim = int.EndPoint
             lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
             int.Layer = lat_esq.Layer = lat_dir.Layer = 'Vidro Interno'
-            linha.Delete()
-
-def fillet_vidros(handles):
-    linhas_externas = deepcopy(handles['externos'])
-    linhas_internas = deepcopy(handles['internos'])
-
-    for index in range(0, len(linhas_externas)-1):
-        acad.SendCommand(f'(c:custom_fillet "{linhas_externas[index]}" "{linhas_externas[index+1]}")\n')
-        acad.SendCommand(f'(c:custom_fillet "{linhas_internas[index]}" "{linhas_internas[index+1]}")\n')
+    return handles_vidros
 
 def calcular_gaps_vidro_vidro(ang):
     '''
@@ -94,7 +83,6 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
     folga_vidro_vidro = float(-1) 
     juncoes_secoes = deepcopy(juncoes)
     folgas_secoes = []
-    print(f'Juncoes secoes = {juncoes_secoes}')
     for index, secao in enumerate(juncoes_secoes):
         folgas_secao = []
         for lado in range(0, 2):
@@ -114,12 +102,10 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
             elif secao[lado] == 1 or secao[lado] == 2: 
                 folgas_secao.append(0)
             elif secao[lado] == 3 and lado == 0: 
-                print(f'Angs in -1{angs_in[index-1]}')
                 folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[index-1]))
             elif secao[lado] == 3 and lado == 1:
                 folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[index]))
         folgas_secoes.append(folgas_secao)
-    print(f'Folgas secoes = {folgas_secoes}')
     return folgas_secoes
 
 def pontos_dos_vidros(vidros, folgas):
@@ -166,3 +152,10 @@ def medida_dos_vidros(lcs:list, quant_vidros: list, folgas: list):
         vidros_totais.append(vidros_secao)
 
     return vidros_totais
+
+def printar_vidros(vidros):
+    cont = 1
+    for secao in vidros:
+        for medida in secao:
+            print(f'V{cont}: {medida}. ', end='')
+            cont += 1

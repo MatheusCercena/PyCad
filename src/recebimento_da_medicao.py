@@ -109,7 +109,6 @@ def definir_juncoes(lcs, angs_in):
             elif lado == 0 and juncoes[-1][1] == 3: #se ultimo é vidro-vidro, este é vidro-vidro
                 esq_dir.append(3)
             elif len(angs_in) != 0 and index < len(angs_in):
-                print('aqui')
                 if 70 < (abs(angs_in[index])) < 110: #passante-colante
                     res = input(f'A juncão entre os vidros do lado {index} e {index+1} será passante e colante, qual deseja que seja o passante? Digite "e" para o vidro do lado {index} ou "d" para o vidro do lado {index + 1}: ')
                     while res not in ['e', 'd']:
