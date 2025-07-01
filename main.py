@@ -7,8 +7,10 @@ from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, 
 from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
 from src.comandos import carregar_comandos
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
+from src.limpar import limpar_tudo
 
 if __name__ == "__main__":
+    limpar_tudo()
     lcs = pedir_linhas_de_centro()
     quant_vidros = pedir_quant_vidros(lcs)
     angs_in = pedir_angSecoes(lcs)
@@ -47,8 +49,12 @@ if __name__ == "__main__":
     pontos_vidros = pontos_dos_vidros(vidros, folgas_vidros)
     desenhar_guias_vidros(handles_lcs, vidros, pontos_vidros)
     handles_vidros = offset_vidros(8)
+    print(folgas_vidros)
     remover_guias()
 
-    desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros)
-    handles_leitos = offset_leitos(vidros, pontos_vidros, angs_in)
+    folga_leitos = folgas_leitos(vidros, folgas_vidros, angs_in, gaps_lcs)
+    print(f'Folga leitos: {folga_leitos}')
+    print(f'VIdros {vidros}')
+    desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros, folga_leitos)
+
     # remover_guias()

@@ -6,3 +6,4 @@ def get_acad():
         return acad, acad.ModelSpace
     except Exception as erro:
         raise RuntimeError("Erro ao conectar com o AutoCAD") from erro
+

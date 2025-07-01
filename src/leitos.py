@@ -3,8 +3,7 @@ Desenha os leitos, através de offsets chamados via COM e fillets por lisp.
 """
 from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
-from copy import deepcopy
-from math import sqrt
+from math import sqrt, tan, radians
 
 acad2 = Autocad(create_if_not_exists=True)
 acad, acad_ModelSpace = get_acad()
@@ -22,7 +21,7 @@ def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia):
             Inicio_secao[1] + vetor_unitario[1] * distancia
         )
 
-def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list):
+def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list, folgas_leitos: list):
     for i, linha_de_centro in enumerate(handles_lcs):
         
         ini_linha_de_centro = linha_de_centro.StartPoint
@@ -34,66 +33,87 @@ def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
         for index in range(0, len(vidros_sacada[i])):
             comeco_vidro = posicao_dos_vidros[i][index][0]
             fim_vidro = posicao_dos_vidros[i][index][1]
-            inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro + 1.5)
-            fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro - 1.5)
+            inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro + folgas_leitos[i][index][1])
+            fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro - folgas_leitos[i][index][1])
             acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
 
-# def definir_leitos():
-#     folgas_lados = []
-#     for secao in folgas_vidros:
-#         folgas_leitos_secao = []
-#         for index, vidro in enumerate(vidros[secao]):
-#             folgas = []
-#             for lado in range(2):
-#                 if lado == 0:
+def calcular_gaps_leito(ang):
+    '''
+    calcula o gap entre os leitos e a linha de centro quando é juncão do tipo vidro-vidro.
+    '''
+    cat_adj = 14
+    gap_leito = round((tan(radians(abs(ang/2))) * cat_adj), 2)
+    return gap_leito
 
-def offset_leitos(vidros, folgas_vidros, angs_in):
-    handles_leitos = {'externos': '', 'internos': ''}
-    folgas_lados = []
-    for secao in folgas_vidros:
+def folgas_leitos(vidros, folgas_vidros, angs_in, gaps_lcs):
+    '''
+    Calcula as folgas dos leitos para cada vidro em cada seção da sacada.
+    
+    vidros: lista de listas, cada sublista representa os vidros de uma seção
+    folgas_vidros: mesma estrutura que vidros, mas com folgas esquerda/direita
+    angs_in: lista com ângulos de entrada das seções
+    gaps_lcs: lista com valores de gap (folga) por seção e lado
+    '''
+    folgas_leitos_sacada = []
+    for secao in range(len(vidros)):
         folgas_leitos_secao = []
-        for index, vidro in enumerate(vidros[secao]):
-            folgas = []
+        for index in range(len(vidros[secao])):
+            folgas_leitos_vidro = []
             for lado in range(2):
                 if lado == 0:
                     if index == 0:
-                        if folgas_vidros[secao][0] in (0, 12, -12, 7):
-                            folgas = [1.5]
-                            folgas_leitos_secao.append(folgas)
-                        if folgas_vidros[secao][0] == 2:
-                            folgas = []
-                            #folgas = logica_para_passante_colante()
-                            folgas_leitos_secao.append(folgas)
-                        if folgas_vidros[secao][0] == -7:
-                            folgas = []
-                            #folgas = logica_para_passante_colante()
-                            folgas_leitos_secao.append(folgas)
-                        if folgas_vidros[secao][0] == -1:
-                            folgas = []
-                            #folgas = logica_para_passante_colante()
-                            folgas_leitos_secao.append(folgas)
+                        if folgas_vidros[secao][index][0] == 2:
+                            folga_esq = calcular_gaps_leito(angs_in[secao-1]) - 1
+                        elif folgas_vidros[secao][index][0] == -7:
+                            folga_esq = calcular_gaps_leito(angs_in[secao-1])
+                        elif folgas_vidros[secao][index][0] == 1:
+                            folga_esq = gaps_lcs[secao][0]
+                            if angs_in[secao-1] < 20:
+                                folga_esq += 1.5
+                        else:
+                            folga_esq = 1.5
                     else:
-                        pass
-                        #logica_para_curvas()
+                        folga_esq = 1.5
+                    folgas_leitos_vidro.append(folga_esq)
                 if lado == 1:
+                    if folgas_vidros[secao][index][1] == 2:
+                        folga_dir = calcular_gaps_leito(angs_in[secao]) - 1
+                    elif folgas_vidros[secao][index][1] == -7:
+                        folga_dir = calcular_gaps_leito(angs_in[secao])
+                    elif folgas_vidros[secao][index][1] == 1:
+                        folga_dir = gaps_lcs[secao][1]
+                        if angs_in[secao-1] < 20:
+                            folga_dir += 1.5
+                    else:
+                        folga_dir = 1.5
+                    folgas_leitos_vidro.append(folga_dir)
+            folgas_leitos_secao.append(folgas_leitos_vidro)
+        folgas_leitos_sacada.append(folgas_leitos_secao)
+    return folgas_leitos_sacada
 
-                
-                 
-    # for linha in acad_ModelSpace:
-    #     if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
-    #         ext = linha.Offset(14)
-    #         handles_leitos['externos'].append(ext.Handle)
-    #         ext.Layer = 'Leito Externo'
-    #         int = linha.Offset(-14)
-    #         handles_leitos['internos'].append(int.Handle)
-    #         ext.Layer = 'Leito Interno'
+# [
+# [[12.0, 337.0], [340.0, 665.0], [668.0, 993.0]], 
+# [[-2.0, 395.0], [398.0, 795.0], [798.0, 1195.0], [1198.0, 1595.0], [1598.0, 1997.0]], 
+# [[2.66, 396.66], [399.66, 793.66], [796.66, 1190.66], [1193.66, 1587.66], [1590.66, 1987.66]]
+# ]
 
-    #     # if 
-    #         ext_ini = ext.StartPoint
-    #         int_ini = int.StartPoint
-    #         lat_esq = acad2.model.AddLine(APoint(ext_ini[0], ext_ini[1]), APoint(int_ini[0], int_ini[1]))
-    #         ext_fim = ext.EndPoint
-    #         int_fim = int.EndPoint
-    #         lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
-    #         int.Layer = lat_esq.Layer = lat_dir.Layer = 'Leito Interno'
-    return handles_leitos
+# def desenhar_leitos(folgas_leito, vidros, folgas_vidros, angs_in, gaps_lcs):
+#     for linha in acad_ModelSpace:
+#         if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
+#             ext = linha.Offset(14)
+#             handles_leitos['externos'].append(ext.Handle)
+#             ext.Layer = 'Leito Externo'
+#             int = linha.Offset(-14)
+#             handles_leitos['internos'].append(int.Handle)
+#             ext.Layer = 'Leito Interno'
+
+#         # if 
+#             ext_ini = ext.StartPoint
+#             int_ini = int.StartPoint
+#             lat_esq = acad2.model.AddLine(APoint(ext_ini[0], ext_ini[1]), APoint(int_ini[0], int_ini[1]))
+#             ext_fim = ext.EndPoint
+#             int_fim = int.EndPoint
+#             lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
+#             int.Layer = lat_esq.Layer = lat_dir.Layer = 'Leito Interno'
+#     return handles_leitos
+
