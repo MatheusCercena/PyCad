@@ -33,7 +33,7 @@ def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
         for index in range(0, len(vidros_sacada[i])):
             comeco_vidro = posicao_dos_vidros[i][index][0]
             fim_vidro = posicao_dos_vidros[i][index][1]
-            inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro + folgas_leitos[i][index][1])
+            inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro + folgas_leitos[i][index][0])
             fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro - folgas_leitos[i][index][1])
             acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
 
@@ -45,7 +45,7 @@ def calcular_gaps_leito(ang):
     gap_leito = round((tan(radians(abs(ang/2))) * cat_adj), 2)
     return gap_leito
 
-def folgas_leitos(vidros, folgas_vidros, angs_in, gaps_lcs):
+def folgas_leitos(vidros, folgas_vidros, angs_in):
     '''
     Calcula as folgas dos leitos para cada vidro em cada seção da sacada.
     
@@ -62,40 +62,64 @@ def folgas_leitos(vidros, folgas_vidros, angs_in, gaps_lcs):
             for lado in range(2):
                 if lado == 0:
                     if index == 0:
-                        if folgas_vidros[secao][index][0] == 2:
-                            folga_esq = calcular_gaps_leito(angs_in[secao-1]) - 1
-                        elif folgas_vidros[secao][index][0] == -7:
-                            folga_esq = calcular_gaps_leito(angs_in[secao-1])
-                        elif folgas_vidros[secao][index][0] == 1:
-                            folga_esq = gaps_lcs[secao][0]
-                            if angs_in[secao-1] < 20:
-                                folga_esq += 1.5
+                        if folgas_vidros[secao][0] == 2:
+                            folga_esq = calcular_gaps_leito(angs_in[secao-1]) + 3 
+                            print(f'Lado {0} Index {index} folga {folga_esq}')
+                            print('entrei no 1 - 1')
+                        elif folgas_vidros[secao][0] == -7:
+                            folga_esq = calcular_gaps_leito(angs_in[secao-1]) - 7
+                            print(f'Lado {0} Index {index} folga {folga_esq}')
+                            print('entrei no 1 - 2')
+                        elif folgas_vidros[secao][0] == -1:
+                            print(abs(angs_in[secao-1])/2)
+                            if abs(angs_in[secao-1])/2 < 20:
+                                folga_esq = 1.5
+                            else: 
+                                folga_esq = 0
+                            print(f'Lado {0} Index {index} folga {folga_esq}')
+                            print('entrei no 1 - 3')
                         else:
                             folga_esq = 1.5
+                            print(f'Lado {0} Index {index} folga {folga_esq}')
+                            print('entrei no 1 - 4')
                     else:
                         folga_esq = 1.5
+                        print(f'Lado {0} Index {index} folga {folga_esq}')
+                        print('entrei no 1 - 5')
                     folgas_leitos_vidro.append(folga_esq)
+                    print(f'Folga leitos vidro s{secao} {folgas_leitos_vidro}')
                 if lado == 1:
-                    if folgas_vidros[secao][index][1] == 2:
-                        folga_dir = calcular_gaps_leito(angs_in[secao]) - 1
-                    elif folgas_vidros[secao][index][1] == -7:
-                        folga_dir = calcular_gaps_leito(angs_in[secao])
-                    elif folgas_vidros[secao][index][1] == 1:
-                        folga_dir = gaps_lcs[secao][1]
-                        if angs_in[secao-1] < 20:
-                            folga_dir += 1.5
+                    if index+1 == len(vidros[secao]):                            
+                        if folgas_vidros[secao][1] == 2:
+                            folga_dir = calcular_gaps_leito(angs_in[secao]) + 3
+                            print(f'Lado {1} Index {index} folga {folga_dir}')
+                            print('entrei no 2 - 1')
+                        elif folgas_vidros[secao][1] == -7:
+                            folga_dir = calcular_gaps_leito(angs_in[secao]) - 7
+                            print(f'Lado {1} Index {index} folga {folga_dir}')
+                            print('entrei no 2 - 2')
+                        elif folgas_vidros[secao][1] == -1:
+                            print(abs(angs_in[secao-1])/2)
+                            if abs(angs_in[secao-1])/2 < 20:
+                                folga_dir = 1.5
+                            else: 
+                                folga_dir = 0
+                            print(f'Lado {1} Index {index} folga {folga_dir}')
+                            print('entrei no 2 - 3')
+                        else:
+                            folga_dir = 1.5
+                            print(f'Lado {1} Index {index} folga {folga_dir}')
+                            print('entrei no 2 - 4')
                     else:
                         folga_dir = 1.5
+                        print(f'Lado {1} Index {index} folga {folga_dir}')
+                        print('entrei no 2 - 5')
+
                     folgas_leitos_vidro.append(folga_dir)
+                    print(f'Folga leitos vidro s{secao} {folgas_leitos_vidro}')
             folgas_leitos_secao.append(folgas_leitos_vidro)
         folgas_leitos_sacada.append(folgas_leitos_secao)
     return folgas_leitos_sacada
-
-# [
-# [[12.0, 337.0], [340.0, 665.0], [668.0, 993.0]], 
-# [[-2.0, 395.0], [398.0, 795.0], [798.0, 1195.0], [1198.0, 1595.0], [1598.0, 1997.0]], 
-# [[2.66, 396.66], [399.66, 793.66], [796.66, 1190.66], [1193.66, 1587.66], [1590.66, 1987.66]]
-# ]
 
 # def desenhar_leitos(folgas_leito, vidros, folgas_vidros, angs_in, gaps_lcs):
 #     for linha in acad_ModelSpace:

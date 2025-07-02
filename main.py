@@ -45,6 +45,7 @@ if __name__ == "__main__":
         print(f'Info cant dir: {info_cant_dir}')
 
     folgas_vidros = definir_folgas_vidros(juncoes, gaps_lcs, angs_in)
+
     vidros = medida_dos_vidros(lcs, quant_vidros, folgas_vidros)
     pontos_vidros = pontos_dos_vidros(vidros, folgas_vidros)
     desenhar_guias_vidros(handles_lcs, vidros, pontos_vidros)
@@ -52,9 +53,9 @@ if __name__ == "__main__":
     print(folgas_vidros)
     remover_guias()
 
-    folga_leitos = folgas_leitos(vidros, folgas_vidros, angs_in, gaps_lcs)
+    folga_leitos = folgas_leitos(vidros, folgas_vidros, angs_in)
     print(f'Folga leitos: {folga_leitos}')
-    print(f'VIdros {vidros}')
+    print(f'Vidros {vidros}')
     desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros, folga_leitos)
 
     # remover_guias()
