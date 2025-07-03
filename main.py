@@ -1,5 +1,5 @@
 from src.achar_secao_principal import descobrir_secao_principal
-from src.recebimento_da_medicao import pedir_linhas_de_centro, pedir_quant_vidros, pedir_angSecoes, pedir_angParedes, pedir_prumos, definir_juncoes
+from src.recebimento_da_medicao import pedir_linhas_de_centro, pedir_quant_vidros, pedir_angSecoes, pedir_angParedes, pedir_prumos, definir_juncoes, solicitar_sentido_abertura
 from src.linhas_de_centro import definir_linhas_de_centro, redesenhar_linhas_de_centro
 from src.perfis_U import offset_perfis_U, fillet_perfis_U
 from src.leitos import *
@@ -13,6 +13,8 @@ if __name__ == "__main__":
     limpar_tudo()
     lcs = pedir_linhas_de_centro()
     quant_vidros = pedir_quant_vidros(lcs)
+    sentido = solicitar_sentido_abertura()
+    print(sentido)
     angs_in = pedir_angSecoes(lcs)
     angs_paredes = pedir_angParedes()
     # prumos = pedir_prumos()

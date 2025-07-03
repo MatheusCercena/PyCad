@@ -4,6 +4,11 @@ Funções para pedir os dados principais das medições para serem usadas pelas 
 
 def pedir_linhas_de_centro():
     linhas_de_centro = []
+
+    print(f'''
+{' - '*10}LINHAS DE CENTRO{' - '*10}
+''')
+
     cont = 1
     while True:
         try:
@@ -20,6 +25,10 @@ def pedir_linhas_de_centro():
 
 def pedir_quant_vidros(lcs):
     quant_vidros = []
+    print(f'''
+{' - '*10}QUANTIDADE DE VIDROS{' - '*10}
+''')
+
     for c in range(0, len(lcs)):
         try:
             quant = int(input(f'Digite a quantidade de vidros da S{c+1}: '))
@@ -34,6 +43,10 @@ def pedir_angSecoes(lcs: int):
     Solicita ao usuário os angulos interno e retorna uma lista com os angulos internos no formato: [ang_1, ang_2, ..., ang_n]
     '''
     angs_in = []
+    print(f'''
+{' - '*10}ANGULOS DAS SEÇÕES{' - '*10}
+''')
+
     for c in range(0, len(lcs)-1):
         #inserir o angulo medido no transferidor, sem conversão.
         while True:
@@ -51,6 +64,10 @@ def pedir_angParedes():
     Solicita ao usuário os angulos das extremidades direita e esquerda, e retorna uma lista com os angulos externos no formato: [ang_esq, ang_dir]
     '''
     angs_ex = []
+    print(f'''
+{' - '*10}ANGULOS DAS PAREDES{' - '*10}
+''')
+
     while True:
         try:
             ang_esq = 90 - float(input(f'Digite o angulo da extremidade esquerda: '))
@@ -72,6 +89,10 @@ def pedir_prumos():
     Solicita ao usuário os prumos das extremidades direita e esquerda, e retorna uma lista com os angulos externos no formato: [prumo_esq, prumo_dir]
     '''
     prumos = []
+    print(f'''
+{' - '*10}PRUMOS{' - '*10}
+''')
+
     while True:
         try:
             prumo_esq = float(input(f'Digite o angulo da extremidade esquerda: '))
@@ -125,3 +146,59 @@ def definir_juncoes(lcs, angs_in):
 
     return juncoes
 
+def solicitar_sentido_abertura():
+    sentidos = []
+    moveis = []
+    v_ini = ''
+    v_fin = ''
+    print(f'''
+{' - '*10}SENTIDOS DE ABERTURA{' - '*10}
+''')
+    while True:
+        cont = 1
+        while True:
+            try:
+                v_ini = int(input(f'Digite o vidro onde começa a {cont}ª abertura: '))
+
+                #if not any(v_ini in sublista for sublista in sentidos):
+
+                break
+            except:
+                print(f'[ERRO] O vidro precisa ser numérico.')
+        while True:
+            try:
+                v_fin = int(input(f'Digite o vidro onde termina a {cont}ª abertura: '))
+                break
+            except:
+                print(f'[ERRO] O vidro precisa ser numérico.')
+        while True:
+            try:
+                giratorio = input(f'O vidro giratrio da abertura será no {v_ini} ou no {v_fin}?')
+                break
+            except:
+                print(f'[ERRO] O vidro giratório precisa ser numérico.')
+        [moveis.append(vidro) for vidro in range(v_ini, v_fin+1)]
+        sentido = ['direita' if giratorio == {v_fin} else 'esquerda'] 
+        print(f'Certo, os vidros da {cont}ª abertura irao abrir para a {sentido}.')
+        abertura = [v_ini, v_fin, giratorio, sentido, moveis]
+        sentidos.append(abertura)
+        res = ''
+        while res not in 'sn':
+            res = input(f'Deseja informar outra abertura? [s/n]')
+            if res not in 'sn':
+                print('A resposta precisa ser "s" ou "n".')
+        if res == 'n':
+            break
+    return sentidos
+
+def determinacao_fixos(quant_vidros, sentidos_abert):
+    vidros_totais = sum(quant_vidros)
+    fixos = []
+    for vidro in range(vidros_totais):
+        vidro += 1
+        if not any(vidro in sublista for sublista in sentidos_abert):
+           fixos.append(vidro)
+    if fixos:
+        lista = ', '.join(str(fixo) for fixo in fixos)
+        print(f'Os vidros {lista} serão fixos.')
+    return fixos
