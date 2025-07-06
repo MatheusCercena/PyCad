@@ -146,59 +146,80 @@ def definir_juncoes(lcs, angs_in):
 
     return juncoes
 
-def solicitar_sentido_abertura():
+def solicitar_sentido_abertura(quant_vidros: list):
+    '''
+Retorna uma lista de sublistas em que cada sublista representa uma abertura:
+item 0: onde a abertura começa
+item 1: onde termina a abertura
+item 2: qual vidro é o giratório
+item 3: qual o sentido de abertura (direita ou esquerda)
+item 4: lista contendo os vidros que são fixos.
+    '''
     sentidos = []
     moveis = []
     v_ini = ''
     v_fin = ''
+    giratorio = ''
     print(f'''
 {' - '*10}SENTIDOS DE ABERTURA{' - '*10}
 ''')
+
+    cont = 1
     while True:
-        cont = 1
+        if len(moveis) > 0 and max(moveis) >= sum(quant_vidros):
+            break
         while True:
             try:
                 v_ini = int(input(f'Digite o vidro onde começa a {cont}ª abertura: '))
-
-                #if not any(v_ini in sublista for sublista in sentidos):
-
-                break
+                if v_ini > sum(quant_vidros):
+                    print(f'A sacada tem menos que {v_ini} vidros. Escolha um vidro existente na sacada')
+                    continue
+                elif v_ini not in moveis and v_ini != 0:
+                    break
+                else:
+                    print('Esse vidro já abre em outro lugar.')
+                    continue
             except:
                 print(f'[ERRO] O vidro precisa ser numérico.')
         while True:
             try:
                 v_fin = int(input(f'Digite o vidro onde termina a {cont}ª abertura: '))
-                break
+                if v_fin > sum(quant_vidros):
+                    print(f'A sacada tem menos que {v_fin} vidros. Escolha um vidro existente na sacada')
+                    continue
+                elif v_ini not in moveis and v_ini != 0:
+                    break
+                else:
+                    print('Esse vidro já abre em outro lugar.')
+                    continue
             except:
                 print(f'[ERRO] O vidro precisa ser numérico.')
         while True:
             try:
-                giratorio = input(f'O vidro giratrio da abertura será no {v_ini} ou no {v_fin}?')
-                break
+                giratorio = int(input(f'O vidro giratrio da abertura será no {v_ini} ou no {v_fin}?'))
+                if giratorio in [v_ini, v_fin]:
+                    break
+                else:
+                    print(f'O vidro giratório precisa ser o {v_ini} ou o {v_fin}.')
+                    continue
             except:
                 print(f'[ERRO] O vidro giratório precisa ser numérico.')
         [moveis.append(vidro) for vidro in range(v_ini, v_fin+1)]
-        sentido = ['direita' if giratorio == {v_fin} else 'esquerda'] 
+        sentido = 'direita' if giratorio == v_fin else 'esquerda'
         print(f'Certo, os vidros da {cont}ª abertura irao abrir para a {sentido}.')
-        abertura = [v_ini, v_fin, giratorio, sentido, moveis]
+        abertura = [v_ini, v_fin, giratorio, sentido]
         sentidos.append(abertura)
         res = ''
-        while res not in 'sn':
-            res = input(f'Deseja informar outra abertura? [s/n]')
-            if res not in 'sn':
-                print('A resposta precisa ser "s" ou "n".')
+        cont += 1 
+        fixos = []
+        for vidro in range(1, sum(quant_vidros)+1):
+            if vidro not in moveis:
+                fixos.append(vidro)
+        res = input(f'Deseja informar outra abertura? [s/n]').strip().lower()
+        while res not in ['s', 'n']:
+            print('A resposta precisa ser "s" ou "n".')
+            res = input(f'Deseja informar outra abertura? [s/n]').strip().lower()
         if res == 'n':
-            break
-    return sentidos
-
-def determinacao_fixos(quant_vidros, sentidos_abert):
-    vidros_totais = sum(quant_vidros)
-    fixos = []
-    for vidro in range(vidros_totais):
-        vidro += 1
-        if not any(vidro in sublista for sublista in sentidos_abert):
-           fixos.append(vidro)
-    if fixos:
-        lista = ', '.join(str(fixo) for fixo in fixos)
-        print(f'Os vidros {lista} serão fixos.')
-    return fixos
+            return sentidos, fixos
+        if res == 's':
+            continue

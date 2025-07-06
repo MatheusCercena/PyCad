@@ -22,6 +22,7 @@ def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia):
         )
 
 def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list, folgas_leitos: list):
+    handles_guias_leitos = []
     for i, linha_de_centro in enumerate(handles_lcs):
         
         ini_linha_de_centro = linha_de_centro.StartPoint
@@ -35,7 +36,9 @@ def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
             fim_vidro = posicao_dos_vidros[i][index][1]
             inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro + folgas_leitos[i][index][0])
             fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro - folgas_leitos[i][index][1])
-            acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
+            guia = acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
+            handles_guias_leitos.append(guia.Handle)
+    return handles_guias_leitos
 
 def calcular_gaps_leito(ang):
     '''
@@ -121,23 +124,80 @@ def folgas_leitos(vidros, folgas_vidros, angs_in):
         folgas_leitos_sacada.append(folgas_leitos_secao)
     return folgas_leitos_sacada
 
-# def desenhar_leitos(folgas_leito, vidros, folgas_vidros, angs_in, gaps_lcs):
-#     for linha in acad_ModelSpace:
-#         if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
-#             ext = linha.Offset(14)
-#             handles_leitos['externos'].append(ext.Handle)
-#             ext.Layer = 'Leito Externo'
-#             int = linha.Offset(-14)
-#             handles_leitos['internos'].append(int.Handle)
-#             ext.Layer = 'Leito Interno'
 
-#         # if 
-#             ext_ini = ext.StartPoint
-#             int_ini = int.StartPoint
-#             lat_esq = acad2.model.AddLine(APoint(ext_ini[0], ext_ini[1]), APoint(int_ini[0], int_ini[1]))
-#             ext_fim = ext.EndPoint
-#             int_fim = int.EndPoint
-#             lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
-#             int.Layer = lat_esq.Layer = lat_dir.Layer = 'Leito Interno'
-#     return handles_leitos
+def converter_ordem_para_secoes(vidros, lista):
+    lista_nova = []
+    cont = 0
+    for secao in vidros:
+        lista_secao = []
+        for vidro in secao:
+            lista_secao.append(lista[cont])
+            cont += 1
+        lista_nova.append(lista_secao)
+    return lista_nova
+
+# def definir_graus_leitos(folgas_leitos, giratorios, angs, sentido):
+    
+
+#     cont = 0
+#     for secao in folgas_leitos:
+#         for leito in secao:
+#             for i in range(2):
+#                 if i == 0 and folgas_leitos[secao][leito][i] == 1.5:
+
+#                 if leito in giratório_esq
+
+#                 if leito in giratório_esq
+                
+#                 if leito in pseudo_giratório_dir
+                
+#                 if leito in pseudo_giratórios_dir
+#         cont += 1
+
+def desenhar_leitos(vidros, angs, giratorios, sentidos):
+    handles_leitos = {'externos': [], 'internos': []}
+    handles_guias = converter_ordem_para_secoes(vidros, handles_guias)
+    
+    pos_vidro = 1
+    pos_giratorio = 0
+    pos_sentido = 0
+
+    for secao in handles_guias:
+        for index, linha_guia in enumerate(secao):
+            ext = linha_guia.Offset(14)
+            handles_leitos['externos'].append(ext[0].Handle)
+            ext.Layer = 'Leito Externo'
+
+            int = linha_guia.Offset(-14)
+            handles_leitos['internos'].append(int[0].Handle)
+            int.Layer = 'Leito Interno'
+
+            ext_ini = ext.StartPoint
+            int_ini = int.StartPoint
+            lat_esq = acad2.model.AddLine(APoint(ext_ini[0], ext_ini[1]), APoint(int_ini[0], int_ini[1]))
+            lat_esq.Layer = 'Leito Interno'
+
+            ext_fim = ext.EndPoint
+            int_fim = int.EndPoint
+            lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
+            lat_dir.Layer = 'Leito Interno'
+
+            if index == 0 and angs(index) > 0:
+                lat_esq.Rotate()
+            if index == 0 and angs(index) < 0:
+                lat_esq.Rotate()
+            if index == len(linha_guia) and angs(index) > 0:
+                lat_dir.Rotate()            
+            if index == len(linha_guia) and angs(index) > 0:
+                lat_dir.Rotate()
+            if pos_vidro in giratorios:
+                if pos_sentido == 'direta':
+                    lat_esq.Rotate()
+                else:
+                    lat_dir.Rotate()
+
+        pos_sentido += 1
+        pos_vidro += 1
+
+    return handles_leitos
 
