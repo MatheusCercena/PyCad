@@ -13,9 +13,10 @@ if __name__ == "__main__":
     limpar_tudo()
     lcs = pedir_linhas_de_centro()
     quant_vidros = pedir_quant_vidros(lcs)
-    sentidos_abert = solicitar_sentido_abertura(quant_vidros)
+    sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
     giratorios = [sentido[2] for sentido in sentidos_abert]
-    sentidos = [sentido[3] for sentido in sentidos_abert]
+    adjacentes = [sentido[3] for sentido in sentidos_abert]
+    sentidos = [sentido[4] for sentido in sentidos_abert]
     angs_in = pedir_angSecoes(lcs)
     angs_paredes = pedir_angParedes()
     # prumos = pedir_prumos()
@@ -54,13 +55,9 @@ if __name__ == "__main__":
     pontos_vidros = pontos_dos_vidros(vidros, folgas_vidros)
     desenhar_guias_vidros(handles_lcs, vidros, pontos_vidros)
     handles_vidros = offset_vidros(8)
-    print(folgas_vidros)
     remover_guias()
 
     folga_leitos = folgas_leitos(vidros, folgas_vidros, angs_in)
-    print(f'Folga leitos: {folga_leitos}')
-    print(f'Vidros {vidros}')
-    # graus_leitos = definir_graus_leitos(sentido)
     handles_guias_leitos = desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros, folga_leitos)
-    desenhar_leitos()
-    # remover_guias()
+    desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
+    remover_guias()

@@ -97,7 +97,6 @@ def descobrir_secao_principal(pos_lcs):
     else:
         coord_c = definir_linha_perpendicular(pos_lcs)
         for secao in range(0, len(pos_lcs)):
-            
             interseccao = solve((def_eq_reta(pos_lcs[secao]), def_eq_reta(coord_c)), (x, y))
             # verificar se intercepta / solve ou def eq reta esta dando problema, verificar
             verificacao = verificar_se_intercepta(pos_lcs[secao], interseccao)

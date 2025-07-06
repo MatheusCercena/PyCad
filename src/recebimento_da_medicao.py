@@ -30,12 +30,14 @@ def pedir_quant_vidros(lcs):
 ''')
 
     for c in range(0, len(lcs)):
-        try:
-            quant = int(input(f'Digite a quantidade de vidros da S{c+1}: '))
-        except:
-            print(f'[ERRO] O campo "quantidade de vidros" precisa conter apenas numeros inteiros: ')
-            continue
-        quant_vidros.append(quant)
+        while True:
+            try:
+                quant = int(input(f'Digite a quantidade de vidros da S{c+1}: '))
+                quant_vidros.append(quant)
+                break
+            except:
+                print(f'[ERRO] O campo "quantidade de vidros" precisa conter apenas numeros inteiros: ')
+                continue
     return quant_vidros
 
 def pedir_angSecoes(lcs: int):
@@ -152,18 +154,19 @@ Retorna uma lista de sublistas em que cada sublista representa uma abertura:
 item 0: onde a abertura começa
 item 1: onde termina a abertura
 item 2: qual vidro é o giratório
-item 3: qual o sentido de abertura (direita ou esquerda)
-item 4: lista contendo os vidros que são fixos.
+item 3: qual vidro é o vidro adjacente a o giratório
+item 4: qual o sentido de abertura (direita ou esquerda)
+item 5: lista contendo os vidros que são fixos.
     '''
     sentidos = []
     moveis = []
     v_ini = ''
     v_fin = ''
     giratorio = ''
+    adjacente = ''
     print(f'''
 {' - '*10}SENTIDOS DE ABERTURA{' - '*10}
 ''')
-
     cont = 1
     while True:
         if len(moveis) > 0 and max(moveis) >= sum(quant_vidros):
@@ -196,7 +199,7 @@ item 4: lista contendo os vidros que são fixos.
                 print(f'[ERRO] O vidro precisa ser numérico.')
         while True:
             try:
-                giratorio = int(input(f'O vidro giratrio da abertura será no {v_ini} ou no {v_fin}?'))
+                giratorio = int(input(f'O vidro giratrio da abertura será no {v_ini} ou no {v_fin}? '))
                 if giratorio in [v_ini, v_fin]:
                     break
                 else:
@@ -206,20 +209,24 @@ item 4: lista contendo os vidros que são fixos.
                 print(f'[ERRO] O vidro giratório precisa ser numérico.')
         [moveis.append(vidro) for vidro in range(v_ini, v_fin+1)]
         sentido = 'direita' if giratorio == v_fin else 'esquerda'
+        vidros_na_abertura = [n for n in range(v_ini, v_fin+1)]
+        adjacente = (giratorio-1 if sentido == 'direita' else giratorio+1) if len(vidros_na_abertura) >= 2 else 0
         print(f'Certo, os vidros da {cont}ª abertura irao abrir para a {sentido}.')
-        abertura = [v_ini, v_fin, giratorio, sentido]
+        abertura = [v_ini, v_fin, giratorio, adjacente, sentido]
         sentidos.append(abertura)
-        res = ''
         cont += 1 
-        fixos = []
-        for vidro in range(1, sum(quant_vidros)+1):
-            if vidro not in moveis:
-                fixos.append(vidro)
-        res = input(f'Deseja informar outra abertura? [s/n]').strip().lower()
-        while res not in ['s', 'n']:
-            print('A resposta precisa ser "s" ou "n".')
+        
+        res = ''
+
+        while res not in ['s', 'n'] and max(moveis) != sum(quant_vidros):
             res = input(f'Deseja informar outra abertura? [s/n]').strip().lower()
-        if res == 'n':
+            if res not in ['s', 'n']:
+                print('A resposta precisa ser "s" ou "n".')
+        if res == 'n' or max(moveis) == sum(quant_vidros):
+            fixos = []
+            for vidro in range(1, sum(quant_vidros)+1):
+                if vidro not in moveis:
+                    fixos.append(vidro)
             return sentidos, fixos
         if res == 's':
             continue

@@ -40,9 +40,17 @@ def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
             acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
 
 def remover_guias():
-    for linha in acad_ModelSpace:
-        if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
-            linha.Delete()
+    # for linha in acad_ModelSpace:
+    #     if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
+    #         linha.Delete()
+   
+    for i in range(acad_ModelSpace.Count - 1, -1, -1):  # reverso
+        try:
+            entidade = acad_ModelSpace.Item(i)
+            if entidade.EntityName == 'AcDbLine' and entidade.Layer == '0':
+                entidade.Delete()
+        except Exception as e:
+            print(f"Erro ao deletar entidade {i}: {e}")
 
 def offset_vidros(espessura_vidro):
     handles_vidros = []
