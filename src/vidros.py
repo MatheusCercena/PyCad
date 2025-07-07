@@ -6,6 +6,7 @@ from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
 from copy import deepcopy
 from math import tan, radians, floor, sqrt
+from time import sleep
 
 acad, acad_ModelSpace = get_acad()
 acad2 = Autocad(create_if_not_exists=True)
@@ -26,9 +27,12 @@ def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia):
 def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list):
     for i, linha_de_centro in enumerate(handles_lcs):
         
-        ini_linha_de_centro = linha_de_centro.StartPoint
-        fim_linha_de_centro = linha_de_centro.EndPoint
-
+        for tentativa in range(5):
+            try:
+                ini_linha_de_centro = linha_de_centro.StartPoint
+                fim_linha_de_centro = linha_de_centro.EndPoint
+            except:
+                sleep(0.5)
         vetor_linha = (fim_linha_de_centro[0] - ini_linha_de_centro[0], fim_linha_de_centro[1] - ini_linha_de_centro[1])
         vetores_unitarios = normalizar(vetor_linha)
 
@@ -50,6 +54,7 @@ def remover_guias():
 
 def offset_vidros(espessura_vidro):
     handles_vidros = []
+    coord_vidros = []
     for linha in acad_ModelSpace:
         if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
             ext = linha.Offset(espessura_vidro/2)[0]
@@ -61,9 +66,12 @@ def offset_vidros(espessura_vidro):
             lat_esq = acad2.model.AddLine(APoint(ext_ini[0], ext_ini[1]), APoint(int_ini[0], int_ini[1]))
             ext_fim = ext.EndPoint
             int_fim = int.EndPoint
+            coord_vidros.append([ext_ini, ext_fim])
             lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
             int.Layer = lat_esq.Layer = lat_dir.Layer = 'Vidro Interno'
-    return handles_vidros
+            
+
+    return handles_vidros, coord_vidros
 
 def calcular_gaps_vidro_vidro(ang):
     '''

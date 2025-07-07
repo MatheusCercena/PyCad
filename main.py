@@ -55,7 +55,8 @@ if __name__ == "__main__":
     vidros = medida_dos_vidros(lcs, quant_vidros, folgas_vidros)
     pontos_vidros = pontos_dos_vidros(vidros, folgas_vidros)
     desenhar_guias_vidros(handles_lcs, vidros, pontos_vidros)
-    handles_vidros = offset_vidros(8)
+    handles_vidros, coord_vidros = offset_vidros(8)
+    print(coord_vidros)
     remover_guias()
 
     folga_leitos = folgas_leitos(vidros, folgas_vidros, angs_in)
@@ -63,20 +64,8 @@ if __name__ == "__main__":
     desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
     remover_guias()
 
-    # def atualizar_handles_vidros():
-    #     handles = []
-    #     for i in range(acad_ModelSpace.Count - 1, -1, -1):  # reverso
-    #         try:
-    #             entidade = acad_ModelSpace.Item(i)
-    #             if entidade.EntityName == 'AcDbLine' and entidade.Layer == 'Vidro Externo':
-    #                 handles.append(entidade)
-    #         except Exception as e:
-    #             print(f"Erro ao deletar entidade {i}: {e}")
-    #     return handles
-
-    # handles_vidros = atualizar_handles_vidros()
     
-    # puxar_cotas_vidro(handles_vidros)
+    puxar_cotas_vidro(coord_vidros)
     # puxar_cotas_leito(handles_leitos)
     # puxar_cotas_lcs(handles_lcs)
     # puxar_cotas_perfis_U(handles_vidros)

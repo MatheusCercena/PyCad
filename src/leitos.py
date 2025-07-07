@@ -150,7 +150,7 @@ def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentido
                     ext.Layer = 'Leito Externo'
                     break
                 except:
-                    pass
+                    sleep(0.5)
 
             int = linha_guia.Offset(-14)[0]
             handles_leitos['internos'].append(int.Handle)
