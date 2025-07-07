@@ -39,11 +39,7 @@ def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
             fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro)
             acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
 
-def remover_guias():
-    # for linha in acad_ModelSpace:
-    #     if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
-    #         linha.Delete()
-   
+def remover_guias():   
     for i in range(acad_ModelSpace.Count - 1, -1, -1):  # reverso
         try:
             entidade = acad_ModelSpace.Item(i)

@@ -5,7 +5,7 @@ from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
 from math import sqrt, tan, radians
 from sympy import symbols, Eq, solve
-
+from time import sleep
 
 acad2 = Autocad(create_if_not_exists=True)
 acad, acad_ModelSpace = get_acad()
@@ -120,9 +120,7 @@ def def_eq_reta_leitos(ponto_a, ponto_b):
     define a equação da reta a ser usada para verificar se a seção intercepta a linha perpendicular
     '''
     x1 = ponto_a[0]
-    y1 = ponto_a[1]
     x2 = ponto_b[0]
-    y2 = ponto_b[1]
 
     if x2 == x1:
         return Eq(x, x1)
@@ -145,18 +143,23 @@ def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentido
     for index, secao in enumerate(handles_guias):
         for i, linha_guia in enumerate(secao):
             #Offsets
-            ext = linha_guia.Offset(14)[0]
-            handles_leitos['externos'].append(acad.HandleToObject(ext.Handle))
-            ext.Layer = 'Leito Externo'
+            for tentativa in range(5):
+                try:
+                    ext = linha_guia.Offset(14)[0]
+                    handles_leitos['externos'].append(ext.Handle)
+                    ext.Layer = 'Leito Externo'
+                    break
+                except:
+                    pass
 
             int = linha_guia.Offset(-14)[0]
-            handles_leitos['internos'].append(acad.HandleToObject(int.Handle))
+            handles_leitos['internos'].append(int.Handle)
             int.Layer = 'Leito Interno'
             
             #Guias
-            guia_int = linha_guia.Offset(4)[0]
-            guia_ext = linha_guia.Offset(-4)[0]
-            coord_guia_interna_x = guia_int.EndPoint
+            guia_ext = linha_guia.Offset(4)[0]
+            guia_int = linha_guia.Offset(-4)[0]
+            coord_guia_interna_x = guia_int.StartPoint
             coord_guia_interna_y = guia_int.EndPoint
             coord_guia_externa_x = guia_ext.StartPoint
             coord_guia_externa_y = guia_ext.EndPoint
@@ -169,13 +172,13 @@ def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentido
 
             lat_esq = acad2.model.AddLine(APoint(ext_ini[0], ext_ini[1]), APoint(int_ini[0], int_ini[1]))
             lat_esq.Layer = 'Leito Interno'
-            handles_leitos['lat_esq'].append(acad.HandleToObject(lat_esq.Handle))
+            handles_leitos['lat_esq'].append(lat_esq.Handle)
             coord_lat_esq_x = lat_esq.StartPoint
             coord_lat_esq_y = lat_esq.EndPoint
 
             lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
             lat_dir.Layer = 'Leito Interno'
-            handles_leitos['lat_dir'].append(acad.HandleToObject(lat_dir.Handle))
+            handles_leitos['lat_dir'].append(lat_dir.Handle)
             coord_lat_dir_x = lat_dir.StartPoint
             coord_lat_dir_y = lat_dir.EndPoint
 
@@ -184,39 +187,45 @@ def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentido
             interseccao_dir_inf  = solve((def_eq_reta_leitos(coord_guia_interna_x, coord_guia_interna_y), def_eq_reta_leitos(coord_lat_dir_x, coord_lat_dir_y)), (x, y))
             interseccao_esq_sup  = solve((def_eq_reta_leitos(coord_guia_externa_x, coord_guia_externa_y), def_eq_reta_leitos(coord_lat_esq_x, coord_lat_esq_y)), (x, y))
             interseccao_dir_sup = solve((def_eq_reta_leitos(coord_guia_externa_x, coord_guia_externa_y), def_eq_reta_leitos(coord_lat_dir_x, coord_lat_dir_y)), (x, y))
-            
+
             # rotacoes lado esquerdo
             if index != 0:
-                if not (70 < abs(angs[index-1]) < 110):
-                    if i == 0 and angs[index-1] > 0:
-                        lat_esq.Rotate(APoint(float(interseccao_esq_inf[x]), float(interseccao_esq_inf[y])), radians((angs[index-1])/2))
-                    elif i == 0 and angs[index-1] < 0:
+                if i == 0 and not (70 < abs(angs[index-1]) < 110):
+                    if angs[index-1] < 0:
+                        lat_esq.Rotate(APoint(float(interseccao_esq_inf[x]), float(interseccao_esq_inf[y])), radians((angs[index-1])/2)*-1)
+                    elif angs[index-1] > 0:
                         lat_esq.Rotate(APoint(float(interseccao_esq_sup[x]), float(interseccao_esq_sup[y])), radians((angs[index-1])/2))
-            
+
             # rotacoes lado direito
             if index != len(handles_guias)-1:
-                if i == len(secao) and angs[index] > 0:
-                    lat_dir.Rotate(APoint(float(interseccao_dir_inf[x]), float(interseccao_dir_inf[y])), radians((angs[index])/2))            
-                elif i == len(secao) and angs[index] > 0:
-                    lat_dir.Rotate(APoint(float(interseccao_dir_sup[x]), float(interseccao_dir_sup[y])), radians((angs[index])/2))
-            
+                if i == len(secao)-1 and angs[index] > 0 and not (70 < abs(angs[index]) < 110):
+                    lat_dir.Rotate(APoint(float(interseccao_dir_sup[x]), float(interseccao_dir_sup[y])), radians((angs[index])/2)*-1)      
+                elif i == len(secao)-1 and angs[index] < 0 and not (70 < abs(angs[index]) < 110):
+                    lat_dir.Rotate(APoint(float(interseccao_dir_inf[x]), float(interseccao_dir_inf[y])), radians((angs[index])/2))
+
             # rotacoes giratorios
             if pos_vidro in giratorios:
-                if sentidos[pos_sentido] == 'direita':
-                    lat_esq.Rotate(APoint(float(interseccao_esq_inf[x]), float(interseccao_esq_inf[y])), radians(5))
-                else:
-                    lat_dir.Rotate(APoint(float(interseccao_dir_inf[x]), float(interseccao_dir_inf[y])), radians(5))
+                if sentidos[pos_sentido] == 'direita' and i != 0:
+                    lat_esq.Rotate(APoint(float(interseccao_esq_sup[x]), float(interseccao_esq_sup[y])), radians(-5))
+                elif sentidos[pos_sentido] == 'esquerda' and i != len(secao)-1:
+                    lat_dir.Rotate(APoint(float(interseccao_dir_sup[x]), float(interseccao_dir_sup[y])), radians(5))
                 if pos_vidro-1 in adjacentes:
                     pos_sentido += 1
 
             # rotacoes vidros adjacentes aos giratorios
             if pos_vidro in adjacentes:
-                if sentidos[pos_sentido] == 'direita':
-                    handles_leitos['lat_dir'][-1].Rotate(APoint(float(interseccao_esq_sup[x]), float(interseccao_esq_sup[y])), radians(5))
-                elif sentidos[pos_sentido-1] == 'esquerda':
-                    handles_leitos['lat_esq'][-1].Rotate(APoint(float(interseccao_dir_sup[x]), float(interseccao_dir_sup[y])), radians(5))
+                if sentidos[pos_sentido] == 'direita' and i != len(secao)-1:
+                    lat_dir.Rotate(APoint(float(interseccao_dir_inf[x]), float(interseccao_dir_inf[y])), radians(-5))
+                elif sentidos[pos_sentido] == 'esquerda' and i != 0:
+                    lat_esq.Rotate(APoint(float(interseccao_esq_inf[x]), float(interseccao_esq_inf[y])), radians(5))
                 if pos_vidro-1 in giratorios:
                     pos_sentido += 1
+
+            acad.SendCommand(f'(c:custom_fillet "{handles_leitos['externos'][pos_vidro-1]}" "{handles_leitos['lat_esq'][pos_vidro-1]}")\n')
+            acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_esq'][pos_vidro-1]}" "{handles_leitos['internos'][pos_vidro-1]}")\n')
+            acad.SendCommand(f'(c:custom_fillet "{handles_leitos['internos'][pos_vidro-1]}" "{handles_leitos['lat_dir'][pos_vidro-1]}")\n')
+            acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_dir'][pos_vidro-1]}" "{handles_leitos['externos'][pos_vidro-1]}")\n')
+
             pos_vidro += 1
 
     return handles_leitos

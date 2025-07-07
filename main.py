@@ -8,6 +8,7 @@ from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
 from src.comandos import carregar_comandos
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
 from src.limpar import limpar_tudo
+from src.cotas import puxar_cotas_vidro
 
 if __name__ == "__main__":
     limpar_tudo()
@@ -61,3 +62,24 @@ if __name__ == "__main__":
     handles_guias_leitos = desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros, folga_leitos)
     desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
     remover_guias()
+
+    # def atualizar_handles_vidros():
+    #     handles = []
+    #     for i in range(acad_ModelSpace.Count - 1, -1, -1):  # reverso
+    #         try:
+    #             entidade = acad_ModelSpace.Item(i)
+    #             if entidade.EntityName == 'AcDbLine' and entidade.Layer == 'Vidro Externo':
+    #                 handles.append(entidade)
+    #         except Exception as e:
+    #             print(f"Erro ao deletar entidade {i}: {e}")
+    #     return handles
+
+    # handles_vidros = atualizar_handles_vidros()
+    
+    # puxar_cotas_vidro(handles_vidros)
+    # puxar_cotas_leito(handles_leitos)
+    # puxar_cotas_lcs(handles_lcs)
+    # puxar_cotas_perfis_U(handles_vidros)
+    # puxar_cotas_furos(handles_vidros)
+    # puxar_cotas_drenos(handles_vidros)
+    
