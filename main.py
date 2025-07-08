@@ -8,7 +8,7 @@ from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
 from src.comandos import carregar_comandos
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
 from src.limpar import limpar_tudo
-from src.cotas import puxar_cotas_leito
+from src.cotas import cotar_medida_total
 
 if __name__ == "__main__":
     limpar_tudo()
@@ -62,9 +62,8 @@ if __name__ == "__main__":
     handle_leitos, coord_leitos = desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
     remover_guias()
 
-    
     # puxar_cotas_vidro(coord_vidros)
-    puxar_cotas_leito(coord_leitos)
+    cotar_medida_total(coord_leitos)
     # puxar_cotas_lcs(handles_lcs)
     # puxar_cotas_perfis_U(handles_vidros)
     # puxar_cotas_furos(handles_vidros)

@@ -32,6 +32,7 @@ def fazer_parede_dir(handles_lcs, perfil_U_ext, perfil_U_int, angulo):
             pythoncom.PumpWaitingMessages()
             ini = acad.HandleToObject(perfil_U_ext).EndPoint
             fim = acad.HandleToObject(perfil_U_int).EndPoint
+            break
         except:
             sleep(0.5)
     linha = acad2.model.AddLine(APoint(ini[0], ini[1]), APoint(fim[0], fim[1]))

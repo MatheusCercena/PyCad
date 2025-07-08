@@ -1,89 +1,86 @@
 from pyautocad import Autocad, APoint
-from math import sqrt#, tan, radians
+from math import sqrt,atan2, cos, sin
 # from time import sleep
 
 acad2 = Autocad(create_if_not_exists=True)
 
-# def ponto_offset_perpendicular(p1: APoint, p2: APoint, distancia: float):
-#     # vetor da linha p1 -> p2
-#     dx = p2.x - p1.x
-#     dy = p2.y - p1.y
+def cotar_medida_total(perfis, offset=28):
+    for perfil in perfis:
+        p1, p2 = obter_pontos_para_cota_corrigida(perfil, offset)
+        a1 = APoint(*p1)
+        a2 = APoint(*p2)
 
-#     # vetor perpendicular: (-dy, dx) ou (dy, -dx)
-#     perp_x = -dy
-#     perp_y = dx
+        # Calcula ângulo da cota (mesmo do vetor base interno)
+        dx = perfil[1][0] - perfil[0][0]
+        dy = perfil[1][1] - perfil[0][1]
+        ang = atan2(dy, dx)
 
-#     # normaliza o vetor perpendicular
-#     norm = sqrt(perp_x**2 + perp_y**2)
-#     if norm == 0:
-#         return APoint(p1.x, p1.y + distancia)  # fallback pra vertical
+        # vetor base da cota (direção do perfil)
+        dx = a2.x - a1.x
+        dy = a2.y - a1.y
+        mod = sqrt(dx**2 + dy**2)
 
-#     unit_x = perp_x / norm
-#     unit_y = perp_y / norm
+        # vetor perpendicular unitário
+        vx = -dy / mod
+        vy =  dx / mod
 
-#     # ponto médio da linha
-#     mx = (p1.x + p2.x) / 2
-#     my = (p1.y + p2.y) / 2
+        # aplica offset de 200mm na direção perpendicular
+        offset = 200
+        loc_x = (a1.x + a2.x) / 2 + vx * offset
+        loc_y = (a1.y + a2.y) / 2 + vy * offset
+        loc = APoint(loc_x, loc_y)
 
-#     # ponto deslocado
-#     loc_x = mx + unit_x * distancia
-#     loc_y = my + unit_y * distancia
+        # agora sim, desenha a cota afastada corretamente
+        acad2.model.AddDimRotated(a1, a2, loc, ang)
 
-#     return APoint(loc_x, loc_y)
 
-# def puxar_cotas_vidro(coordenadas_vidros):
-#     offset = 200
-#     for linha in coordenadas_vidros:
-#         inicio_linha = APoint(linha[0])
-#         fim_linha = APoint(linha[1])
-
-#         loc = ponto_offset_perpendicular(inicio_linha, fim_linha, offset)
-
-#         dim = acad2.model.AddDimAligned(inicio_linha, fim_linha, loc)
-#         dim.StyleName = 'Vidro'
-
-from math import sqrt, atan2
-
-def calcular_dist(p1, p2):
-    return sqrt((p2[0] - p1[0])**2 + (p2[1] - p1[1])**2)
-
-def vetor_para_angulo_rad(p1, p2):
-    return atan2(p2[1] - p1[1], p2[0] - p1[0])  # já retorna em radianos
-
-def cotar_maior_lado(leito):
-    # leito é uma lista com 4 pontos (x, y)
-    lados = [
-        (leito[0], leito[1]),
-        (leito[1], leito[2]),
-        (leito[2], leito[3]),
-        (leito[3], leito[0])
-    ]
+def obter_pontos_para_cota_corrigida(leito, offset=28):
+    """
+    Dado um leito com 4 pontos [(x0,y0), (x1,y1), (x2,y2), (x3,y3)] e um offset,
+    retorna dois pontos (x, y) que definem corretamente a cota entre os extremos,
+    com offset perpendicular ao vetor base e rotação compensada.
     
-    # encontra o lado com maior distância
-    lado_mais_longo = max(lados, key=lambda lado: calcular_dist(*lado))
-    p1, p2 = APoint(*lado_mais_longo[0]), APoint(*lado_mais_longo[1])
-    comprimento = calcular_dist(lado_mais_longo[0], lado_mais_longo[1])
+    Retorna: (ponto_inicio, ponto_fim)
+    """
+
+    # 1. Vetor base: ponto 0 (início interno) até ponto 1 (fim interno)
+    base = leito[0]
+    direcao = leito[1]
+    dx = direcao[0] - base[0]
+    dy = direcao[1] - base[1]
+    theta = -atan2(dy, dx)  # rotação para alinhar com eixo X
+
+    # 2. Rotaciona todos os pontos para normalizar
+    rotacionados = []
+    for i, ponto in enumerate(leito):
+        x, y = ponto[:2] 
+        xt = x - base[0]
+        yt = y - base[1]
+        xr = xt * cos(theta) - yt * sin(theta)
+        yr = xt * sin(theta) + yt * cos(theta)
+        rotacionados.append((i, xr, yr))
+
+    # 3. Identifica os extremos (menor e maior X)
+    extremos = sorted(rotacionados, key=lambda p: p[1])
+    ponto_ini_idx, x_ini, y_ini = extremos[0]
+    ponto_fim_idx, x_fim, y_fim = extremos[-1]
+
+    # 4. Aplica offset (Y + offset) ao ponto de início apenas
+    y_ini_offset = y_ini + offset
+
+    # 5. Desfaz a rotação para voltar ao plano original
+
+    # ponto início corrigido
+    x_rot = x_ini * cos(-theta) - y_ini_offset * sin(-theta)
+    y_rot = x_ini * sin(-theta) + y_ini_offset * cos(-theta)
     
-    # calcula ângulo e ponto médio
-    angulo = vetor_para_angulo_rad(lado_mais_longo[0], lado_mais_longo[1])
-    mx = (p1.x + p2.x) / 2
-    my = (p1.y + p2.y) / 2
+    ponto_inicio = (x_rot + base[0], y_rot + base[1])
 
-    # desloca cota perpendicularmente ao lado
-    offset = -400
-    dx = p2.x - p1.x
-    dy = p2.y - p1.y
-    perp_x = -dy
-    perp_y = dx
-    norm = sqrt(perp_x**2 + perp_y**2)
-    unit_x = perp_x / norm
-    unit_y = perp_y / norm
-    loc = APoint(mx + unit_x * offset, my + unit_y * offset)
+    # ponto fim permanece sem offset
+    x_rot_fim = x_fim * cos(-theta) - y_fim * sin(-theta)
+    y_rot_fim = x_fim * sin(-theta) + y_fim * cos(-theta)
+    ponto_fim = (x_rot_fim + base[0], y_rot_fim + base[1])
 
-    # desenha a cota com o ângulo correto
-    dim = acad2.model.AddDimRotated(p1, p2, loc, angulo)
-    dim.StyleName = 'Vidro'
+    return ponto_inicio, ponto_fim
+        
 
-def puxar_cotas_leito(lista_de_leitos):
-    for leito in lista_de_leitos:
-        cotar_maior_lado(leito)

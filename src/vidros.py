@@ -33,6 +33,7 @@ def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
                 pythoncom.PumpWaitingMessages()
                 ini_linha_de_centro = linha_de_centro.StartPoint
                 fim_linha_de_centro = linha_de_centro.EndPoint
+                break
             except:
                 sleep(0.5)
         vetor_linha = (fim_linha_de_centro[0] - ini_linha_de_centro[0], fim_linha_de_centro[1] - ini_linha_de_centro[1])

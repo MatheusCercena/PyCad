@@ -232,9 +232,16 @@ def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentido
                     acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_esq'][pos_vidro-1]}" "{handles_leitos['internos'][pos_vidro-1]}")\n')
                     acad.SendCommand(f'(c:custom_fillet "{handles_leitos['internos'][pos_vidro-1]}" "{handles_leitos['lat_dir'][pos_vidro-1]}")\n')
                     acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_dir'][pos_vidro-1]}" "{handles_leitos['externos'][pos_vidro-1]}")\n')
+                    break
                 except:
                     sleep(0.5)
-            ext_ini, ext_fim, int_ini, int_fim = ext.StartPoint, ext.EndPoint, int.StartPoint, int.EndPoint
-            coordenadas_leitos.append([ext_ini, ext_fim, int_ini, int_fim])
+            for tentativa in range(5):
+                try:
+                    pythoncom.PumpWaitingMessages()
+                    ext_ini, ext_fim, int_ini, int_fim = ext.StartPoint, ext.EndPoint, int.StartPoint, int.EndPoint
+                    coordenadas_leitos.append([ext_ini, ext_fim, int_ini, int_fim])
+                    break
+                except:
+                    sleep(0.5)
             pos_vidro += 1
     return handles_leitos, coordenadas_leitos
