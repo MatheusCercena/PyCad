@@ -8,7 +8,7 @@ from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
 from src.comandos import carregar_comandos
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
 from src.limpar import limpar_tudo
-from src.cotas import puxar_cotas_vidro
+from src.cotas import puxar_cotas_leito
 
 if __name__ == "__main__":
     limpar_tudo()
@@ -23,7 +23,6 @@ if __name__ == "__main__":
     # prumos = pedir_prumos()
     juncoes = definir_juncoes(lcs, angs_in)
  
-
     carregar_comandos()
 
     pos_lcs = definir_linhas_de_centro(lcs, angs_in)
@@ -60,12 +59,12 @@ if __name__ == "__main__":
 
     folga_leitos = folgas_leitos(vidros, folgas_vidros, angs_in)
     handles_guias_leitos = desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros, folga_leitos)
-    desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
+    handle_leitos, coord_leitos = desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
     remover_guias()
 
     
-    puxar_cotas_vidro(coord_vidros)
-    # puxar_cotas_leito(handles_leitos)
+    # puxar_cotas_vidro(coord_vidros)
+    puxar_cotas_leito(coord_leitos)
     # puxar_cotas_lcs(handles_lcs)
     # puxar_cotas_perfis_U(handles_vidros)
     # puxar_cotas_furos(handles_vidros)
