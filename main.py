@@ -56,7 +56,6 @@ if __name__ == "__main__":
     pontos_vidros = pontos_dos_vidros(vidros, folgas_vidros)
     desenhar_guias_vidros(handles_lcs, vidros, pontos_vidros)
     handles_vidros, coord_vidros = offset_vidros(8)
-    print(coord_vidros)
     remover_guias()
 
     folga_leitos = folgas_leitos(vidros, folgas_vidros, angs_in)

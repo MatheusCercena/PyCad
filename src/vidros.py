@@ -2,6 +2,7 @@
 Desenha os vidros, através de offsets chamados via COM e fillets por lisp.
 """
 
+import pythoncom
 from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
 from copy import deepcopy
@@ -29,6 +30,7 @@ def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
         
         for tentativa in range(5):
             try:
+                pythoncom.PumpWaitingMessages()
                 ini_linha_de_centro = linha_de_centro.StartPoint
                 fim_linha_de_centro = linha_de_centro.EndPoint
             except:

@@ -1,6 +1,8 @@
 """
 Desenha os leitos, através de offsets chamados via COM e fillets por lisp.
 """
+
+import pythoncom
 from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
 from math import sqrt, tan, radians
@@ -135,6 +137,7 @@ def def_eq_reta_leitos(ponto_a, ponto_b):
 
 def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentidos):
     handles_leitos = {'externos': [], 'internos': [], 'lat_esq': [], 'lat_dir': []}
+    coordenadas_leitos = []
     handles_guias = converter_ordem_para_secoes(vidros, handles_guias)
     
     pos_vidro = 1
@@ -145,6 +148,7 @@ def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentido
             #Offsets
             for tentativa in range(5):
                 try:
+                    pythoncom.PumpWaitingMessages()
                     ext = linha_guia.Offset(14)[0]
                     handles_leitos['externos'].append(ext.Handle)
                     ext.Layer = 'Leito Externo'
@@ -221,11 +225,15 @@ def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentido
                 if pos_vidro-1 in giratorios:
                     pos_sentido += 1
 
-            acad.SendCommand(f'(c:custom_fillet "{handles_leitos['externos'][pos_vidro-1]}" "{handles_leitos['lat_esq'][pos_vidro-1]}")\n')
-            acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_esq'][pos_vidro-1]}" "{handles_leitos['internos'][pos_vidro-1]}")\n')
-            acad.SendCommand(f'(c:custom_fillet "{handles_leitos['internos'][pos_vidro-1]}" "{handles_leitos['lat_dir'][pos_vidro-1]}")\n')
-            acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_dir'][pos_vidro-1]}" "{handles_leitos['externos'][pos_vidro-1]}")\n')
-
+            for tentativa in range(5):
+                try:
+                    pythoncom.PumpWaitingMessages()
+                    acad.SendCommand(f'(c:custom_fillet "{handles_leitos['externos'][pos_vidro-1]}" "{handles_leitos['lat_esq'][pos_vidro-1]}")\n')
+                    acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_esq'][pos_vidro-1]}" "{handles_leitos['internos'][pos_vidro-1]}")\n')
+                    acad.SendCommand(f'(c:custom_fillet "{handles_leitos['internos'][pos_vidro-1]}" "{handles_leitos['lat_dir'][pos_vidro-1]}")\n')
+                    acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_dir'][pos_vidro-1]}" "{handles_leitos['externos'][pos_vidro-1]}")\n')
+                except:
+                    sleep(0.5)
             pos_vidro += 1
 
     return handles_leitos
