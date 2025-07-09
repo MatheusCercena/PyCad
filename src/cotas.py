@@ -1,14 +1,19 @@
 from pyautocad import Autocad, APoint
-from math import sqrt,atan2, cos, sin
-# from time import sleep
-
+from math import sqrt,atan2, cos, sin, degrees
+from src.ucs import definir_ucs
 acad2 = Autocad(create_if_not_exists=True)
 
 def cotar_medida_total(perfis, offset=28):
-    for perfil in perfis:
+    
+    for i, perfil in enumerate(perfis):
+        p1 = perfil[0]
+        p2 = perfil[1]
+        definir_ucs(i, p1, p2)
+
         p1, p2 = obter_pontos_para_cota_corrigida(perfil, offset)
         a1 = APoint(*p1)
         a2 = APoint(*p2)
+
 
         # Calcula ângulo da cota (mesmo do vetor base interno)
         dx = perfil[1][0] - perfil[0][0]
@@ -30,8 +35,9 @@ def cotar_medida_total(perfis, offset=28):
         loc_y = (a1.y + a2.y) / 2 + vy * offset
         loc = APoint(loc_x, loc_y)
 
-        # agora sim, desenha a cota afastada corretamente
-        acad2.model.AddDimRotated(a1, a2, loc, ang)
+        for i, (p1, p2) in enumerate(perfis):
+            
+            acad2.model.AddDimRotated(a1, a2, loc, ang)
 
 
 def obter_pontos_para_cota_corrigida(leito, offset=28):
@@ -65,14 +71,9 @@ def obter_pontos_para_cota_corrigida(leito, offset=28):
     ponto_ini_idx, x_ini, y_ini = extremos[0]
     ponto_fim_idx, x_fim, y_fim = extremos[-1]
 
-    # 4. Aplica offset (Y + offset) ao ponto de início apenas
-    y_ini_offset = y_ini + offset
-
-    # 5. Desfaz a rotação para voltar ao plano original
-
     # ponto início corrigido
-    x_rot = x_ini * cos(-theta) - y_ini_offset * sin(-theta)
-    y_rot = x_ini * sin(-theta) + y_ini_offset * cos(-theta)
+    x_rot = x_ini * cos(-theta)
+    y_rot = x_ini * sin(-theta)
     
     ponto_inicio = (x_rot + base[0], y_rot + base[1])
 

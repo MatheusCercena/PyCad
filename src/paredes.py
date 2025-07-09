@@ -15,8 +15,14 @@ def fazer_parede_esq(lcs, perfil_U_ext, perfil_U_int, angulo):
     Desenha a parede esquerda sem dar fillet com os perfis U e retorna o handle dela
     return: Handle (str)
     '''
-    ini = acad.HandleToObject(perfil_U_ext).StartPoint
-    fim = acad.HandleToObject(perfil_U_int).StartPoint
+    for tentativa in range(5):
+        try:
+            pythoncom.PumpWaitingMessages()
+            ini = acad.HandleToObject(perfil_U_ext).StartPoint
+            fim = acad.HandleToObject(perfil_U_int).StartPoint
+            break
+        except:
+            sleep(0.5)
     linha = acad2.model.AddLine(APoint(ini[0], ini[1]), APoint(fim[0], fim[1]))
     linha.Rotate(APoint(lcs[0], lcs[1]), radians(angulo * 1))
     linha.Layer = 'Paredes'

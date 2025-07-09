@@ -81,7 +81,7 @@ def pedir_angParedes():
             ang_dir = 90 - float(input(f'Digite o angulo da extremidade direita: '))
             break
         except:
-            print(f'[ERRO] O campo "angulo parede direita" precisa conter apenas numeros: ')
+            print(f'[ERRO] O campo "angulo parede direita" precisa conter apenas numeros e ter 2 dígitos: ')
     angs_ex.append(ang_esq)
     angs_ex.append(ang_dir)
     return angs_ex
@@ -190,7 +190,7 @@ item 5: lista contendo os vidros que são fixos.
                 if v_fin > sum(quant_vidros):
                     print(f'A sacada tem menos que {v_fin} vidros. Escolha um vidro existente na sacada')
                     continue
-                elif v_ini not in moveis and v_ini != 0:
+                elif v_fin not in moveis and v_fin != 0:
                     break
                 else:
                     print('Esse vidro já abre em outro lugar.')
@@ -199,7 +199,7 @@ item 5: lista contendo os vidros que são fixos.
                 print(f'[ERRO] O vidro precisa ser numérico.')
         while True:
             try:
-                giratorio = int(input(f'O vidro giratrio da abertura será no {v_ini} ou no {v_fin}? '))
+                giratorio = int(input(f'O vidro giratório da abertura será no {v_ini} ou no {v_fin}? '))
                 if giratorio in [v_ini, v_fin]:
                     break
                 else:
