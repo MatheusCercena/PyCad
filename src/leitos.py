@@ -155,10 +155,15 @@ def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentido
                     break
                 except:
                     sleep(0.5)
-
-            int = linha_guia.Offset(-14)[0]
-            handles_leitos['internos'].append(int.Handle)
-            int.Layer = 'Leito Interno'
+            for tentativa in range(5):
+                try:
+                    pythoncom.PumpWaitingMessages()
+                    int = linha_guia.Offset(-14)[0]
+                    handles_leitos['internos'].append(int.Handle)
+                    int.Layer = 'Leito Interno'
+                    break
+                except:
+                    sleep(0.5)
             
             #Guias
             guia_ext = linha_guia.Offset(4)[0]

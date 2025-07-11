@@ -4,16 +4,17 @@ from src.ucs import definir_ucs
 acad2 = Autocad(create_if_not_exists=True)
 
 def cotar_medida_total(perfis, offset=28):
-    
     for i, perfil in enumerate(perfis):
+        print(f'perfil {perfil}')
         p1 = perfil[0]
-        p2 = perfil[1]
+        p2 = perfil[-1]
+        print(f'p1 {p1}')
+        print(f'p2 {p2}')
         definir_ucs(i, p1, p2)
 
         p1, p2 = obter_pontos_para_cota_corrigida(perfil, offset)
         a1 = APoint(*p1)
         a2 = APoint(*p2)
-
 
         # Calcula ângulo da cota (mesmo do vetor base interno)
         dx = perfil[1][0] - perfil[0][0]
@@ -36,7 +37,6 @@ def cotar_medida_total(perfis, offset=28):
         loc = APoint(loc_x, loc_y)
 
         for i, (p1, p2) in enumerate(perfis):
-            
             acad2.model.AddDimRotated(a1, a2, loc, ang)
 
 

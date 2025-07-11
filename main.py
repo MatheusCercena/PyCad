@@ -68,4 +68,4 @@ if __name__ == "__main__":
     # puxar_cotas_perfis_U(handles_vidros)
     # puxar_cotas_furos(handles_vidros)
     # puxar_cotas_drenos(handles_vidros)
-    
+
