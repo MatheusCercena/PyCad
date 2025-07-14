@@ -1,18 +1,15 @@
 from pyautocad import Autocad, APoint
-from math import sqrt,atan2, cos, sin, degrees
-from src.ucs import definir_ucs
+from math import sqrt,atan2, cos, sin, hypot
+from src.autocad_conn import get_acad
+
+acad, acad_ModelSpace = get_acad()
 acad2 = Autocad(create_if_not_exists=True)
 
 def cotar_medida_total(perfis, offset=28):
-    for i, perfil in enumerate(perfis):
+    for perfil in perfis:
         print(f'perfil {perfil}')
-        p1 = perfil[0]
-        p2 = perfil[-1]
-        print(f'p1 {p1}')
-        print(f'p2 {p2}')
-        definir_ucs(i, p1, p2)
 
-        p1, p2 = obter_pontos_para_cota_corrigida(perfil, offset)
+        p1, p2 = obter_pontos_para_cota_corrigida(perfil)
         a1 = APoint(*p1)
         a2 = APoint(*p2)
 
@@ -36,11 +33,14 @@ def cotar_medida_total(perfis, offset=28):
         loc_y = (a1.y + a2.y) / 2 + vy * offset
         loc = APoint(loc_x, loc_y)
 
-        for i, (p1, p2) in enumerate(perfis):
-            acad2.model.AddDimRotated(a1, a2, loc, ang)
+        print(f'a1 {a1}')
+        print(f'a2 {a2}')
+        print(f'loc {loc}')
+        print(f'ang {ang}')
+        dim = acad2.model.AddDimRotated(a1, a2, loc, ang)
+        dim.TextRotation = ang
 
-
-def obter_pontos_para_cota_corrigida(leito, offset=28):
+def obter_pontos_para_cota_corrigida(leito):
     """
     Dado um leito com 4 pontos [(x0,y0), (x1,y1), (x2,y2), (x3,y3)] e um offset,
     retorna dois pontos (x, y) que definem corretamente a cota entre os extremos,
