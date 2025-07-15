@@ -2,16 +2,13 @@ from pyautocad import Autocad, APoint
 from math import sqrt,atan2, cos, sin, hypot
 from src.autocad_conn import get_acad
 
-acad, acad_ModelSpace = get_acad()
-acad2 = Autocad(create_if_not_exists=True)
+acad = Autocad(create_if_not_exists=True)
 
-def cotar_medida_total(perfis, offset=28):
+def cotar_medida_total(perfis, tipo_cota='ISO-25', offset=200):
     for perfil in perfis:
-        print(f'perfil {perfil}')
-
         p1, p2 = obter_pontos_para_cota_corrigida(perfil)
-        a1 = APoint(*p1)
-        a2 = APoint(*p2)
+        a1 = APoint(p1[0], p1[1])
+        a2 = APoint(p2[0], p2[1])
 
         # Calcula ângulo da cota (mesmo do vetor base interno)
         dx = perfil[1][0] - perfil[0][0]
@@ -28,17 +25,15 @@ def cotar_medida_total(perfis, offset=28):
         vy =  dx / mod
 
         # aplica offset de 200mm na direção perpendicular
-        offset = 200
         loc_x = (a1.x + a2.x) / 2 + vx * offset
         loc_y = (a1.y + a2.y) / 2 + vy * offset
         loc = APoint(loc_x, loc_y)
 
-        print(f'a1 {a1}')
-        print(f'a2 {a2}')
-        print(f'loc {loc}')
-        print(f'ang {ang}')
-        dim = acad2.model.AddDimRotated(a1, a2, loc, ang)
+        dim = acad.model.AddDimRotated(a1, a2, loc, ang)
         dim.TextRotation = ang
+        dim.StyleName = tipo_cota
+        dim.TextMovement = 1    
+        #offset from dim line deixar 0 ou 30
 
 def obter_pontos_para_cota_corrigida(leito):
     """
@@ -83,5 +78,3 @@ def obter_pontos_para_cota_corrigida(leito):
     ponto_fim = (x_rot_fim + base[0], y_rot_fim + base[1])
 
     return ponto_inicio, ponto_fim
-        
-

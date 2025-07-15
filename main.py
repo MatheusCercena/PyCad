@@ -61,11 +61,12 @@ if __name__ == "__main__":
     handles_guias_leitos = desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros, folga_leitos)
     handle_leitos, coord_leitos = desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
     remover_guias()
+    print(coord_vidros)
     print(coord_leitos)
-    print(handle_leitos)
 
-    # puxar_cotas_vidro(coord_vidros)
-    cotar_medida_total(coord_leitos, handle_leitos)
+    cotar_medida_total(coord_vidros, 'Vidro', 250)
+    cotar_medida_total(coord_leitos, 'Leito', 400)
+
     # puxar_cotas_lcs(handles_lcs)
     # puxar_cotas_perfis_U(handles_vidros)
     # puxar_cotas_furos(handles_vidros)
