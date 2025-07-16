@@ -29,3 +29,21 @@ def fillet_perfis_U(handles):
     for index in range(0, len(linhas_externas)-1):
         acad.SendCommand(f'(c:custom_fillet "{linhas_externas[index]}" "{linhas_externas[index+1]}")\n')
         acad.SendCommand(f'(c:custom_fillet "{linhas_internas[index]}" "{linhas_internas[index+1]}")\n')
+
+def definir_coord_perfis_U(handles):
+    linhas_externas = deepcopy(handles['externos'])
+    linhas_internas = deepcopy(handles['internos'])
+    coordenadas = []
+    for linha in range(len(linhas_externas)):
+        coord = []
+        
+        linha_ext = acad.HandleToObject(linhas_externas[linha])
+        coord.append(linha_ext.StartPoint)
+        coord.append(linha_ext.EndPoint)
+    
+        linha_int = acad.HandleToObject(linhas_internas[linha])
+        coord.append(linha_int.StartPoint)
+        coord.append(linha_int.EndPoint)
+
+        coordenadas.append(coord)
+    return coordenadas

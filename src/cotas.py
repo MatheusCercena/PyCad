@@ -1,6 +1,5 @@
 from pyautocad import Autocad, APoint
 from math import sqrt,atan2, cos, sin, hypot
-from src.autocad_conn import get_acad
 
 acad = Autocad(create_if_not_exists=True)
 
@@ -32,28 +31,31 @@ def cotar_medida_total(perfis, tipo_cota='ISO-25', offset=200):
         dim = acad.model.AddDimRotated(a1, a2, loc, ang)
         dim.TextRotation = ang
         dim.StyleName = tipo_cota
-        dim.TextMovement = 1    
-        #offset from dim line deixar 0 ou 30
-
-def obter_pontos_para_cota_corrigida(leito):
+        dim.TextInsideAlign = True     
+        dim.TextMovement = 0
+        dim.TextOutsideAlign = False  # evita forçar pra fora
+        dim.TextInsideAlign = True    # tenta centralizar o texto
+        
+def obter_pontos_para_cota_corrigida(perfil):
     """
-    Dado um leito com 4 pontos [(x0,y0), (x1,y1), (x2,y2), (x3,y3)] e um offset,
+    Dado um leito com 4 pontos [(x0,y0,z0), (x1,y1,z1), (x2,y2,z2), (x3,y3,z3)] e um offset,
+    Dado um leito com 4 pontos [(ini_int), (fim_int), (ini_ext), (fim_ext)] e um offset,
     retorna dois pontos (x, y) que definem corretamente a cota entre os extremos,
     com offset perpendicular ao vetor base e rotação compensada.
-    
+    [(12.0, 4.0, 0.0), (337.0, 4.0, 0.0)], 
+    [0.0, 0.0, 1000.0, 0.0]
     Retorna: (ponto_inicio, ponto_fim)
     """
-
     # 1. Vetor base: ponto 0 (início interno) até ponto 1 (fim interno)
-    base = leito[0]
-    direcao = leito[1]
+    base = perfil[0]
+    direcao = perfil[1]
     dx = direcao[0] - base[0]
     dy = direcao[1] - base[1]
     theta = -atan2(dy, dx)  # rotação para alinhar com eixo X
 
     # 2. Rotaciona todos os pontos para normalizar
     rotacionados = []
-    for i, ponto in enumerate(leito):
+    for i, ponto in enumerate(perfil):
         x, y = ponto[:2] 
         xt = x - base[0]
         yt = y - base[1]

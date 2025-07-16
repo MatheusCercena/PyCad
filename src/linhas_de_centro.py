@@ -119,3 +119,20 @@ def redesenhar_linhas_de_centro(lcs:list, angs_in: list, sec_princ: int):
     for index, value in enumerate(ordem_desenho):
         lista[value] = novas_lcs[index]
     return lista_de_LCs, lista
+
+def definir_coord_lcs(pos_lcs):
+    coordenadas = []
+    for lcs in pos_lcs:
+        coord = []
+
+        p0 = (lcs[0], lcs[1], 0.0)
+        p1 = (lcs[2], lcs[3], 0.0)
+        p2 = p0
+        p3 = p1
+
+        coord.append(p0)
+        coord.append(p1)
+        coord.append(p2)
+        coord.append(p3)
+        coordenadas.append(coord)
+    return coordenadas
