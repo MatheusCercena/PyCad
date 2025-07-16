@@ -24,6 +24,9 @@ def pedir_linhas_de_centro():
     return linhas_de_centro
 
 def pedir_quant_vidros(lcs):
+    '''
+    Retorna uma lista com a quantidade de vidros de cada lado.
+    '''
     quant_vidros = []
     print(f'''
 {' - '*10}QUANTIDADE DE VIDROS{' - '*10}
@@ -119,6 +122,10 @@ def definir_juncoes(lcs, angs_in):
         2 - colante
         3 - vidro-vidro
     '''
+    print(f'''
+{' - '*10}DEFINIR PASSANTES / COLANTES.{' - '*10}
+''')
+
     juncoes = []
     for index in range(0, len(lcs)):
         esq_dir = []
@@ -230,3 +237,21 @@ item 5: lista contendo os vidros que são fixos.
             return sentidos, fixos
         if res == 's':
             continue
+
+def pedir_elevador():
+    '''
+    Solicita ao usuário os prumos das extremidades direita e esquerda, e retorna uma lista com os angulos externos no formato: [prumo_esq, prumo_dir]
+    '''
+    print(f'''
+{' - '*10}ALTURA ELEVADOR{' - '*10}
+''')
+
+    while True:
+        try:
+            elevador = int(input(f'Digite o angulo da extremidade esquerda: '))     
+            if len(elevador) != 4:
+                raise ValueError
+            break
+        except:
+            print(f'[ERRO] O campo "elevador" precisa conter apenas numeros inteiros e ter 4 dígitos.')
+    return elevador

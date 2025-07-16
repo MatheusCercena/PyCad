@@ -72,7 +72,6 @@ def offset_vidros(espessura_vidro):
             coord_vidros.append([ext_ini, ext_fim])
             lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
             int.Layer = lat_esq.Layer = lat_dir.Layer = 'Vidro Interno'
-            
 
     return handles_vidros, coord_vidros
 
@@ -95,7 +94,7 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
     folga_parede = float(-12) 
     folga_passante = float(2)
     folga_colante = float(-7)
-    folga_vidro_vidro = float(-1) 
+    folga_vidro_vidro = float(-1)
     juncoes_secoes = deepcopy(juncoes)
     folgas_secoes = []
     for index, secao in enumerate(juncoes_secoes):
