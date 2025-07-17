@@ -4,7 +4,7 @@ Desenha os perfis U, através de offsets chamados via COM e fillets por lisp.
 
 from copy import deepcopy
 from src.autocad_conn import get_acad
-from src.calcs import normalizar, definir_pontos_na_secao
+from src.calcs import normalizar, obter_pontos_medida_total, definir_pontos_na_secao
 
 acad, acad_ModelSpace = get_acad()
 
@@ -57,13 +57,15 @@ def associar_aberturas_aos_lados(quant_vidros, aberturas):
     '''
     todos_vidros = distribuir_vidros_por_lado(quant_vidros)
     resultado = []
-    for abertura in aberturas:
-        for lado in todos_vidros:
-            if abertura[2] in lado:
-                resultado.append(abertura[4])
+
+    for lado in todos_vidros:
+        for abertura in aberturas:
+            if abertura[2] in lado:  # Se o vidro giratório está neste lado
+                resultado.append(abertura[4])  # 'direita' ou 'esquerda'
                 break
             else:
-                resultado.append(0)
+                resultado.append(0)  # Não há giratório neste lado
+    
     return resultado
 
 def definir_coord_perfis_U(handles):
@@ -85,14 +87,15 @@ def definir_coord_perfis_U(handles):
         coordenadas.append(coord)
     return coordenadas
 
-# def redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado):
-#     for linha in range(len(linhas_externas)):
-#         if 
+# def redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado, elevador):
+    
+#     for lado in coord_perfis_U:
 
-#         if aberturas_por_lado[linha] != 0:
-#             #adicionar if pra caso o lado seja maior que 1980 e menor que elevador, definir a medida
+        
+#         normalizar()
+#         if aberturas_por_lado == 'esquerda':
 #             pass
-
-#         vetor_linha = (fim_linha_de_centro[0] - ini_linha_de_centro[0], fim_linha_de_centro[1] - ini_linha_de_centro[1])
-#         vetores_unitarios = normalizar(vetor_linha)
-
+#         elif aberturas_por_lado == 'direita':
+#             pass
+#         else: #0
+#             pass

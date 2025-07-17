@@ -34,7 +34,7 @@ def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
             handles_guias_leitos.append(acad.HandleToObject(guia.Handle))
     return handles_guias_leitos
 
-def folgas_leitos(vidros, folgas_vidros, angs_in):
+def folgas_leitos(vidros, folgas_vidros, angs_in, aberturas):
     '''
     Calcula as folgas dos leitos para cada vidro em cada seção da sacada.
     
@@ -64,6 +64,7 @@ def folgas_leitos(vidros, folgas_vidros, angs_in):
                             folga_esq = 1.5
                     else:
                         folga_esq = 1.5
+                    # if aberturas[2]
                     folgas_leitos_vidro.append(folga_esq)
                 if lado == 1:
                     if index+1 == len(vidros[secao]):                            

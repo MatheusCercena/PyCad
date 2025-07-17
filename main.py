@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     aberturas_por_lado = associar_aberturas_aos_lados(quant_vidros, sentidos_abert)
     coord_perfis_U = definir_coord_perfis_U(handles_perfis_U)
-    # coord_perfis_U = redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado)
+    # coord_perfis_U = redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado, elevador)
 
     parede_esq = fazer_parede_esq(pos_lcs[0], handles_perfis_U['externos'][0], handles_perfis_U['internos'][0], angs_paredes[0])
     fillet_paredes(handles_perfis_U['externos'][0], handles_perfis_U['internos'][0], parede_esq)
