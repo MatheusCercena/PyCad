@@ -1,5 +1,5 @@
 """
-Desenha os leitos, através de offsets chamados via COM e fillets por lisp.
+Desenha as paredes, através de offsets chamados via COM e fillets por lisp.
 """
 import pythoncom
 from pyautocad import Autocad, APoint

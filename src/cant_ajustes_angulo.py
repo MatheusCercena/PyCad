@@ -1,15 +1,7 @@
-from math import radians, tan
-
-def calcular_gaps_paredes(ang):
-    '''
-    calcula o gap entre a linha de centro e a parede, que é diferente de 0 no caso de paredes anguladas.
-    '''
-    cat_adj = 18
-    gap_lcs = round((tan(radians(abs(ang))) * cat_adj), 0)
-    return gap_lcs
+from src.calcs import calcular_gaps_paredes
     
 def necessidade_cant_ajuste(ang, abre_ali: bool):
-    ''''
+    '''
     Esperado valor 0 para abertura para dentro e 1 para abertura para fora
     '''
     if abre_ali == True:
@@ -55,7 +47,7 @@ def necessidade_cant_ajuste(ang, abre_ali: bool):
 
 def infos_cant_ajuste(gap_cant):
     '''
-    retorna modelo da cantoneira necessária, se precisa refilar e a medida das paredes dela caso haja necessidade de refilar
+    Retorna modelo da cantoneira necessária, se precisa refilar e a medida das paredes dela caso haja necessidade de refilar
     '''
     if 7 < gap_cant < 15:
         mod = 'ct-005'

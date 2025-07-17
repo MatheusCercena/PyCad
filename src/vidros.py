@@ -5,25 +5,13 @@ Desenha os vidros, através de offsets chamados via COM e fillets por lisp.
 import pythoncom
 from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
+from src.calcs import calcular_gaps_vidro, normalizar, definir_pontos_na_secao
 from copy import deepcopy
-from math import tan, radians, floor, sqrt
+from math import floor, sqrt
 from time import sleep
 
 acad, acad_ModelSpace = get_acad()
 acad2 = Autocad(create_if_not_exists=True)
-
-def normalizar(vetor):
-    vetor_unitario = sqrt(vetor[0]**2 + vetor[1]**2)
-    vetor_unitario_x = vetor[0]/vetor_unitario
-    vetor_unitario_y = vetor[1]/vetor_unitario
-    
-    return (vetor_unitario_x, vetor_unitario_y)
-
-def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia):
-        return (
-            Inicio_secao[0] + vetor_unitario[0] * distancia,
-            Inicio_secao[1] + vetor_unitario[1] * distancia
-        )
 
 def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list):
     for i, linha_de_centro in enumerate(handles_lcs):
@@ -75,15 +63,7 @@ def offset_vidros(espessura_vidro):
 
     return handles_vidros, coord_vidros
 
-def calcular_gaps_vidro_vidro(ang):
-    '''
-    calcula o gap entre o vidro e a linha de centro quando é juncão do tipo vidro-vidro.
-    '''
-    cat_adj = 4
-    gap_vidro = round((tan(radians(abs(ang/2))) * cat_adj), 2)
-    return gap_vidro
-
-def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
+def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessura_vidro: int):
     '''
     Retorna uma lista com as folgas de cada secao da sacada, de forma que cada elemento é outra lista com 4 elementos, sendo eles:
     0 - Folga parede esquerdo
@@ -116,9 +96,9 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list):
             elif secao[lado] == 1 or secao[lado] == 2: 
                 folgas_secao.append(0)
             elif secao[lado] == 3 and lado == 0: 
-                folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[index-1]))
+                folgas_secao.append(calcular_gaps_vidro(angs_in[index-1], espessura_vidro))
             elif secao[lado] == 3 and lado == 1:
-                folgas_secao.append(calcular_gaps_vidro_vidro(angs_in[index]))
+                folgas_secao.append(calcular_gaps_vidro(angs_in[index], espessura_vidro))
         folgas_secoes.append(folgas_secao)
     return folgas_secoes
 

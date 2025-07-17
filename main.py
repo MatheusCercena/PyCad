@@ -1,11 +1,11 @@
 from src.achar_secao_principal import descobrir_secao_principal
 from src.recebimento_da_medicao import pedir_linhas_de_centro, pedir_quant_vidros, pedir_angSecoes, pedir_angParedes, pedir_prumos, definir_juncoes, solicitar_sentido_abertura, pedir_elevador
 from src.linhas_de_centro import definir_linhas_de_centro, redesenhar_linhas_de_centro, definir_coord_lcs
-from src.perfis_U import offset_perfis_U, fillet_perfis_U, definir_coord_perfis_U, associar_aberturas_aos_lados
+from src.perfis_U import offset_perfis_U, fillet_perfis_U, definir_coord_perfis_U, associar_aberturas_aos_lados#, redefinir_coord_perfis_U
 from src.leitos import *
 from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros, desenhar_guias_vidros, remover_guias
 from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
-from src.comandos import carregar_comandos
+from src.comandos_cad import carregar_comandos
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
 from src.limpar import limpar_tudo
 from src.cotas import cotar_medida_total
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     # prumos = pedir_prumos()
     juncoes = definir_juncoes(lcs, angs_in)
     elevador = pedir_elevador()
-    espessura_vidro = 8
+    espessura_vidro = int(8)
 
     carregar_comandos()
 
@@ -36,7 +36,8 @@ if __name__ == "__main__":
     fillet_perfis_U(handles_perfis_U)
 
     aberturas_por_lado = associar_aberturas_aos_lados(quant_vidros, sentidos_abert)
-    coord_perfis_U = definir_coord_perfis_U(handles_perfis_U, aberturas_por_lado)
+    coord_perfis_U = definir_coord_perfis_U(handles_perfis_U)
+    # coord_perfis_U = redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado)
 
     parede_esq = fazer_parede_esq(pos_lcs[0], handles_perfis_U['externos'][0], handles_perfis_U['internos'][0], angs_paredes[0])
     fillet_paredes(handles_perfis_U['externos'][0], handles_perfis_U['internos'][0], parede_esq)
@@ -55,7 +56,7 @@ if __name__ == "__main__":
         info_cant_dir = infos_cant_ajuste(gap_cant_dir)
         print(f'Info cant dir: {info_cant_dir}')
 
-    folgas_vidros = definir_folgas_vidros(juncoes, gaps_lcs, angs_in)
+    folgas_vidros = definir_folgas_vidros(juncoes, gaps_lcs, angs_in, espessura_vidro)
 
     vidros = medida_dos_vidros(lcs, quant_vidros, folgas_vidros)
     pontos_vidros = pontos_dos_vidros(vidros, folgas_vidros)
@@ -75,4 +76,3 @@ if __name__ == "__main__":
 
     # puxar_cotas_furos(handles_vidros)
     # puxar_cotas_drenos(handles_vidros)
-

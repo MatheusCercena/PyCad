@@ -5,7 +5,8 @@ Desenha os leitos, através de offsets chamados via COM e fillets por lisp.
 import pythoncom
 from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
-from math import sqrt, tan, radians
+from src.calcs import normalizar, definir_pontos_na_secao, calcular_gaps_leito
+from math import radians
 from sympy import symbols, Eq, solve
 from time import sleep
 
@@ -13,19 +14,6 @@ acad2 = Autocad(create_if_not_exists=True)
 acad, acad_ModelSpace = get_acad()
 
 x, y, b = symbols('x y b')
-
-def normalizar(vetor):
-    vetor_unitario = sqrt(vetor[0]**2 + vetor[1]**2)
-    vetor_unitario_x = vetor[0]/vetor_unitario
-    vetor_unitario_y = vetor[1]/vetor_unitario
-    
-    return (vetor_unitario_x, vetor_unitario_y)
-
-def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia):
-        return (
-            Inicio_secao[0] + vetor_unitario[0] * distancia,
-            Inicio_secao[1] + vetor_unitario[1] * distancia
-        )
 
 def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list, folgas_leitos: list):
     handles_guias_leitos = []
@@ -45,14 +33,6 @@ def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
             guia = acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
             handles_guias_leitos.append(acad.HandleToObject(guia.Handle))
     return handles_guias_leitos
-
-def calcular_gaps_leito(ang):
-    '''
-    calcula o gap entre os leitos e a linha de centro quando é juncão do tipo vidro-vidro.
-    '''
-    cat_adj = 14
-    gap_leito = round((tan(radians(abs(ang/2))) * cat_adj), 2)
-    return gap_leito
 
 def folgas_leitos(vidros, folgas_vidros, angs_in):
     '''

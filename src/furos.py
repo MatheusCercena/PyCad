@@ -7,4 +7,3 @@ def definir_pontos_furos(handles_perfis_U):
         acad.HandleToObject(perfil_U).Offset(700)
         #pegar medidas dos vidros pelas posicoes vidros e calcular a partir daí 
         #ou, antes, fazer a função pra dividir os trilhos
-

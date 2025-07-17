@@ -248,9 +248,10 @@ def pedir_elevador():
 
     while True:
         try:
-            elevador = int(input(f'Digite o angulo da extremidade esquerda: '))     
-            if len(elevador) != 4:
+            elevador = input(f'Digite a medida segura do elevador: ')
+            if len(elevador) != 4  or not elevador.isdigit():
                 raise ValueError
+            elevador = int(elevador)
             break
         except:
             print(f'[ERRO] O campo "elevador" precisa conter apenas numeros inteiros e ter 4 dígitos.')

@@ -1,7 +1,6 @@
 from sympy import symbols, Eq, solve
 from math import sqrt, pow
 
-
 x, y, b = symbols('x y b')
 
 def definir_linha_perpendicular(pos_lcs):
@@ -12,6 +11,7 @@ def definir_linha_perpendicular(pos_lcs):
     l_guia_ini = pos_lcs[0][0], pos_lcs[0][1]
     l_guia_fin = pos_lcs[len(pos_lcs)-1][2], pos_lcs[len(pos_lcs)-1][3]
     ini_reta_perp = [(l_guia_fin[0] - l_guia_ini[0])/2, (l_guia_fin[1] - l_guia_ini[1])/2]
+
     #calculando vetor_AB
     vetor_AB = ini_reta_perp[0] - l_guia_ini[0], ini_reta_perp[1] - l_guia_ini[1] 
     vetor_AB_perp1 = vetor_AB[1]*-1, vetor_AB[0]
@@ -27,6 +27,7 @@ def definir_linha_perpendicular(pos_lcs):
     vetor_AB2_unit = vetor_AB_perp2[0]/vetor_AB2_norm, vetor_AB_perp2[1]/vetor_AB2_norm
     vetor_AC2 = vetor_AB2_unit[0]*comp_AC, vetor_AB2_unit[1]*comp_AC
     coord_c2 = ini_reta_perp[0] + vetor_AC2[0], ini_reta_perp[1] + vetor_AC2[1]
+
     return coord_c1[0], coord_c1[1], coord_c2[0], coord_c2[1]
 
 def def_eq_reta(secao):

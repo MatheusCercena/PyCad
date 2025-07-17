@@ -4,6 +4,7 @@ Desenha os perfis U, através de offsets chamados via COM e fillets por lisp.
 
 from copy import deepcopy
 from src.autocad_conn import get_acad
+from src.calcs import normalizar, definir_pontos_na_secao
 
 acad, acad_ModelSpace = get_acad()
 
@@ -29,30 +30,6 @@ def fillet_perfis_U(handles):
     for index in range(0, len(linhas_externas)-1):
         acad.SendCommand(f'(c:custom_fillet "{linhas_externas[index]}" "{linhas_externas[index+1]}")\n')
         acad.SendCommand(f'(c:custom_fillet "{linhas_internas[index]}" "{linhas_internas[index+1]}")\n')
-
-def definir_coord_perfis_U(handles, aberturas_por_lado):
-    linhas_externas = deepcopy(handles['externos'])
-    linhas_internas = deepcopy(handles['internos'])
-    coordenadas = []
-
-    for linha in range(len(linhas_externas)):
-
-        if aberturas_por_lado[linha] != 0:
-            #adicionar if pra caso o lado seja maior que 1980 e menor que elevador, definir a medida
-            pass
-
-        coord = []
-        
-        linha_ext = acad.HandleToObject(linhas_externas[linha])
-        coord.append(linha_ext.StartPoint)
-        coord.append(linha_ext.EndPoint)
-    
-        linha_int = acad.HandleToObject(linhas_internas[linha])
-        coord.append(linha_int.StartPoint)
-        coord.append(linha_int.EndPoint)
-
-        coordenadas.append(coord)
-    return coordenadas
 
 def distribuir_vidros_por_lado(quant_vidros):
     """
@@ -88,4 +65,34 @@ def associar_aberturas_aos_lados(quant_vidros, aberturas):
             else:
                 resultado.append(0)
     return resultado
+
+def definir_coord_perfis_U(handles):
+    linhas_externas = deepcopy(handles['externos'])
+    linhas_internas = deepcopy(handles['internos'])
+    coordenadas = []
+
+    for linha in range(len(linhas_externas)):
+        coord = []
+        
+        linha_ext = acad.HandleToObject(linhas_externas[linha])
+        coord.append(linha_ext.StartPoint)
+        coord.append(linha_ext.EndPoint)
+    
+        linha_int = acad.HandleToObject(linhas_internas[linha])
+        coord.append(linha_int.StartPoint)
+        coord.append(linha_int.EndPoint)
+
+        coordenadas.append(coord)
+    return coordenadas
+
+# def redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado):
+#     for linha in range(len(linhas_externas)):
+#         if 
+
+#         if aberturas_por_lado[linha] != 0:
+#             #adicionar if pra caso o lado seja maior que 1980 e menor que elevador, definir a medida
+#             pass
+
+#         vetor_linha = (fim_linha_de_centro[0] - ini_linha_de_centro[0], fim_linha_de_centro[1] - ini_linha_de_centro[1])
+#         vetores_unitarios = normalizar(vetor_linha)
 
