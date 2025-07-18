@@ -1,9 +1,18 @@
 from math import sqrt, tan, radians, atan2, cos, sin 
+from math import atan2, cos, sin, radians, degrees
+from typing import Tuple, List
+import numpy as np
+
+Ponto3D = Tuple[float, float, float]
+Ponto2D = Tuple[float, float]
 
 def normalizar(vetor: tuple[float, float]) -> tuple[float, float]:
     """Retorna o vetor unitário (normalizado)"""
     norma = sqrt(vetor[0]**2 + vetor[1]**2)
     return (vetor[0]/norma, vetor[1]/norma)
+
+def distancia_2d(p1, p2):
+    return sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
 def multiplicar_vetor(vetor: tuple[float, float], escalar: float) -> tuple[float, float]:
     """Multiplica um vetor por um escalar"""
@@ -105,19 +114,24 @@ def obter_pontos_medida_total(perfil: list[tuple[float, float, float]]) -> tuple
         rotacionados.append((i, xr, yr))
 
     # 3. Identifica os extremos (menor e maior X)
-    extremos = sorted(rotacionados, key=lambda p: p[1])
-    ponto_ini_idx, x_ini, y_ini = extremos[0]
-    ponto_fim_idx, x_fim, y_fim = extremos[-1]
+    extremos = rotacionados
+    extremos_sorted = sorted(extremos, key=lambda p: p[1])
+    ponto_ini_idx, x_ini, y_ini = extremos_sorted[0]
+    ponto_fim_idx, x_fim, y_fim = extremos_sorted[-1]
 
     # ponto início corrigido
-    x_rot = x_ini * cos(-theta)
-    y_rot = x_ini * sin(-theta)
-    
-    ponto_inicio = (x_rot + base[0], y_rot + base[1])
+    pontos = [ponto_ini_idx, ponto_fim_idx]
+    x_rot_ini = x_ini * cos(-theta)
+    y_rot_ini = x_ini * sin(-theta)
+    ponto_inicio = (x_rot_ini + base[0], y_rot_ini + base[1])
 
     # ponto fim permanece sem offset
-    x_rot_fim = x_fim * cos(-theta) - y_fim * sin(-theta)
-    y_rot_fim = x_fim * sin(-theta) + y_fim * cos(-theta)
+    # x_rot_fim = x_fim * cos(-theta) - y_fim * sin(-theta)
+    # y_rot_fim = x_fim * sin(-theta) + y_fim * cos(-theta)
+    # ponto_fim = (x_rot_fim + base[0], y_rot_fim + base[1])
+    x_rot_fim = x_fim * cos(-theta)
+    y_rot_fim = x_fim * sin(-theta)
+
     ponto_fim = (x_rot_fim + base[0], y_rot_fim + base[1])
 
-    return ponto_inicio, ponto_fim
+    return pontos, ponto_inicio, ponto_fim

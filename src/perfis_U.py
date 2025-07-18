@@ -4,7 +4,7 @@ Desenha os perfis U, através de offsets chamados via COM e fillets por lisp.
 
 from copy import deepcopy
 from src.autocad_conn import get_acad
-from src.calcs import normalizar, obter_pontos_medida_total, definir_pontos_na_secao
+from src.calcs import distancia_2d, obter_pontos_medida_total, definir_pontos_na_secao
 
 acad, acad_ModelSpace = get_acad()
 
@@ -68,7 +68,10 @@ def associar_aberturas_aos_lados(quant_vidros, aberturas):
     
     return resultado
 
-def definir_coord_perfis_U(handles):
+def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[float, float, float]]]:
+    '''
+    retorna uma lista de sublistas que contem 4 tuplas com os pontos x, y, z de cada extremidade do perfil U
+    '''
     linhas_externas = deepcopy(handles['externos'])
     linhas_internas = deepcopy(handles['internos'])
     coordenadas = []
@@ -87,15 +90,14 @@ def definir_coord_perfis_U(handles):
         coordenadas.append(coord)
     return coordenadas
 
-# def redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado, elevador):
+def redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado, elevador):
     
-#     for lado in coord_perfis_U:
-
-        
-#         normalizar()
-#         if aberturas_por_lado == 'esquerda':
-#             pass
-#         elif aberturas_por_lado == 'direita':
-#             pass
-#         else: #0
-#             pass
+    for lado in coord_perfis_U:
+        p1, p2 = obter_pontos_medida_total(lado)
+        comprimento_perfil = distancia_2d(p1, p2)
+        if aberturas_por_lado == 'esquerda':
+            pass
+        elif aberturas_por_lado == 'direita':
+            pass
+        else: #0
+            pass

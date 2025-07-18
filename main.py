@@ -45,6 +45,8 @@ if __name__ == "__main__":
     parede_dir = fazer_parede_dir(pos_lcs[-1], handles_perfis_U['externos'][-1], handles_perfis_U['internos'][-1], angs_paredes[1])
     fillet_paredes(handles_perfis_U['externos'][-1], handles_perfis_U['internos'][-1], parede_dir)
 
+    coord_perfis_U = definir_coord_perfis_U(handles_perfis_U)
+
     gap_lcs_parede_esq, gap_cant_esq, necessidade_cant_esq = necessidade_cant_ajuste(angs_paredes[0], True)
     gap_lcs_parede_dir, gap_cant_dir, necessidade_cant_dir = necessidade_cant_ajuste(angs_paredes[1], False)
 
@@ -64,7 +66,7 @@ if __name__ == "__main__":
     handles_vidros, coord_vidros = offset_vidros(espessura_vidro)
     remover_guias()
 
-    folga_leitos = folgas_leitos(vidros, folgas_vidros, angs_in)
+    folga_leitos = folgas_leitos(vidros, folgas_vidros, angs_in, sentidos_abert)
     handles_guias_leitos = desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros, folga_leitos)
     handle_leitos, coord_leitos = desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
     remover_guias()
