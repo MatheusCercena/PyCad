@@ -6,12 +6,16 @@ import numpy as np
 Ponto3D = Tuple[float, float, float]
 Ponto2D = Tuple[float, float]
 
+def vetor_entre_pontos(p1: tuple[float, float], p2: tuple[float, float]) -> tuple[float, float]:
+    """Retorna o vetor que vai de p1 até p2"""
+    return (p2[0] - p1[0], p2[1] - p1[1])
+
 def normalizar(vetor: tuple[float, float]) -> tuple[float, float]:
     """Retorna o vetor unitário (normalizado)"""
     norma = sqrt(vetor[0]**2 + vetor[1]**2)
     return (vetor[0]/norma, vetor[1]/norma)
 
-def distancia_2d(p1, p2):
+def distancia_2d(p1: tuple, p2: tuple):
     return sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
 def multiplicar_vetor(vetor: tuple[float, float], escalar: float) -> tuple[float, float]:
@@ -39,7 +43,7 @@ def vetor_perpendicular_unitario(p1: tuple[float, float], p2: tuple[float, float
     mod = sqrt(dx**2 + dy**2)
     return (-dy / mod, dx / mod)
 
-def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia):
+def definir_pontos_na_secao(Inicio_secao, vetor_unitario, distancia) -> tuple[float, float]:
         return (
             Inicio_secao[0] + vetor_unitario[0] * distancia,
             Inicio_secao[1] + vetor_unitario[1] * distancia

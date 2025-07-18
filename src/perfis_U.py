@@ -4,7 +4,7 @@ Desenha os perfis U, através de offsets chamados via COM e fillets por lisp.
 
 from copy import deepcopy
 from src.autocad_conn import get_acad
-from src.calcs import distancia_2d, obter_pontos_medida_total, definir_pontos_na_secao
+from src.calcs import distancia_2d, obter_pontos_medida_total, normalizar, definir_pontos_na_secao, vetor_entre_pontos
 
 acad, acad_ModelSpace = get_acad()
 
@@ -90,22 +90,50 @@ def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[flo
         coordenadas.append(coord)
     return coordenadas
 
-def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float]]], aberturas_por_lado: list, elevador: int):
-    
-    for lado in coord_perfis_U:
-        p1, p2 = obter_pontos_medida_total(lado)
+def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float]]], aberturas_por_lado: list, elevador: int) -> list[list[list[float, float]]]:
+    #corrigir funcao pra que tenha 4 elementos, no caso o 2 internos e 2 externos.
+    coordenadas = []
+    for i, lado in enumerate(coord_perfis_U):
+        pontos = obter_pontos_medida_total(lado)
+        p1 = pontos[1]
+        p2 = pontos[2]
+        
         comprimento_perfil = distancia_2d(p1, p2)
         comprimento_restante = comprimento_perfil
-        perfis_secao = []
-        while comprimento_restante > elevador:
-            secao_nova = 1980
-            perfis_secao.append(secao_nova)
-            comprimento_restante -= secao_nova
-             
 
-            if aberturas_por_lado == 'esquerda':
-                pass
-            elif aberturas_por_lado == 'direita':
-                pass
-            else: #0
-                pass
+        perfis_secao = []
+        while True:
+            if elevador < comprimento_restante > 2800:
+                secao_nova = 1980
+                perfis_secao.append(secao_nova)
+                comprimento_restante -= secao_nova
+            elif elevador < comprimento_restante <= 2800:
+                secao_nova = comprimento_restante/2
+                perfis_secao.append(secao_nova)
+                comprimento_restante -= secao_nova
+            else:#comprimento_restante < elevador
+                if aberturas_por_lado[i][4] == 'esquerda':
+                    perfis_secao.append(comprimento_restante)
+                elif aberturas_por_lado[i][4] == 'direita':
+                    perfis_secao.insert(0, comprimento_restante)
+                else:
+                    perfis_secao.insert(0, comprimento_restante)
+                    #mais tarde fazer funcao pra levar em conta o angulo da sacada.
+                break
+
+        vetor = vetor_entre_pontos(p1, p2)
+        vetor_unitario = normalizar(vetor)
+        ini_perfil = p1
+        coord_perfis_secao = []
+        for perfil in perfis_secao:
+            coord_perfil = []
+            coord_perfil.append(ini_perfil)
+
+            fim_perfil = definir_pontos_na_secao(p1, vetor_unitario, perfil)   
+            coord_perfil.append(fim_perfil)
+            
+            ini_perfil = fim_perfil
+            coord_perfis_secao.append(coord_perfil)
+
+        coordenadas.append(coord_perfis_secao)
+    return coordenadas

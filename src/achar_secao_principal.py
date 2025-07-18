@@ -4,7 +4,6 @@ Realiza uma série de calculos sobre a lista de linhas de centro para definir qu
 
 from src.calcs import normalizar, ponto_medio, somar_pontos, multiplicar_vetor
 from sympy import symbols, Eq, solve
-from math import sqrt, pow
 from src.calcs import dentro_do_intervalo
 
 x, y, b = symbols('x y b')
