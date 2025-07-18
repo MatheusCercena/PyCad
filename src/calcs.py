@@ -119,16 +119,12 @@ def obter_pontos_medida_total(perfil: list[tuple[float, float, float]]) -> tuple
     ponto_ini_idx, x_ini, y_ini = extremos_sorted[0]
     ponto_fim_idx, x_fim, y_fim = extremos_sorted[-1]
 
-    # ponto início corrigido
+    # pontos corrigidos
     pontos = [ponto_ini_idx, ponto_fim_idx]
     x_rot_ini = x_ini * cos(-theta)
     y_rot_ini = x_ini * sin(-theta)
     ponto_inicio = (x_rot_ini + base[0], y_rot_ini + base[1])
 
-    # ponto fim permanece sem offset
-    # x_rot_fim = x_fim * cos(-theta) - y_fim * sin(-theta)
-    # y_rot_fim = x_fim * sin(-theta) + y_fim * cos(-theta)
-    # ponto_fim = (x_rot_fim + base[0], y_rot_fim + base[1])
     x_rot_fim = x_fim * cos(-theta)
     y_rot_fim = x_fim * sin(-theta)
 

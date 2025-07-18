@@ -90,14 +90,22 @@ def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[flo
         coordenadas.append(coord)
     return coordenadas
 
-def redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado, elevador):
+def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float]]], aberturas_por_lado: list, elevador: int):
     
     for lado in coord_perfis_U:
         p1, p2 = obter_pontos_medida_total(lado)
         comprimento_perfil = distancia_2d(p1, p2)
-        if aberturas_por_lado == 'esquerda':
-            pass
-        elif aberturas_por_lado == 'direita':
-            pass
-        else: #0
-            pass
+        comprimento_restante = comprimento_perfil
+        perfis_secao = []
+        while comprimento_restante > elevador:
+            secao_nova = 1980
+            perfis_secao.append(secao_nova)
+            comprimento_restante -= secao_nova
+             
+
+            if aberturas_por_lado == 'esquerda':
+                pass
+            elif aberturas_por_lado == 'direita':
+                pass
+            else: #0
+                pass

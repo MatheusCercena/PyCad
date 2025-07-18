@@ -13,6 +13,11 @@ def pedir_linhas_de_centro():
     while True:
         try:
             lc_secoes = int(input(f'Digite a linha de centro da S{cont}: '))
+            if not 30 <= lc_secoes <= 30000:
+                raise ValueError
+        except ValueError:
+            print(f'[ERRO] Medida inválida: o valor deve ser um número inteiro entre 30 e 30000.')
+            continue
         except:
             print(f'[ERRO] O campo "linha de centro" precisa conter apenas numeros inteiros: ')
             continue
