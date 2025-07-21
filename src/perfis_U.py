@@ -9,7 +9,8 @@ Desenha os perfis U, através de offsets chamados via COM e fillets por lisp.
 
 from copy import deepcopy
 from src.autocad_conn import get_acad
-from src.calcs import distancia_2d, obter_pontos_medida_total, normalizar, definir_pontos_na_secao, vetor_entre_pontos
+from src.calcs_vetor import distancia_2d, normalizar, definir_pontos_na_secao, vetor_entre_pontos
+from src.calcs_cad import obter_pontos_medida_total
 from pyautocad import APoint
 
 acad, acad_ModelSpace = get_acad()
@@ -54,60 +55,6 @@ def fillet_perfis_U(handles: dict[str, list[str]]) -> None:
     for index in range(0, len(linhas_externas)-1):
         acad.SendCommand(f'(c:custom_fillet "{linhas_externas[index]}" "{linhas_externas[index+1]}")\n')
         acad.SendCommand(f'(c:custom_fillet "{linhas_internas[index]}" "{linhas_internas[index+1]}")\n')
-
-def distribuir_vidros_por_lado(quant_vidros: list[int]) -> list[list[int]]:
-    """Distribui os vidros por lado da sacada.
-    
-    Recebe uma lista com a quantidade de vidros por lado e retorna uma lista de sublistas,
-    cada uma contendo os números sequenciais dos vidros de cada lado.
-
-    Args:
-        quant_vidros: Lista com a quantidade de vidros por lado.
-
-    Returns:
-        list: Lista de sublistas com números sequenciais dos vidros de cada lado.
-        
-    Example:
-        Entrada: [3, 5, 2]
-        Saída: [[1, 2, 3], [4, 5, 6, 7, 8], [9, 10]]
-    """
-    todos_vidros = []
-    cont = 1
-
-    for qtd in quant_vidros:
-        vidros_lado = list(range(cont, cont + qtd))
-        todos_vidros.append(vidros_lado)
-        cont += qtd
-
-    return todos_vidros
-
-def associar_aberturas_aos_lados(quant_vidros: list[int], aberturas: list) -> list:
-    """Associa as aberturas aos lados da sacada.
-    
-    Args:
-        quant_vidros: Lista com quantidade de vidros por lado.
-        aberturas: Lista com valores de cada abertura conforme função "solicitar sentido de abertura".
-    
-    Returns:
-        list: Lista com os sentidos de abertura associados aos lados.
-    """
-    todos_vidros = distribuir_vidros_por_lado(quant_vidros)
-    resultado = []
-
-    for lado in todos_vidros:
-        for abertura in aberturas:
-            parcial = ['', 0]
-            if abertura[2] in lado:  # Se o vidro giratório está neste lado
-                quant = abertura[1] - abertura[0]
-                if quant > parcial[1]:
-                    parcial[0] = abertura[4]
-                    parcial[1] = quant
-                   # 'direita' ou 'esquerda'
-            else:
-                parcial[0] = 0  # Não há giratório neste lado
-            resultado.append(parcial[0])
-    
-    return resultado
 
 def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[float, float, float]]]:
     """Define as coordenadas dos perfis U.

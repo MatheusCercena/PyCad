@@ -10,7 +10,8 @@ Desenha os leitos, através de offsets chamados via COM e fillets por lisp.
 import pythoncom
 from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
-from src.calcs import normalizar, definir_pontos_na_secao, calcular_gaps_leito
+from src.calcs_vetor import normalizar, definir_pontos_na_secao
+from src.calcs_cad import calcular_gaps_leito
 from math import radians
 from sympy import symbols, Eq, solve
 from time import sleep

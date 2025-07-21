@@ -10,7 +10,8 @@ Desenha os vidros, através de offsets chamados via COM e fillets por lisp.
 import pythoncom
 from pyautocad import Autocad, APoint
 from src.autocad_conn import get_acad
-from src.calcs import calcular_gaps_vidro, normalizar, definir_pontos_na_secao
+from src.calcs_vetor import normalizar, definir_pontos_na_secao
+from src.calcs_cad import calcular_gaps_vidro
 from copy import deepcopy
 from math import floor, sqrt
 from time import sleep
@@ -63,37 +64,7 @@ def remover_guias() -> None:
         except Exception as e:
             print(f"Erro ao deletar entidade {i}: {e}")
 
-def offset_vidros(espessura_vidro: int) -> tuple[list[str], list[list[tuple[float, float, float]]]]:
-    """Cria offsets dos vidros externos e internos.
-    
-    Args:
-        espessura_vidro: Espessura do vidro em milímetros.
-    
-    Returns:
-        tuple: Tupla contendo:
-            - Lista de handles dos vidros
-            - Lista com coordenadas dos vidros
-    """
-    handles_vidros = []
-    coord_vidros = []
-    for linha in acad_ModelSpace:
-        if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
-            ext = linha.Offset(espessura_vidro/2)[0]
-            handles_vidros.append(ext.Handle)
-            ext.Layer = 'Vidro Externo'
-            int = linha.Offset(-1*espessura_vidro/2)[0]
-            ext_ini = ext.StartPoint
-            int_ini = int.StartPoint
-            lat_esq = acad2.model.AddLine(APoint(ext_ini[0], ext_ini[1]), APoint(int_ini[0], int_ini[1]))
-            ext_fim = ext.EndPoint
-            int_fim = int.EndPoint
-            coord_vidros.append([ext_ini, ext_fim])
-            lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
-            int.Layer = lat_esq.Layer = lat_dir.Layer = 'Vidro Interno'
-
-    return handles_vidros, coord_vidros
-
-def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessura_vidro: int) -> list:
+def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessura_vidro: int) -> list[list[int, int]]:
     """Define as folgas dos vidros para cada seção da sacada.
     
     Args:
@@ -109,10 +80,10 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessur
             - Folga ajuste de ângulo esquerdo
             - Folga ajuste de ângulo direito
     """
-    folga_parede = float(-12) 
-    folga_passante = float(2)
-    folga_colante = float(-7)
-    folga_vidro_vidro = float(-1)
+    folga_parede = -12
+    folga_passante = 2
+    folga_colante = -7
+    folga_vidro_vidro = -1
     juncoes_secoes = deepcopy(juncoes)
     folgas_secoes = []
     for index, secao in enumerate(juncoes_secoes):
@@ -140,36 +111,7 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessur
         folgas_secoes.append(folgas_secao)
     return folgas_secoes
 
-def pontos_dos_vidros(vidros: list, folgas: list) -> list:
-    """Calcula os pontos de posicionamento dos vidros.
-    
-    Args:
-        vidros: Lista com os vidros por seção.
-        folgas: Lista com as folgas dos vidros.
-    
-    Returns:
-        list: Lista com os pontos de posicionamento dos vidros.
-    """
-    folga_vep = float(3)
-    todos_pontos = []
-    for i, linha_de_centro in enumerate(vidros):
-        pos_acumulada = 0
-        pontos_linha_de_centro = []
-        for index, vidro in enumerate(linha_de_centro):
-            pontos = []
-            if index == 0:
-                pos_inicial = folgas[i][0]*-1 + folgas[i][2] #aqui pode ser necessario nao multiplicar por -1 um dos fatores
-            if index > 0:
-                pos_inicial = pos_acumulada
-            pos_final = pos_inicial + vidro
-            pos_acumulada = pos_final + folga_vep                
-            pontos.append(pos_inicial)
-            pontos.append(pos_final)
-            pontos_linha_de_centro.append(pontos)
-        todos_pontos.append(pontos_linha_de_centro)
-    return todos_pontos
-
-def medida_dos_vidros(lcs: list, quant_vidros: list, folgas: list) -> list:
+def medida_dos_vidros(lcs: list, quant_vidros: list, folgas: list) -> list[int]:
     """Calcula as medidas dos vidros individuais.
     
     Args:
@@ -204,17 +146,62 @@ def medida_dos_vidros(lcs: list, quant_vidros: list, folgas: list) -> list:
 
     return vidros_totais
 
-def printar_vidros(vidros: list) -> None:
-    """Imprime as medidas dos vidros no console.
+def pontos_dos_vidros(medidas_vidros: list[int], folgas: list[list[int, int]]) -> list[list[float, float]]:
+    """Calcula os pontos de posicionamento dos vidros tendo como referencia o inicio da linha de centro.
     
     Args:
-        vidros: Lista com as medidas dos vidros.
+        vidros: Lista com os vidros por seção.
+        folgas: Lista com as folgas dos vidros.
     
     Returns:
-        None: Função imprime no console sem retorno.
+        list: Lista com os pontos de posicionamento dos vidros.
     """
-    cont = 1
-    for secao in vidros:
-        for medida in secao:
-            print(f'V{cont}: {medida}. ', end='')
-            cont += 1
+    folga_vep = float(3)
+    todos_pontos = []
+    for i, linha_de_centro in enumerate(medidas_vidros):
+        pos_acumulada = 0
+        pontos_linha_de_centro = []
+        for index, vidro in enumerate(linha_de_centro):
+            pontos = []
+            if index == 0:
+                pos_inicial = folgas[i][0]*-1 + folgas[i][2] #aqui pode ser necessario nao multiplicar por -1 um dos fatores
+            if index > 0:
+                pos_inicial = pos_acumulada
+            pos_final = pos_inicial + vidro
+            pos_acumulada = pos_final + folga_vep                
+            pontos.append(pos_inicial)
+            pontos.append(pos_final)
+            pontos_linha_de_centro.append(pontos)
+        todos_pontos.append(pontos_linha_de_centro)
+    return todos_pontos
+
+def offset_vidros(espessura_vidro: int) -> tuple[list[str], list[list[tuple[float, float, float]]]]:
+    """Cria offsets dos vidros externos e internos.
+    
+    Args:
+        espessura_vidro: Espessura do vidro em milímetros.
+    
+    Returns:
+        tuple: Tupla contendo:
+            - Lista de handles dos vidros
+            - Lista com coordenadas dos vidros
+    """
+    handles_vidros = []
+    coord_vidros = []
+    for linha in acad_ModelSpace:
+        if linha.EntityName == 'AcDbLine' and linha.Layer == '0':
+            ext = linha.Offset(espessura_vidro/2)[0]
+            handles_vidros.append(ext.Handle)
+            ext.Layer = 'Vidro Externo'
+            int = linha.Offset(-1*espessura_vidro/2)[0]
+            ext_ini = ext.StartPoint
+            int_ini = int.StartPoint
+            lat_esq = acad2.model.AddLine(APoint(ext_ini[0], ext_ini[1]), APoint(int_ini[0], int_ini[1]))
+            ext_fim = ext.EndPoint
+            int_fim = int.EndPoint
+            coord_vidros.append([ext_ini, ext_fim])
+            lat_dir = acad2.model.AddLine(APoint(ext_fim[0], ext_fim[1]), APoint(int_fim[0], int_fim[1]))
+            int.Layer = lat_esq.Layer = lat_dir.Layer = 'Vidro Interno'
+
+    return handles_vidros, coord_vidros
+

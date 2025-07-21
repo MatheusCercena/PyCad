@@ -3,7 +3,7 @@ Módulo para cálculo e definição de cantoneiras de ajuste de ângulo.
 
 Fornece funções para determinar a necessidade, modelo e medidas de cantoneiras de acordo com o ângulo e folgas do projeto.
 """
-from src.calcs import calcular_gaps_paredes
+from src.calcs_cad import calcular_gaps_paredes
     
 def necessidade_cant_ajuste(ang: float, abre_ali: bool) -> tuple[float, float, bool]:
     """Determina a necessidade de cantoneira de ajuste baseado no ângulo e direção de abertura.

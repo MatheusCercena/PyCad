@@ -7,9 +7,9 @@ Realiza cálculos para determinar qual linha de centro será usada como referên
 Realiza uma série de calculos sobre a lista de linhas de centro para definir qual delas será a seção principal a ser usada para realocar as seções após estas serem definidas, para desenhar as linhas seguindo um sentido de visualização idealizado.
 """
 
-from src.calcs import normalizar, ponto_medio, somar_pontos, multiplicar_vetor
+from src.calcs_vetor import normalizar, ponto_medio, somar_pontos, multiplicar_vetor
 from sympy import symbols, Eq, solve
-from src.calcs import dentro_do_intervalo
+from src.calcs_vetor import dentro_do_intervalo
 
 x, y, b = symbols('x y b')
 
