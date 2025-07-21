@@ -1,4 +1,9 @@
 """
+Módulo para identificação da seção principal em projetos de linhas de centro.
+
+Realiza cálculos para determinar qual linha de centro será usada como referência principal para o desenho e realocação das seções.
+"""
+"""
 Realiza uma série de calculos sobre a lista de linhas de centro para definir qual delas será a seção principal a ser usada para realocar as seções após estas serem definidas, para desenhar as linhas seguindo um sentido de visualização idealizado.
 """
 
@@ -8,22 +13,21 @@ from src.calcs import dentro_do_intervalo
 
 x, y, b = symbols('x y b')
 
-def definir_linha_perpendicular(pos_lcs):
-    """
+def definir_linha_perpendicular(pos_lcs: list) -> tuple[float, float, float, float]:
+    """Define uma linha perpendicular às linhas de centro.
+    
     A partir das posições das linhas de centro, define dois pontos (C1 e C2) sobre uma reta
     perpendicular à reta formada entre o início da primeira e o final da última seção.
-
-    Retorna: (x1, y1, x2, y2)
-    """
-    # Ponto inicial da linha guia
-    ponto_ini = (pos_lcs[0][0], pos_lcs[0][1])
-    # Ponto final da linha guia
-    ponto_fim = (pos_lcs[-1][2], pos_lcs[-1][3])
     
-    # Ponto médio da linha guia
+    Args:
+        pos_lcs: Lista com as posições das linhas de centro.
+    
+    Returns:
+        tuple: Coordenadas dos pontos C1 e C2 (x1, y1, x2, y2).
+    """
+    ponto_ini = (pos_lcs[0][0], pos_lcs[0][1])
+    ponto_fim = (pos_lcs[-1][2], pos_lcs[-1][3])
     ponto_base = ponto_medio(ponto_ini, ponto_fim)
-
-    # Vetor AB da linha guia
     vetor_AB = (ponto_fim[0] - ponto_ini[0], ponto_fim[1] - ponto_ini[1])
 
     # Vetores perpendiculares a AB
@@ -43,10 +47,17 @@ def definir_linha_perpendicular(pos_lcs):
 
     return coord_c1[0], coord_c1[1], coord_c2[0], coord_c2[1]
 
-def def_eq_reta(secao):
-    '''
-    define a equação da reta a ser usada para verificar se a seção intercepta a linha perpendicular
-    '''
+def def_eq_reta(secao: list) -> Eq:
+    """Define a equação da reta de uma seção.
+    
+    Define a equação da reta a ser usada para verificar se a seção intercepta a linha perpendicular.
+    
+    Args:
+        secao: Lista com as coordenadas da seção [x1, y1, x2, y2].
+    
+    Returns:
+        Eq: Equação da reta da seção.
+    """
     valor_m = (secao[3] - secao[1]) / (secao[2] - secao[0])
     y_f = secao[3]
     x_f = secao[2]
@@ -55,12 +66,16 @@ def def_eq_reta(secao):
 
     return Eq(y, valor_m*x + valor_b)
    
-def verificar_se_intercepta(secao: list, interseccao: dict):
-    '''
-    secao = seção que se quer saber se intercepta a linha guia
-    interseccao = dicionario com chaves x e y
-    A funcao verifica se os eixos x e y da secao interceptam a guia e retorna true ou false
-    '''
+def verificar_se_intercepta(secao: list, interseccao: dict) -> bool:
+    """Verifica se uma seção intercepta a linha guia.
+    
+    Args:
+        secao: Lista com as coordenadas da seção [x1, y1, x2, y2].
+        interseccao: Dicionário com chaves x e y da interseção.
+    
+    Returns:
+        bool: True se a seção intercepta a guia, False caso contrário.
+    """
     
     intervalo_x = sorted([secao[0], secao[2]])
     intervalo_y = sorted([secao[1], secao[3]])
@@ -73,10 +88,17 @@ def verificar_se_intercepta(secao: list, interseccao: dict):
     else:
         return False
 
-def descobrir_secao_principal(pos_lcs):
-    '''
-    descobre a linha de centro principal dentro de uma lista de linhas de centro (pos_lcs).
-    '''
+def descobrir_secao_principal(pos_lcs: list) -> int:
+    """Descobre a linha de centro principal.
+    
+    Descobre a linha de centro principal dentro de uma lista de linhas de centro (pos_lcs).
+    
+    Args:
+        pos_lcs: Lista com as posições das linhas de centro.
+    
+    Returns:
+        int: Índice da seção principal.
+    """
     # Se houver apenas uma seção, retorna 0 automaticamente
     if len(pos_lcs) == 1:
         return 0

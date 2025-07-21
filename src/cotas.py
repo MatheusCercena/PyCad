@@ -1,11 +1,27 @@
+"""
+Módulo para criação de cotas de medida total no AutoCAD.
+
+Fornece função para cotar perfis desenhados, facilitando a documentação e conferência de projetos.
+"""
 from pyautocad import Autocad, APoint
 from math import sqrt,atan2
 from src.calcs import obter_pontos_medida_total, ponto_medio, somar_pontos, multiplicar_vetor, vetor_perpendicular_unitario, angulo_do_vetor
 acad = Autocad(create_if_not_exists=True)
 
-def cotar_medida_total(perfis, tipo_cota='ISO-25', offset=200):
+def cotar_medida_total(perfis: list, tipo_cota: str = 'ISO-25', offset: int = 200) -> None:
+    """Cria cotas de medida total para os perfis no AutoCAD.
+    
+    Args:
+        perfis: Lista com os perfis a serem cotados.
+        tipo_cota: Tipo de cota a ser utilizada. Padrão: 'ISO-25'.
+        offset: Distância de offset da cota. Padrão: 200.
+    
+    Returns:
+        None: Função cria cotas no AutoCAD sem retorno.
+    """
     
     for perfil in perfis:
+        # if len(perfil) == 2: 
         pontos, p1, p2 = obter_pontos_medida_total(perfil)
         a1 = APoint(*p1)
         a2 = APoint(*p2)

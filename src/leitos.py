@@ -1,4 +1,9 @@
 """
+Módulo para desenho e manipulação de leitos no AutoCAD.
+
+Inclui funções para desenhar guias, calcular folgas, converter estruturas e desenhar leitos completos com suas características geométricas.
+"""
+"""
 Desenha os leitos, através de offsets chamados via COM e fillets por lisp.
 """
 
@@ -15,7 +20,18 @@ acad, acad_ModelSpace = get_acad()
 
 x, y, b = symbols('x y b')
 
-def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list, folgas_leitos: list):
+def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list, folgas_leitos: list) -> list:
+    """Desenha as guias dos leitos no AutoCAD.
+    
+    Args:
+        handles_lcs: Lista de handles das linhas de centro.
+        vidros_sacada: Lista com os vidros da sacada.
+        posicao_dos_vidros: Lista com as posições dos vidros.
+        folgas_leitos: Lista com as folgas dos leitos.
+    
+    Returns:
+        list: Lista com handles das guias dos leitos.
+    """
     handles_guias_leitos = []
     for i, linha_de_centro in enumerate(handles_lcs):
         
@@ -34,15 +50,18 @@ def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
             handles_guias_leitos.append(acad.HandleToObject(guia.Handle))
     return handles_guias_leitos
 
-def folgas_leitos(vidros, folgas_vidros, angs_in, aberturas):
-    '''
-    Calcula as folgas dos leitos para cada vidro em cada seção da sacada.
+def folgas_leitos(vidros: list, folgas_vidros: list, angs_in: list[float], aberturas: list) -> list:
+    """Calcula as folgas dos leitos para cada vidro em cada seção da sacada.
     
-    vidros: lista de listas, cada sublista representa os vidros de uma seção
-    folgas_vidros: mesma estrutura que vidros, mas com folgas esquerda/direita
-    angs_in: lista com ângulos de entrada das seções
-    gaps_lcs: lista com valores de gap (folga) por seção e lado
-    '''
+    Args:
+        vidros: Lista de listas, cada sublista representa os vidros de uma seção.
+        folgas_vidros: Mesma estrutura que vidros, mas com folgas esquerda/direita.
+        angs_in: Lista com ângulos de entrada das seções.
+        aberturas: Lista com informações das aberturas.
+    
+    Returns:
+        list: Lista com as folgas dos leitos por seção e vidro.
+    """
     folgas_leitos_sacada = []
     for secao in range(len(vidros)):
         folgas_leitos_secao = []
@@ -87,7 +106,16 @@ def folgas_leitos(vidros, folgas_vidros, angs_in, aberturas):
         folgas_leitos_sacada.append(folgas_leitos_secao)
     return folgas_leitos_sacada
 
-def converter_ordem_para_secoes(vidros, lista):
+def converter_ordem_para_secoes(vidros: list, lista: list) -> list:
+    """Converte uma lista ordenada para estrutura de seções.
+    
+    Args:
+        vidros: Lista com estrutura de vidros por seção.
+        lista: Lista ordenada a ser convertida.
+    
+    Returns:
+        list: Lista convertida para estrutura de seções.
+    """
     lista_nova = []
     cont = 0
     for secao in vidros:
@@ -98,10 +126,18 @@ def converter_ordem_para_secoes(vidros, lista):
         lista_nova.append(lista_secao)
     return lista_nova
 
-def def_eq_reta_leitos(ponto_a, ponto_b):
-    '''
-    define a equação da reta a ser usada para verificar se a seção intercepta a linha perpendicular
-    '''
+def def_eq_reta_leitos(ponto_a: tuple[float, float], ponto_b: tuple[float, float]) -> Eq:
+    """Define a equação da reta entre dois pontos para leitos.
+    
+    Define a equação da reta a ser usada para verificar se a seção intercepta a linha perpendicular.
+    
+    Args:
+        ponto_a: Primeiro ponto (x, y).
+        ponto_b: Segundo ponto (x, y).
+    
+    Returns:
+        Eq: Equação da reta entre os pontos.
+    """
     x1 = ponto_a[0]
     x2 = ponto_b[0]
 
@@ -116,7 +152,22 @@ def def_eq_reta_leitos(ponto_a, ponto_b):
 
         return Eq(y, valor_m*x + valor_b)
 
-def desenhar_leitos(handles_guias, vidros, angs, giratorios, adjacentes, sentidos):
+def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], giratorios: list[int], adjacentes: list[int], sentidos: list[str]) -> tuple[dict[str, list[str]], list]:
+    """Desenha os leitos no AutoCAD com todas as suas características.
+    
+    Args:
+        handles_guias: Lista de handles das guias dos leitos.
+        vidros: Lista com os vidros por seção.
+        angs: Lista com ângulos das seções.
+        giratorios: Lista com índices dos vidros giratórios.
+        adjacentes: Lista com índices dos vidros adjacentes aos giratórios.
+        sentidos: Lista com sentidos de abertura ('direita' ou 'esquerda').
+    
+    Returns:
+        tuple: Tupla contendo:
+            - Dicionário com handles dos leitos organizados por tipo
+            - Lista com coordenadas dos leitos
+    """
     handles_leitos = {'externos': [], 'internos': [], 'lat_esq': [], 'lat_dir': []}
     coordenadas_leitos = []
     handles_guias = converter_ordem_para_secoes(vidros, handles_guias)

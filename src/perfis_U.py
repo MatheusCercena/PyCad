@@ -1,14 +1,30 @@
 """
+Módulo para desenho e manipulação de perfis U no AutoCAD.
+
+Inclui funções para criar offsets, aplicar fillets, distribuir vidros, associar aberturas e calcular coordenadas dos perfis U.
+"""
+"""
 Desenha os perfis U, através de offsets chamados via COM e fillets por lisp.
 """
 
 from copy import deepcopy
 from src.autocad_conn import get_acad
 from src.calcs import distancia_2d, obter_pontos_medida_total, normalizar, definir_pontos_na_secao, vetor_entre_pontos
+from pyautocad import APoint
 
 acad, acad_ModelSpace = get_acad()
 
-def offset_perfis_U(handles_lcs):
+def offset_perfis_U(handles_lcs: list) -> dict[str, list[str]]:
+    """Cria offsets dos perfis U externos e internos.
+    
+    Args:
+        handles_lcs: Lista de handles das linhas de centro.
+    
+    Returns:
+        dict: Dicionário com handles dos perfis U externos e internos.
+            - 'externos': Lista de handles dos perfis U externos
+            - 'internos': Lista de handles dos perfis U internos
+    """
     offset_ext = 20
     offset_int = 32
 
@@ -23,7 +39,15 @@ def offset_perfis_U(handles_lcs):
         handles['internos'].append(linha_int[0].Handle)
     return handles
 
-def fillet_perfis_U(handles):
+def fillet_perfis_U(handles: dict[str, list[str]]) -> None:
+    """Aplica fillets nos perfis U externos e internos.
+    
+    Args:
+        handles: Dicionário contendo handles dos perfis U externos e internos.
+    
+    Returns:
+        None: Função executa comandos no AutoCAD sem retorno.
+    """
     linhas_externas = deepcopy(handles['externos'])
     linhas_internas = deepcopy(handles['internos'])
 
@@ -31,14 +55,21 @@ def fillet_perfis_U(handles):
         acad.SendCommand(f'(c:custom_fillet "{linhas_externas[index]}" "{linhas_externas[index+1]}")\n')
         acad.SendCommand(f'(c:custom_fillet "{linhas_internas[index]}" "{linhas_internas[index+1]}")\n')
 
-def distribuir_vidros_por_lado(quant_vidros):
-    """
+def distribuir_vidros_por_lado(quant_vidros: list[int]) -> list[list[int]]:
+    """Distribui os vidros por lado da sacada.
+    
     Recebe uma lista com a quantidade de vidros por lado e retorna uma lista de sublistas,
     cada uma contendo os números sequenciais dos vidros de cada lado.
 
-    Exemplo:
-    Entrada: [3, 5, 2]
-    Saída: [[1, 2, 3], [4, 5, 6, 7, 8], [9, 10]]
+    Args:
+        quant_vidros: Lista com a quantidade de vidros por lado.
+
+    Returns:
+        list: Lista de sublistas com números sequenciais dos vidros de cada lado.
+        
+    Example:
+        Entrada: [3, 5, 2]
+        Saída: [[1, 2, 3], [4, 5, 6, 7, 8], [9, 10]]
     """
     todos_vidros = []
     cont = 1
@@ -50,28 +81,43 @@ def distribuir_vidros_por_lado(quant_vidros):
 
     return todos_vidros
 
-def associar_aberturas_aos_lados(quant_vidros, aberturas):
-    '''
-    param quant_vidros: lista com quantidade de vidros por lado
-    param aberturas: lista com valores de cada abertura conforme funcao "solicitar sentido de abertura"
-    '''
+def associar_aberturas_aos_lados(quant_vidros: list[int], aberturas: list) -> list:
+    """Associa as aberturas aos lados da sacada.
+    
+    Args:
+        quant_vidros: Lista com quantidade de vidros por lado.
+        aberturas: Lista com valores de cada abertura conforme função "solicitar sentido de abertura".
+    
+    Returns:
+        list: Lista com os sentidos de abertura associados aos lados.
+    """
     todos_vidros = distribuir_vidros_por_lado(quant_vidros)
     resultado = []
 
     for lado in todos_vidros:
         for abertura in aberturas:
+            parcial = ['', 0]
             if abertura[2] in lado:  # Se o vidro giratório está neste lado
-                resultado.append(abertura[4])  # 'direita' ou 'esquerda'
-                break
+                quant = abertura[1] - abertura[0]
+                if quant > parcial[1]:
+                    parcial[0] = abertura[4]
+                    parcial[1] = quant
+                   # 'direita' ou 'esquerda'
             else:
-                resultado.append(0)  # Não há giratório neste lado
+                parcial[0] = 0  # Não há giratório neste lado
+            resultado.append(parcial[0])
     
     return resultado
 
 def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[float, float, float]]]:
-    '''
-    retorna uma lista de sublistas que contem 4 tuplas com os pontos x, y, z de cada extremidade do perfil U
-    '''
+    """Define as coordenadas dos perfis U.
+    
+    Args:
+        handles: Dicionário contendo handles dos perfis U externos e internos.
+    
+    Returns:
+        list: Lista de sublistas que contém 4 tuplas com os pontos x, y, z de cada extremidade do perfil U.
+    """
     linhas_externas = deepcopy(handles['externos'])
     linhas_internas = deepcopy(handles['internos'])
     coordenadas = []
@@ -90,8 +136,22 @@ def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[flo
         coordenadas.append(coord)
     return coordenadas
 
-def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float]]], aberturas_por_lado: list, elevador: int) -> list[list[list[float, float]]]:
+def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float]]], aberturas_por_lado: list, elevador: int) -> tuple[list[list[float]], list[float]]:
+    """Redefine as coordenadas dos perfis U considerando aberturas e elevador.
+    
+    Args:
+        coord_perfis_U: Lista com coordenadas dos perfis U.
+        aberturas_por_lado: Lista com aberturas por lado.
+        elevador: Altura máxima do elevador.
+    
+    Returns:
+        tuple: Tupla contendo:
+            - Lista de listas com medidas dos perfis por seção
+            - Lista com coordenadas dos perfis redefinidos
+    """
     #corrigir funcao pra que tenha 4 elementos, no caso o 2 internos e 2 externos.
+
+    medidas = []
     coordenadas = []
     for i, lado in enumerate(coord_perfis_U):
         pontos = obter_pontos_medida_total(lado)
@@ -112,28 +172,33 @@ def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float
                 perfis_secao.append(secao_nova)
                 comprimento_restante -= secao_nova
             else:#comprimento_restante < elevador
-                if aberturas_por_lado[i][4] == 'esquerda':
-                    perfis_secao.append(comprimento_restante)
-                elif aberturas_por_lado[i][4] == 'direita':
-                    perfis_secao.insert(0, comprimento_restante)
+                if aberturas_por_lado[i] == 'esquerda':
+                    if comprimento_restante > 1980:
+                        perfis_secao.append(comprimento_restante)
+                    else:
+                        perfis_secao.insert(0, comprimento_restante)
+                elif aberturas_por_lado[i] == 'direita':
+                    if comprimento_restante > 1980:
+                        perfis_secao.insert(0, comprimento_restante)
+                    else:
+                        perfis_secao.append(comprimento_restante)
                 else:
                     perfis_secao.insert(0, comprimento_restante)
                     #mais tarde fazer funcao pra levar em conta o angulo da sacada.
                 break
-
+        medidas.append(perfis_secao)
         vetor = vetor_entre_pontos(p1, p2)
         vetor_unitario = normalizar(vetor)
         ini_perfil = p1
-        coord_perfis_secao = []
+        distancia = 0
         for perfil in perfis_secao:
+            distancia += perfil
             coord_perfil = []
-            coord_perfil.append(ini_perfil)
+            coord_perfil.append(APoint(*ini_perfil))
 
-            fim_perfil = definir_pontos_na_secao(p1, vetor_unitario, perfil)   
+            fim_perfil = APoint(*definir_pontos_na_secao(p1, vetor_unitario, distancia)) 
             coord_perfil.append(fim_perfil)
             
             ini_perfil = fim_perfil
-            coord_perfis_secao.append(coord_perfil)
-
-        coordenadas.append(coord_perfis_secao)
-    return coordenadas
+            coordenadas.append(coord_perfil)
+    return medidas, coordenadas

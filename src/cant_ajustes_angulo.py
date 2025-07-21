@@ -1,9 +1,23 @@
+"""
+Módulo para cálculo e definição de cantoneiras de ajuste de ângulo.
+
+Fornece funções para determinar a necessidade, modelo e medidas de cantoneiras de acordo com o ângulo e folgas do projeto.
+"""
 from src.calcs import calcular_gaps_paredes
     
-def necessidade_cant_ajuste(ang, abre_ali: bool):
-    '''
-    Esperado valor 0 para abertura para dentro e 1 para abertura para fora
-    '''
+def necessidade_cant_ajuste(ang: float, abre_ali: bool) -> tuple[float, float, bool]:
+    """Determina a necessidade de cantoneira de ajuste baseado no ângulo e direção de abertura.
+    
+    Args:
+        ang: Ângulo da parede em graus.
+        abre_ali: True para abertura para dentro, False para abertura para fora.
+    
+    Returns:
+        tuple: Tupla contendo:
+            - Gap da linha de centro ajustado
+            - Gap da cantoneira
+            - Se há necessidade de cantoneira (True/False)
+    """
     if abre_ali == True:
         quant_cant = 1
     else:
@@ -45,10 +59,19 @@ def necessidade_cant_ajuste(ang, abre_ali: bool):
 
     return gap_lcs, gap_cant, necessidade
 
-def infos_cant_ajuste(gap_cant):
-    '''
-    Retorna modelo da cantoneira necessária, se precisa refilar e a medida das paredes dela caso haja necessidade de refilar
-    '''
+def infos_cant_ajuste(gap_cant: float) -> tuple[str | None, bool | None, int | None, float | None]:
+    """Retorna informações da cantoneira necessária baseada no gap.
+    
+    Args:
+        gap_cant: Gap da cantoneira em milímetros.
+    
+    Returns:
+        tuple: Tupla contendo:
+            - Modelo da cantoneira (str ou None)
+            - Se precisa ser refilada (bool ou None)
+            - Medida interna da cantoneira (int ou None)
+            - Medida externa da cantoneira (float ou None)
+    """
     if 7 < gap_cant < 15:
         mod = 'ct-005'
         refilada = True

@@ -1,8 +1,18 @@
 """
+Módulo para coleta de dados de medição necessários para o desenho automatizado no AutoCAD.
+
+Inclui funções para solicitar ao usuário informações como linhas de centro, ângulos, quantidades de vidros, junções e aberturas, além de validações.
+"""
+"""
 Funções para pedir os dados principais das medições para serem usadas pelas funções de desenho.
 """
 
-def pedir_linhas_de_centro():
+def pedir_linhas_de_centro() -> list[int]:
+    """Solicita ao usuário as linhas de centro das seções.
+    
+    Returns:
+        list: Lista com as linhas de centro das seções em milímetros.
+    """
     linhas_de_centro = []
 
     print(f'''
@@ -28,10 +38,15 @@ def pedir_linhas_de_centro():
             break
     return linhas_de_centro
 
-def pedir_quant_vidros(lcs):
-    '''
-    Retorna uma lista com a quantidade de vidros de cada lado.
-    '''
+def pedir_quant_vidros(lcs: list[int]) -> list[int]:
+    """Solicita ao usuário a quantidade de vidros por seção.
+    
+    Args:
+        lcs: Lista com as linhas de centro das seções.
+    
+    Returns:
+        list: Lista com a quantidade de vidros de cada lado.
+    """
     quant_vidros = []
     print(f'''
 {' - '*10}QUANTIDADE DE VIDROS{' - '*10}
@@ -48,10 +63,15 @@ def pedir_quant_vidros(lcs):
                 continue
     return quant_vidros
 
-def pedir_angSecoes(lcs: int):
-    '''
-    Solicita ao usuário os angulos interno e retorna uma lista com os angulos internos no formato: [ang_1, ang_2, ..., ang_n]
-    '''
+def pedir_angSecoes(lcs: list[int]) -> list[float]:
+    """Solicita ao usuário os ângulos internos entre as seções.
+    
+    Args:
+        lcs: Lista com as linhas de centro das seções.
+    
+    Returns:
+        list: Lista com os ângulos internos no formato: [ang_1, ang_2, ..., ang_n].
+    """
     angs_in = []
     print(f'''
 {' - '*10}ANGULOS DAS SEÇÕES{' - '*10}
@@ -69,10 +89,12 @@ def pedir_angSecoes(lcs: int):
         angs_in.append(ang_sec*-1)
     return angs_in
 
-def pedir_angParedes():
-    '''
-    Solicita ao usuário os angulos das extremidades direita e esquerda, e retorna uma lista com os angulos externos no formato: [ang_esq, ang_dir]
-    '''
+def pedir_angParedes() -> list[float]:
+    """Solicita ao usuário os ângulos das paredes extremas.
+    
+    Returns:
+        list: Lista com os ângulos externos no formato: [ang_esq, ang_dir].
+    """
     angs_ex = []
     print(f'''
 {' - '*10}ANGULOS DAS PAREDES{' - '*10}
@@ -94,10 +116,12 @@ def pedir_angParedes():
     angs_ex.append(ang_dir)
     return angs_ex
 
-def pedir_prumos():
-    '''
-    Solicita ao usuário os prumos das extremidades direita e esquerda, e retorna uma lista com os angulos externos no formato: [prumo_esq, prumo_dir]
-    '''
+def pedir_prumos() -> list[float]:
+    """Solicita ao usuário os prumos das extremidades.
+    
+    Returns:
+        list: Lista com os prumos no formato: [prumo_esq, prumo_dir].
+    """
     prumos = []
     print(f'''
 {' - '*10}PRUMOS{' - '*10}
@@ -119,14 +143,24 @@ def pedir_prumos():
     prumos.append(prumo_dir)
     return prumos
 
-def definir_juncoes(lcs, angs_in):
-    '''
-    Retorna uma lista em que cada elemento representa uma secao e cada secao tem 2 elementos com o elemento 0 sendo o tipo de junao do lado esquerdo da secao e o elemento 1 sendo o tipo de juncao do lado direito da secao:
-        0 - vidro-parede
-        1 - passante
-        2 - colante
-        3 - vidro-vidro
-    '''
+def definir_juncoes(lcs: list[int], angs_in: list[float]) -> list[list[int]]:
+    """Define os tipos de junção para cada seção.
+    
+    Args:
+        lcs: Lista com as linhas de centro das seções.
+        angs_in: Lista com os ângulos internos entre as seções.
+    
+    Returns:
+        list: Lista em que cada elemento representa uma seção e cada seção tem 2 elementos:
+            - Elemento 0: tipo de junção do lado esquerdo da seção
+            - Elemento 1: tipo de junção do lado direito da seção
+            
+            Tipos de junção:
+            - 0: vidro-parede
+            - 1: passante
+            - 2: colante
+            - 3: vidro-vidro
+    """
     print(f'''
 {' - '*10}DEFINIR PASSANTES / COLANTES.{' - '*10}
 ''')
@@ -160,16 +194,22 @@ def definir_juncoes(lcs, angs_in):
 
     return juncoes
 
-def solicitar_sentido_abertura(quant_vidros: list):
-    '''
-Retorna uma lista de sublistas em que cada sublista representa uma abertura:
-item 0: onde a abertura começa
-item 1: onde termina a abertura
-item 2: qual vidro é o giratório
-item 3: qual vidro é o vidro adjacente a o giratório
-item 4: qual o sentido de abertura (direita ou esquerda)
-item 5: lista contendo os vidros que são fixos.
-    '''
+def solicitar_sentido_abertura(quant_vidros: list[int]) -> tuple[list, list[int]]:
+    """Solicita ao usuário os sentidos de abertura dos vidros.
+    
+    Args:
+        quant_vidros: Lista com a quantidade de vidros por seção.
+    
+    Returns:
+        tuple: Tupla contendo:
+            - Lista de sublistas em que cada sublista representa uma abertura:
+                - item 0: onde a abertura começa
+                - item 1: onde termina a abertura
+                - item 2: qual vidro é o giratório
+                - item 3: qual vidro é o vidro adjacente ao giratório
+                - item 4: qual o sentido de abertura (direita ou esquerda)
+            - Lista contendo os vidros que são fixos
+    """
     sentidos = []
     moveis = []
     v_ini = ''
@@ -243,10 +283,12 @@ item 5: lista contendo os vidros que são fixos.
         if res == 's':
             continue
 
-def pedir_elevador():
-    '''
-    Solicita ao usuário os prumos das extremidades direita e esquerda, e retorna uma lista com os angulos externos no formato: [prumo_esq, prumo_dir]
-    '''
+def pedir_elevador() -> int:
+    """Solicita ao usuário a altura máxima do elevador.
+    
+    Returns:
+        int: Altura máxima do elevador em milímetros.
+    """
     print(f'''
 {' - '*10}ALTURA ELEVADOR{' - '*10}
 ''')

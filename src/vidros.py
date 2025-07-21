@@ -1,4 +1,9 @@
 """
+Módulo para desenho, cálculo e manipulação de vidros no AutoCAD.
+
+Inclui funções para desenhar guias, calcular folgas, medidas e posicionamento dos vidros, além de interagir com o AutoCAD para criar entidades relacionadas aos vidros.
+"""
+"""
 Desenha os vidros, através de offsets chamados via COM e fillets por lisp.
 """
 
@@ -13,7 +18,17 @@ from time import sleep
 acad, acad_ModelSpace = get_acad()
 acad2 = Autocad(create_if_not_exists=True)
 
-def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list):
+def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list) -> None:
+    """Desenha as guias dos vidros no AutoCAD.
+    
+    Args:
+        handles_lcs: Lista de handles das linhas de centro.
+        vidros_sacada: Lista com os vidros da sacada.
+        posicao_dos_vidros: Lista com as posições dos vidros.
+    
+    Returns:
+        None: Função desenha elementos no AutoCAD sem retorno.
+    """
     for i, linha_de_centro in enumerate(handles_lcs):
         
         for tentativa in range(5):
@@ -34,7 +49,12 @@ def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
             fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro)
             acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
 
-def remover_guias():   
+def remover_guias() -> None:
+    """Remove as guias dos vidros do AutoCAD.
+    
+    Returns:
+        None: Função remove elementos do AutoCAD sem retorno.
+    """   
     for i in range(acad_ModelSpace.Count - 1, -1, -1):  # reverso
         try:
             entidade = acad_ModelSpace.Item(i)
@@ -43,7 +63,17 @@ def remover_guias():
         except Exception as e:
             print(f"Erro ao deletar entidade {i}: {e}")
 
-def offset_vidros(espessura_vidro):
+def offset_vidros(espessura_vidro: int) -> tuple[list[str], list[list[tuple[float, float, float]]]]:
+    """Cria offsets dos vidros externos e internos.
+    
+    Args:
+        espessura_vidro: Espessura do vidro em milímetros.
+    
+    Returns:
+        tuple: Tupla contendo:
+            - Lista de handles dos vidros
+            - Lista com coordenadas dos vidros
+    """
     handles_vidros = []
     coord_vidros = []
     for linha in acad_ModelSpace:
@@ -63,14 +93,22 @@ def offset_vidros(espessura_vidro):
 
     return handles_vidros, coord_vidros
 
-def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessura_vidro: int):
-    '''
-    Retorna uma lista com as folgas de cada secao da sacada, de forma que cada elemento é outra lista com 4 elementos, sendo eles:
-    0 - Folga parede esquerdo
-    1 - Folga parede direito
-    2 - Folga ajuste de angulo esquerdo
-    3 - Folga ajuste de angulo direito
-    '''
+def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessura_vidro: int) -> list:
+    """Define as folgas dos vidros para cada seção da sacada.
+    
+    Args:
+        juncoes: Lista com tipos de junção por seção.
+        gaps_lcs: Lista com gaps das linhas de centro.
+        angs_in: Lista com ângulos internos.
+        espessura_vidro: Espessura do vidro em milímetros.
+    
+    Returns:
+        list: Lista com as folgas de cada seção da sacada, onde cada elemento é uma lista com 4 elementos:
+            - Folga parede esquerdo
+            - Folga parede direito  
+            - Folga ajuste de ângulo esquerdo
+            - Folga ajuste de ângulo direito
+    """
     folga_parede = float(-12) 
     folga_passante = float(2)
     folga_colante = float(-7)
@@ -102,7 +140,16 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessur
         folgas_secoes.append(folgas_secao)
     return folgas_secoes
 
-def pontos_dos_vidros(vidros, folgas):
+def pontos_dos_vidros(vidros: list, folgas: list) -> list:
+    """Calcula os pontos de posicionamento dos vidros.
+    
+    Args:
+        vidros: Lista com os vidros por seção.
+        folgas: Lista com as folgas dos vidros.
+    
+    Returns:
+        list: Lista com os pontos de posicionamento dos vidros.
+    """
     folga_vep = float(3)
     todos_pontos = []
     for i, linha_de_centro in enumerate(vidros):
@@ -122,7 +169,17 @@ def pontos_dos_vidros(vidros, folgas):
         todos_pontos.append(pontos_linha_de_centro)
     return todos_pontos
 
-def medida_dos_vidros(lcs:list, quant_vidros: list, folgas: list):
+def medida_dos_vidros(lcs: list, quant_vidros: list, folgas: list) -> list:
+    """Calcula as medidas dos vidros individuais.
+    
+    Args:
+        lcs: Lista com as linhas de centro.
+        quant_vidros: Lista com quantidade de vidros por seção.
+        folgas: Lista com as folgas dos vidros.
+    
+    Returns:
+        list: Lista com as medidas dos vidros por seção.
+    """
     folga_vep = float(3)
     vidros_totais = []
 
@@ -147,7 +204,15 @@ def medida_dos_vidros(lcs:list, quant_vidros: list, folgas: list):
 
     return vidros_totais
 
-def printar_vidros(vidros):
+def printar_vidros(vidros: list) -> None:
+    """Imprime as medidas dos vidros no console.
+    
+    Args:
+        vidros: Lista com as medidas dos vidros.
+    
+    Returns:
+        None: Função imprime no console sem retorno.
+    """
     cont = 1
     for secao in vidros:
         for medida in secao:

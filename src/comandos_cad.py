@@ -1,13 +1,23 @@
+"""
+Módulo para carregamento de comandos customizados no AutoCAD.
+
+Inclui função para carregar rotinas LISP personalizadas, facilitando operações como fillet automatizado entre entidades.
+"""
 import os
 from time import sleep
 from src.autocad_conn import get_acad
 
 acad, acad_ModelSpace = get_acad()
 
-def carregar_comandos():
-    '''
-    Carrega_comandos_customizados. Usar preferivelmente no começo do codigo, para evitar erros de dificil identificacao.
-    '''
+def carregar_comandos() -> None:
+    """Carrega comandos customizados no AutoCAD.
+    
+    Carrega comandos customizados no AutoCAD. Usar preferivelmente no começo do código, 
+    para evitar erros de difícil identificação.
+    
+    Returns:
+        None: Função carrega comandos no AutoCAD sem retorno.
+    """
     lisp_code = f'''
 (defun c:custom_fillet ( h1 h2 / linha1 linha2)
     (setq linha1 (handent h1))

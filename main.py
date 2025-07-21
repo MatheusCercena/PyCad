@@ -9,7 +9,6 @@ from src.comandos_cad import carregar_comandos
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
 from src.limpar import limpar_tudo
 from src.cotas import cotar_medida_total
-from pprint import pprint
 
 if __name__ == "__main__":
     limpar_tudo()
@@ -46,7 +45,7 @@ if __name__ == "__main__":
     fillet_paredes(handles_perfis_U['externos'][-1], handles_perfis_U['internos'][-1], parede_dir)
 
     coord_perfis_U = definir_coord_perfis_U(handles_perfis_U)
-    coord_perfis_U = redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado, elevador)
+    medidas_perfis_U, coord_perfis_U = redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado, elevador)
 
     gap_lcs_parede_esq, gap_cant_esq, necessidade_cant_esq = necessidade_cant_ajuste(angs_paredes[0], True)
     gap_lcs_parede_dir, gap_cant_dir, necessidade_cant_dir = necessidade_cant_ajuste(angs_paredes[1], False)
@@ -71,14 +70,7 @@ if __name__ == "__main__":
     handles_guias_leitos = desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros, folga_leitos)
     handle_leitos, coord_leitos = desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
     remover_guias()
-
-    pprint(coord_vidros)
-    pprint(coord_leitos)
-    pprint(coord_lcs)
-    pprint(coord_perfis_U)
     
-
-
     cotar_medida_total(coord_vidros, 'Vidro', 250)
     cotar_medida_total(coord_leitos, 'Leito', 400)
     cotar_medida_total(coord_lcs, 'Linha de centro', 550)
