@@ -20,6 +20,16 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
     Returns:
         None: Função executa operações no AutoCAD sem retorno.
     """
+
+    folga_parede = -12
+    folga_passante = 2
+    folga_colante = -7
+    folga_vidro_vidro = -1
+    # folga_parede = -12
+    # folga_passante = 2
+    # folga_colante = -7
+    # folga_vidro_vidro = -1
+
     offset = 700
     coordenadas = []
 
@@ -31,22 +41,77 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
         vidros_lado = [coord_vidros[i - 1] for i in lado]
         coord_vidros_reorganizada.append(vidros_lado)
 
-    for vidro in coord_vidros:
-        coord = []
-        p1 = vidro[0]
-        p2 = vidro[1]
-        novo_p1, novo_p2 = linha_paralela_com_offset(p1, p2, offset)
+#exemplo folgas vidros
+#[[-12, -7, 0.0, 0], [2, 2, 0, 0], [-7, -12, 0, 0.0]]
 
+    for lado in coord_vidros_reorganizada:
+        for i, vidro in enumerate(lado):
+            coord = []
+            p1 = vidro[0]
+            p2 = vidro[1]
+            novo_p1, novo_p2 = linha_paralela_com_offset(p1, p2, offset)
 
-        desloc_p1 = folgas_vidros
-        desloc_p2 = 0
+            desloc_p1 = 0
+            desloc_p2 = 0
 
-        #continuar com IFs para determinar os pontos de deslocamento
-        p1_final, p2_final = deslocar_pontos_direcao(novo_p1, novo_p2, desloc_p1, desloc_p2)
+            if i == 0 and folgas_vidros[lado][0] == -12:
+                desloc_p1 = -12
+                desloc_p2 = 1.5
+            elif i == 0 and folgas_vidros[lado][0] == 2:
+                desloc_p1 = 52
+                desloc_p2 = 1.5
+            elif i == 0 and folgas_vidros[lado][0] == -7:
+                desloc_p1 = 43
+                desloc_p2 = 1.5
+            elif i == 0 and folgas_vidros[lado][0] == -1:
+                desloc_p1 = 51
+                desloc_p2 = 1.5
+            else:
+                desloc_p1 = -1.5
+                desloc_p2 = 1.5
 
-        coord.append(APoint(*p1_final))
-        coord.append(APoint(*p2_final))
-        coordenadas.append(coord)
+            if i == 1 and folgas_vidros[lado][1] == -12:
+                desloc_p1 = -1.5
+                desloc_p2 = 12
+                
+            elif i == 1 and folgas_vidros[lado][1] == 2:
+                desloc_p1= -1.5
+                desloc_p2= -52
+                
+            elif i == 1 and folgas_vidros[lado][1] == -7:
+                desloc_p1= -1.5
+                desloc_p2= -43
+                
+            elif i == 1 and folgas_vidros[lado][1] == -1:
+                desloc_p1= -1.5
+                desloc_p2= -51
+                
+            else:
+                desloc_p1 = -1.5
+                desloc_p2 = 1.5
+
+            #preparar com os IFs que tem angulos
+            p1_final, p2_final = deslocar_pontos_direcao(novo_p1, novo_p2, desloc_p1, desloc_p2)
+
+            coord.append(APoint(*p1_final))
+            coord.append(APoint(*p2_final))
+            coordenadas.append(coord)
+
+    # for vidro in coord_vidros:
+    #     coord = []
+    #     p1 = vidro[0]
+    #     p2 = vidro[1]
+    #     novo_p1, novo_p2 = linha_paralela_com_offset(p1, p2, offset)
+
+    #     desloc_p1 = folgas_vidros
+    #     desloc_p2 = 0
+
+    #     #continuar com IFs para determinar os pontos de deslocamento
+    #     p1_final, p2_final = deslocar_pontos_direcao(novo_p1, novo_p2, desloc_p1, desloc_p2)
+
+    #     coord.append(APoint(*p1_final))
+    #     coord.append(APoint(*p2_final))
+    #     coordenadas.append(coord)
 
     return coordenadas
 
