@@ -46,6 +46,22 @@ def calcular_gaps_vidro(ang: float, espessura_vidro: int) -> float:
     gap_vidro = round((tan(radians(abs(ang/2))) * cat_adj), 2)
     return gap_vidro
 
+def calcular_gaps_furos(ang: float) -> float:
+    """Calcula o gap entre o vidro e a linha de centro.
+    
+    Usado quando é junção do tipo vidro-vidro.
+    
+    Args:
+        ang: Ângulo da junção em graus.
+        espessura_vidro: Espessura do vidro em milímetros.
+    
+    Returns:
+        float: Gap calculado entre o vidro e a linha de centro.
+    """
+    cat_adj = 26
+    gap_vidro = round((tan(radians(abs(ang/2))) * cat_adj), 2)
+    return gap_vidro
+
 def obter_pontos_medida_total(perfil: list[tuple[float, float, float]]) -> tuple[list[int], tuple[float, float], tuple[float, float]]:
     """Obtém os pontos para cota de medida total de um perfil.
     

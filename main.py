@@ -3,7 +3,7 @@ from src.achar_secao_principal import descobrir_secao_principal
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
 from src.comandos_cad import carregar_comandos
 from src.cotas import cotar_medida_total
-# from src.furos import definir_pontos_furos
+from src.furos import definir_pontos_furos
 from src.leitos import *
 from src.limpar import limpar_tudo
 from src.linhas_de_centro import definir_linhas_de_centro, redesenhar_linhas_de_centro, definir_coord_lcs
@@ -67,7 +67,6 @@ if __name__ == "__main__":
 
     # Vidros
     folgas_vidros = definir_folgas_vidros(juncoes, gaps_lcs, angs_in, espessura_vidro)
-    print(folgas_vidros)
 
     vidros = medida_dos_vidros(lcs, quant_vidros, folgas_vidros)
     pontos_vidros = pontos_dos_vidros(vidros, folgas_vidros)
@@ -82,14 +81,13 @@ if __name__ == "__main__":
     remover_guias()
     
     # Furos
-    # coord_furos = definir_pontos_furos(coord_vidros, folgas_vidros, quant_vidros)
+    coord_furos = definir_pontos_furos(coord_vidros, folgas_vidros, quant_vidros, angs_in, angs_paredes)
+
     #Cotas
     cotar_medida_total(coord_vidros, 'Vidro', 246)
     cotar_medida_total(coord_leitos, 'Leito', 386)
     cotar_medida_total(coord_lcs, 'Linha de centro', 550)
     cotar_medida_total(coord_perfis_U, 'Perfis U', 680)
-    # cotar_medida_total(coord_furos, 'Furos', 150)
+    cotar_medida_total(coord_furos, 'Furos', 150)
 
-
-    # puxar_cotas_furos(handles_vidros)
     # puxar_cotas_drenos(handles_vidros)
