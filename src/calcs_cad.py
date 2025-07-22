@@ -58,7 +58,7 @@ def calcular_gaps_furos(ang: float) -> float:
     Returns:
         float: Gap calculado entre o vidro e a linha de centro.
     """
-    cat_adj = 26
+    cat_adj = 22
     gap_vidro = round((tan(radians(abs(ang/2))) * cat_adj), 2)
     return gap_vidro
 

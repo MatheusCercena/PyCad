@@ -7,11 +7,11 @@ from src.autocad_conn import get_acad
 from src.calcs_vetor import linha_paralela_com_offset, deslocar_pontos_direcao
 from pyautocad import APoint
 from src.aberturas import distribuir_vidros_por_lado
-from src.calcs_cad import calcular_gaps_furos
+from src.calcs_cad import calcular_gaps_furos, calcular_gaps_vidro
 
 acad, acad_ModelSpace = get_acad()
 
-def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], folgas_vidros: list[list[int, int]], quant_vidros, angs_in, angs_paredes) -> list[list[tuple[float, float, float]]]:
+def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], folgas_vidros: list[list[int, int]], quant_vidros, angs_in, angs_paredes, espessura_v) -> list[list[tuple[float, float, float]]]:
     """Define os pontos para furação dos perfis U.
     
     Args:
@@ -51,13 +51,13 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
             if i == 0 and folgas_vidros[index][0] == folga_parede:
                 desloc_p1 = folga_parede - calcular_gaps_furos(angs_paredes[0])
             elif i == 0 and folgas_vidros[index][0] == folga_passante:
-                desloc_p1 = (50+folga_passante) + calcular_gaps_furos(angs_in[index-1])  
+                desloc_p1 = calcular_gaps_furos(angs_in[index-1]) + folga_passante + 50
                 cota_de_50_p2 = desloc_p1
             elif i == 0 and folgas_vidros[index][0] == folga_colante:
-                desloc_p1 = 39 + calcular_gaps_furos(angs_in[index-1])
+                desloc_p1 = calcular_gaps_furos(angs_in[index-1]) + folga_colante + 50
                 cota_de_50_p2 = desloc_p1
             elif i == 0 and folgas_vidros[index][0] == folga_vidro_vidro:
-                desloc_p1 = (50+folga_vidro_vidro*-1) + calcular_gaps_furos(angs_in[index-1])
+                desloc_p1 = calcular_gaps_furos(angs_in[index-1]) - calcular_gaps_vidro(angs_in[index], espessura_v) + folga_vidro_vidro + 50
                 cota_de_50_p2 = desloc_p1
             else:
                 desloc_p1 = -1.5
@@ -66,13 +66,13 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
             if i == len(lado)-1 and folgas_vidros[index][1] == folga_parede:
                 desloc_p2 = folga_parede*-1 + calcular_gaps_furos(angs_paredes[1]) 
             elif i == len(lado)-1 and folgas_vidros[index][1] == folga_passante:
-                desloc_p2= -54 - calcular_gaps_furos(angs_in[index])
+                desloc_p2 = calcular_gaps_furos(angs_in[index])*-1 + folga_passante - 50
                 cota_de_50_p1 = desloc_p2
             elif i == len(lado)-1 and folgas_vidros[index][1] == folga_colante:
-                desloc_p2= -39 - calcular_gaps_furos(angs_in[index])
+                desloc_p2 = calcular_gaps_furos(angs_in[index])*-1 + folga_colante*-1 - 50
                 cota_de_50_p1 = desloc_p2
             elif i == len(lado)-1 and folgas_vidros[index][1] == folga_vidro_vidro:
-                desloc_p2= (folga_vidro_vidro-50) - calcular_gaps_furos(angs_in[index])
+                desloc_p2 = calcular_gaps_furos(angs_in[index])*-1 + calcular_gaps_vidro(angs_in[index], espessura_v) + folga_vidro_vidro*-1 - 50
                 cota_de_50_p1 = desloc_p2
             else:
                 desloc_p2 = 1.5
