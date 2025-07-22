@@ -4,7 +4,7 @@ Módulo responsável por definir pontos de furação nos perfis U com base nas m
 Este módulo interage com o AutoCAD para criar offsets nos perfis U conforme a necessidade do projeto.
 """
 from src.autocad_conn import get_acad
-from src.calcs_vetor import linha_paralela_com_offset, deslocar_pontos_direcao
+from src.calcs_vetor import linha_paralela_com_offset, deslocar_pontos_direcao, distancia_2d
 from pyautocad import APoint
 from src.aberturas import distribuir_vidros_por_lado
 from src.calcs_cad import calcular_gaps_furos, calcular_gaps_vidro
@@ -26,10 +26,9 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], c
     folga_passante = 2
     folga_colante = -3-espessura_v/2
     folga_vidro_vidro = -1
+    offset = 700-espessura_v/2
 
-    offset = 696
     coordenadas = []
-
     distribuicao = distribuir_vidros_por_lado(quant_vidros)
 
     coord_vidros_reorganizada = []
@@ -38,9 +37,6 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], c
         coord_vidros_reorganizada.append(vidros_lado)
 
     for index, lado in enumerate(coord_vidros_reorganizada):
-        perfis_u = coord_perfis_U[index]
-        perfis_novos = linha_paralela_com_offset()
-        #### AQUI, FAZER perfis novos com linha paralela
         for i, vidro in enumerate(lado):            
             coord = []
             coord_50 = []
@@ -49,9 +45,6 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], c
             novo_p1, novo_p2 = linha_paralela_com_offset(p1, p2, offset)
             cota_de_50_p1 = ''
             cota_de_50_p2 = ''
-
-            for perfil in perfis_u:
-                ponto_ini, ponto_fim = deslocar_pontos_direcao(p1, p2, )
 
             #lado esquerdo (desloc_p1)
             if i == 0 and folgas_vidros[index][0] == folga_parede:
@@ -101,5 +94,64 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], c
                 coord_50.append(APoint(*p2_50_ini))
                 coord_50.append(APoint(*p2_50_fim))
                 coordenadas.append(coord_50)
-                
-    return coordenadas
+    
+    coordenadas_finais = redefinir_pontos_furos(coordenadas, coord_perfis_U, offset, espessura_v)
+
+    return coordenadas_finais
+
+def normalizar_coordenadas(ponto_inicial: tuple[float, float], p1: tuple[float, float], p2: tuple[float, float]) -> tuple[int, int]:
+    '''
+    Retorna as coordenadas de p1 e p2 como a distancia linear delas em relação ao ponto inicial.
+    '''
+    novo_p1 = distancia_2d(ponto_inicial, p1)
+    novo_p2 = distancia_2d(ponto_inicial, p2)
+    return novo_p1, novo_p2
+
+def esta_entre(a: float, x: float, y: float) -> bool:
+    if a > min(x, y) and a < max(x, y):
+        return True
+    else: 
+        return False
+
+def redefinir_pontos_furos(coord_furos: list[list[tuple[float, float, float]]], coord_perfis_U: list[list[float]], offset: int, espessura_v: int) -> list[list[tuple[float, float, float]]]:
+    offset_corrigido = offset + espessura_v - espessura_perfil_U
+    espessura_perfil_U = 20
+
+    coordenadas_redefinidas = []
+    for lado in range(len(coord_perfis_U)):
+        perfis_u_lado = coord_perfis_U[lado]
+        furos_lado = coord_furos[lado]
+
+        coordenadas_lado_redefinidas = []
+        perfis_U_normalizados = []
+        furos_normalizados = []
+        for perfil in perfis_u_lado:
+            ini_nova, fim_nova = linha_paralela_com_offset(perfil[0], perfil[1], offset_corrigido)
+            perfil_normalizado = normalizar_coordenadas(perfis_u_lado[0], ini_nova, fim_nova)
+            perfis_U_normalizados.append(perfil_normalizado)
+
+        for furo in furos_lado:
+            furo_normalizado = normalizar_coordenadas(perfis_u_lado[0], furo[0], furo[1])
+            furos_normalizados.append(furo_normalizado)
+            
+        for i, furo in enumerate(furos_normalizados):
+            perfil_tocado = [] 
+            for ponto in furo:
+                for index, perfil in enumerate(perfis_U_normalizados):
+                    if esta_entre(ponto, perfil[0], perfil[1]) == True:
+                        perfil_tocado.append(index)
+                    break
+            if perfil_tocado[0] == perfil_tocado[1]:
+                coord_nova_1 = [] #definir
+                coord_nova_2 = [] #definir
+
+                coordenadas_lado_redefinidas.extend(coord_nova_1, coord_nova_2)
+            else:
+                coordenadas_lado_redefinidas.append(furos_lado[i])
+
+        coordenadas_redefinidas.append(coordenadas_lado_redefinidas)
+    
+    return coordenadas_redefinidas
+        
+
+            

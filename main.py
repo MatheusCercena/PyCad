@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
     # Furos
     coord_furos = definir_pontos_furos(coord_vidros, coord_perfis_U, folgas_vidros, quant_vidros, angs_in, angs_paredes, espessura_vidro)
-
+    
     #Cotas
     cotar_medida_total(coord_vidros, 'Vidro', 246)
     cotar_medida_total(coord_leitos, 'Leito', 386)
