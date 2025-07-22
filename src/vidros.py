@@ -82,7 +82,7 @@ def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessur
     """
     folga_parede = -12
     folga_passante = 2
-    folga_colante = -7
+    folga_colante = -3-espessura_vidro/2
     folga_vidro_vidro = -1
     juncoes_secoes = deepcopy(juncoes)
     folgas_secoes = []

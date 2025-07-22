@@ -11,7 +11,7 @@ from src.calcs_cad import calcular_gaps_furos, calcular_gaps_vidro
 
 acad, acad_ModelSpace = get_acad()
 
-def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], folgas_vidros: list[list[int, int]], quant_vidros, angs_in, angs_paredes, espessura_v) -> list[list[tuple[float, float, float]]]:
+def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], coord_perfis_U: list[list[float]], folgas_vidros: list[list[int, int]], quant_vidros: list[list[int]], angs_in: list[float], angs_paredes: list[float], espessura_v: int) -> list[list[tuple[float, float, float]]]:
     """Define os pontos para furação dos perfis U.
     
     Args:
@@ -24,7 +24,7 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
 
     folga_parede = -12
     folga_passante = 2
-    folga_colante = -7
+    folga_colante = -3-espessura_v/2
     folga_vidro_vidro = -1
 
     offset = 696
@@ -38,7 +38,10 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
         coord_vidros_reorganizada.append(vidros_lado)
 
     for index, lado in enumerate(coord_vidros_reorganizada):
-        for i, vidro in enumerate(lado):
+        perfis_u = coord_perfis_U[index]
+        perfis_novos = linha_paralela_com_offset()
+        #### AQUI, FAZER perfis novos com linha paralela
+        for i, vidro in enumerate(lado):            
             coord = []
             coord_50 = []
             p1 = vidro[0]
@@ -46,6 +49,9 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
             novo_p1, novo_p2 = linha_paralela_com_offset(p1, p2, offset)
             cota_de_50_p1 = ''
             cota_de_50_p2 = ''
+
+            for perfil in perfis_u:
+                ponto_ini, ponto_fim = deslocar_pontos_direcao(p1, p2, )
 
             #lado esquerdo (desloc_p1)
             if i == 0 and folgas_vidros[index][0] == folga_parede:
@@ -77,7 +83,6 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
             else:
                 desloc_p2 = 1.5
 
-
             p1_final, p2_final = deslocar_pontos_direcao(novo_p1, novo_p2, desloc_p1, desloc_p2)
             coord.append(APoint(*p1_final))
             coord.append(APoint(*p2_final))
@@ -96,4 +101,5 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
                 coord_50.append(APoint(*p2_50_ini))
                 coord_50.append(APoint(*p2_50_fim))
                 coordenadas.append(coord_50)
+                
     return coordenadas

@@ -79,9 +79,9 @@ if __name__ == "__main__":
     handles_guias_leitos = desenhar_guias_leitos(handles_lcs, vidros, pontos_vidros, folga_leitos)
     handle_leitos, coord_leitos = desenhar_leitos(handles_guias_leitos, vidros, angs_in, giratorios, adjacentes, sentidos)
     remover_guias()
-    
+
     # Furos
-    coord_furos = definir_pontos_furos(coord_vidros, folgas_vidros, quant_vidros, angs_in, angs_paredes, espessura_vidro)
+    coord_furos = definir_pontos_furos(coord_vidros, coord_perfis_U, folgas_vidros, quant_vidros, angs_in, angs_paredes, espessura_vidro)
 
     #Cotas
     cotar_medida_total(coord_vidros, 'Vidro', 246)
