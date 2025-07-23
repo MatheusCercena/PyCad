@@ -153,7 +153,7 @@ def def_eq_reta_leitos(ponto_a: tuple[float, float], ponto_b: tuple[float, float
 
         return Eq(y, valor_m*x + valor_b)
 
-def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], giratorios: list[int], adjacentes: list[int], sentidos: list[str]) -> tuple[dict[str, list[str]], list]:
+def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], giratorios: list[int], adjacentes: list[int], sentidos: list[str]) -> tuple[dict[str, list[str]], list[tuple[float, float, float]]]:
     """Desenha os leitos no AutoCAD com todas as suas características.
     
     Args:

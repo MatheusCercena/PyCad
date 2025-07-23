@@ -152,7 +152,7 @@ def redesenhar_linhas_de_centro(lcs: list[int], angs_in: list[float], sec_princ:
         lista[value] = novas_lcs[index]
     return lista_de_LCs, lista
 
-def definir_coord_lcs(pos_lcs: list[list[float]]) -> list[list[tuple[float, float, float]]]:
+def definir_coord_lcs(pos_lcs: list[list[float]]) -> list[tuple[float, float, float]]:
     """Define as coordenadas 3D das linhas de centro.
     
     Args:

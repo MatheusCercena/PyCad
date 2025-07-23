@@ -36,6 +36,20 @@ def angulo_do_vetor(p1: tuple[float, float], p2: tuple[float, float]) -> float:
     dy = p2[1] - p1[1]
     return atan2(dy, dx)
 
+def normalizar_coordenadas(ponto_inicial: tuple[float, float], p1: tuple[float, float], p2: tuple[float, float]) -> tuple[int, int]:
+    '''
+    Retorna as coordenadas de p1 e p2 como a distancia linear delas em relação ao ponto inicial.
+    '''
+    novo_p1 = distancia_2d(ponto_inicial, p1)
+    novo_p2 = distancia_2d(ponto_inicial, p2)
+    return novo_p1, novo_p2
+
+def esta_entre(a: float, x: float, y: float) -> bool:
+    if a > min(x, y) and a < max(x, y):
+        return True
+    else: 
+        return False
+
 def vetor_perpendicular_unitario(p1: tuple[float, float], p2: tuple[float, float]) -> tuple[float, float]:
     """Calcula o vetor unitário perpendicular ao vetor formado por p1 -> p2."""
     dx = p2[0] - p1[0]

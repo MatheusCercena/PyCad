@@ -22,7 +22,6 @@ def cotar_medida_total(perfis: list, tipo_cota: str = 'ISO-25', offset: int = 20
     """
     
     for perfil in perfis:
-        # if len(perfil) == 2: 
         pontos, p1, p2 = obter_pontos_medida_total(perfil)
         a1 = APoint(*p1)
         a2 = APoint(*p2)

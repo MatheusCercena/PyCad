@@ -13,7 +13,7 @@ from src.autocad_conn import get_acad
 from src.calcs_vetor import normalizar, definir_pontos_na_secao
 from src.calcs_cad import calcular_gaps_vidro
 from copy import deepcopy
-from math import floor, sqrt
+from math import floor
 from time import sleep
 
 acad, acad_ModelSpace = get_acad()
@@ -175,7 +175,7 @@ def pontos_dos_vidros(medidas_vidros: list[int], folgas: list[list[int, int]]) -
         todos_pontos.append(pontos_linha_de_centro)
     return todos_pontos
 
-def offset_vidros(espessura_vidro: int) -> tuple[list[str], list[list[tuple[float, float, float]]]]:
+def offset_vidros(espessura_vidro: int) -> tuple[list[str], list[tuple[float, float, float]]]:
     """Cria offsets dos vidros externos e internos.
     
     Args:

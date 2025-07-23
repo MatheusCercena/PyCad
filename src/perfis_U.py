@@ -141,9 +141,9 @@ def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float
         for perfil in perfis_secao:
             distancia += perfil
             coord_perfil = []
-            coord_perfil.append(APoint(*ini_perfil))
+            coord_perfil.append(ini_perfil)
 
-            fim_perfil = APoint(*definir_pontos_na_secao(p1, vetor_unitario, distancia)) 
+            fim_perfil = definir_pontos_na_secao(p1, vetor_unitario, distancia)
             coord_perfil.append(fim_perfil)
             
             ini_perfil = fim_perfil
