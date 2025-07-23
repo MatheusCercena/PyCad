@@ -96,8 +96,6 @@ def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float
             - Lista de listas com medidas dos perfis por seção
             - Lista com coordenadas dos perfis redefinidos
     """
-    #corrigir funcao pra que tenha 4 elementos, no caso o 2 internos e 2 externos.
-
     medidas = []
     coordenadas = []
     for i, lado in enumerate(coord_perfis_U):

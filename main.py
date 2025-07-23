@@ -51,6 +51,7 @@ if __name__ == "__main__":
     # Reajustando perfis U
     coord_perfis_U = definir_coord_perfis_U(handles_perfis_U)
     aberturas_por_lado = associar_aberturas_aos_lados(quant_vidros, sentidos_abert)
+    print(aberturas_por_lado)
     medidas_perfis_U, coord_perfis_U = redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado, elevador)
 
     # Ajustes de angulos de paredes

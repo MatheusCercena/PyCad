@@ -10,6 +10,7 @@ Funções para definir as coordenadas das linhas de centro com base nos inputs d
 from pyautocad import Autocad, APoint
 from math import radians
 from src.autocad_conn import get_acad
+import pythoncom
 
 cad, acad_ModelSpace = get_acad()
 
@@ -95,8 +96,10 @@ def redesenhar_linhas_de_centro(lcs: list[int], angs_in: list[float], sec_princ:
     
     lista_de_LCs = lcs.copy() 
     #desenha a seção principal a partir de (0, 0)
-    linha = acad.model.AddLine(APoint(0, 0), APoint(lista_de_LCs[sec_princ], 0))
-    linha.Layer = 'Linha de Centro'
+    for tentativa in range(5):
+        pythoncom.PumpWaitingMessages()
+        linha = acad.model.AddLine(APoint(0, 0), APoint(lista_de_LCs[sec_princ], 0))
+        linha.Layer = 'Linha de Centro'
     inicio = linha.StartPoint
     final = linha.EndPoint
     angs = 0

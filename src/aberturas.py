@@ -41,6 +41,8 @@ def associar_aberturas_aos_lados(quant_vidros: list[int], aberturas: list) -> li
             parcial = ['', 0]
             if abertura[2] in lado:  # Se o vidro giratório está neste lado
                 quant = abertura[1] - abertura[0]
+                if quant == 0:
+                    quant = 1
                 if quant > parcial[1]:
                     parcial[0] = abertura[4]
                     parcial[1] = quant
