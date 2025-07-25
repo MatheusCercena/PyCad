@@ -11,7 +11,6 @@ from copy import deepcopy
 from src.autocad_conn import get_acad
 from src.calcs_vetor import distancia_2d, normalizar, definir_pontos_na_secao, vetor_entre_pontos
 from src.calcs_cad import obter_pontos_medida_total
-from pyautocad import APoint
 
 acad, acad_ModelSpace = get_acad()
 
@@ -81,6 +80,31 @@ def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[flo
         coord.append(linha_int.EndPoint)
 
         coordenadas.append(coord)
+    return coordenadas
+
+def distribuir_perfis_U_por_lado(medidas: list[list[tuple[float, float, float]]], coord_perfis_U: list[tuple[float, float, float]]) -> list[list[tuple[float, float, float]]]:
+    """Distribui os vidros por lado da sacada.
+    
+    Args:
+        quant_vidros: Lista com a quantidade de vidros por lado.
+
+    Returns:
+        list: Lista de sublistas com números sequenciais dos vidros de cada lado.
+        
+    Example:
+        Entrada: [3, 5, 2]
+        Saída: [[1, 2, 3], [4, 5, 6, 7, 8], [9, 10]]
+    """
+    quant_secoes = []
+    for lado in medidas:
+        quant_secoes.append(len(lado))
+
+    coordenadas = []
+    cont = 0
+    for qtd in quant_secoes:
+        coord_lado = [coord_perfis_U[c] for c in range(cont, cont + qtd)]
+        coordenadas.append(coord_lado)
+        cont += qtd
     return coordenadas
 
 def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float]]], aberturas_por_lado: list, elevador: int) -> tuple[list[list[float]], list[float]]:

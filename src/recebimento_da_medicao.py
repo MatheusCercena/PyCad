@@ -82,6 +82,9 @@ def pedir_angSecoes(lcs: list[int]) -> list[float]:
         while True:
             try:
                 ang_sec = float(input(f'Qual o angulo entre a S{c+1} e a S{c+2}: ').replace(',', '.'))
+                if ang_sec < 30:
+                    print('[ERRO] Angulo muito pequeno. ')
+                    break
                 break
             except:
                 print(f'[ERRO] O campo "angulo" precisa conter apenas numeros: ')

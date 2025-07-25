@@ -8,6 +8,7 @@ from src.calcs_vetor import linha_paralela_com_offset, deslocar_pontos_direcao, 
 from pyautocad import APoint
 from src.aberturas import distribuir_vidros_por_lado
 from src.calcs_cad import calcular_gaps_furos, calcular_gaps_vidro
+from src.perfis_U import distribuir_perfis_U_por_lado
 
 acad, acad_ModelSpace = get_acad()
 
@@ -28,6 +29,7 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], m
     folga_vidro_vidro = -1
     offset = 700-espessura_v/2
 
+    quant_furos_por_lado = []
     coordenadas = []
     distribuicao = distribuir_vidros_por_lado(quant_vidros)
 
@@ -37,6 +39,7 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], m
         coord_vidros_reorganizada.append(vidros_lado)
 
     for index, lado in enumerate(coord_vidros_reorganizada):
+        quant_lado = 0
         for i, vidro in enumerate(lado):            
             coord = []
             coord_50 = []
@@ -80,6 +83,7 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], m
             coord.append(APoint(*p1_final))
             coord.append(APoint(*p2_final))
             coordenadas.append(coord)
+            quant_lado += 1
 
             if cota_de_50_p2:
                 p2_50_ini = deslocar_pontos_direcao(p1_final, p2_final, -50, 0)[0]
@@ -87,6 +91,7 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], m
                 coord_50.append(APoint(*p2_50_ini))
                 coord_50.append(APoint(*p2_50_fim))
                 coordenadas.append(coord_50)
+                quant_lado += 1
 
             if cota_de_50_p1:
                 p2_50_ini = p2_final
@@ -94,54 +99,62 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], m
                 coord_50.append(APoint(*p2_50_ini))
                 coord_50.append(APoint(*p2_50_fim))
                 coordenadas.append(coord_50)
-    
-    coordenadas_finais = redefinir_pontos_furos(coordenadas, medidas_perfis_u, coord_perfis_U, offset, espessura_v)
+                quant_lado += 1
+        quant_furos_por_lado.append(quant_lado)
 
+    coordenadas_finais = redefinir_pontos_furos(coordenadas, quant_furos_por_lado, medidas_perfis_u, coord_perfis_U, offset, espessura_v)
     return coordenadas_finais
 
-def redefinir_pontos_furos(coord_furos: list[list[tuple[float, float, float]]], medidas_perfis_U, coord_perfis_U: list[list[float]], offset: int, espessura_v: int) -> list[list[tuple[float, float, float]]]:
+def redefinir_pontos_furos(coord_furos: list[tuple[float, float, float]], quant_furos_lado: list[int], medidas_perfis_U, coord_perfis_U: list[list[float]], offset: int, espessura_v: int) -> list[list[tuple[float, float, float]]]:
     espessura_perfil_U = 20
     offset_corrigido = offset + espessura_v - espessura_perfil_U
 
     coordenadas_redefinidas = []
-    for lado in range(len(coord_perfis_U)):
+
+    perfis_U = distribuir_perfis_U_por_lado(medidas_perfis_U, coord_perfis_U)  
+    furos = distribuir_furos_por_lado(coord_furos, quant_furos_lado)       
+
+    for lado in range(len(perfis_U)):
         coordenadas_lado_redefinidas = []
 
-        perfis_U_guia = distribuir_perfis_U_por_lado(medidas_perfis_U, coord_perfis_U)       
-        perfis_u_lado = perfis_U_guia[lado]
-        furos_lado = coord_furos[lado]
+        perfis_u_lado = perfis_U[lado]
+        furos_lado = furos[lado]
 
         perfis_U_normalizados = []
         furos_normalizados = []
 
-        ini_nova = fim_nova = ''
-        for s, perfil in enumerate(perfis_u_lado):
-            ini_nova, fim_nova = linha_paralela_com_offset(perfil, perfis_u_lado[-1], offset_corrigido)
-            perfis_U_guia.append((ini_nova, fim_nova))
-            perfil_normalizado = normalizar_coordenadas(perfis_u_lado[0], ini_nova, fim_nova)
+        ini_secao = ''
+        ini_secao = linha_paralela_com_offset(perfis_u_lado[lado][0], perfis_u_lado[lado][1], offset_corrigido)[0]
+        for s, perfil in enumerate(perfis_u_lado):  
+            ini_perfil, fim_perfil = linha_paralela_com_offset(perfil[0], perfil[1], offset_corrigido)
+            perfil_normalizado = normalizar_coordenadas(ini_secao, ini_perfil, fim_perfil)
             perfis_U_normalizados.append(perfil_normalizado)
 
         for furo in furos_lado:
-            furo_normalizado = normalizar_coordenadas(perfis_u_lado[0], furo[0], furo[1])
+            furo_normalizado = normalizar_coordenadas(furos_lado[0][0], furo[0], furo[1])
             furos_normalizados.append(furo_normalizado)
             
-        for i, furo in enumerate(furos_normalizados):
+        for i, furo_norm in enumerate(furos_normalizados):
             perfil_tocado = [] 
-            for ponto in furo:
-                for index, perfil in enumerate(perfis_U_normalizados):
-                    if esta_entre(ponto, perfil[0], perfil[1]) == True:
+            for index, perfil_normalizado in enumerate(perfis_U_normalizados):
+                for ponto in range(2):
+                    if esta_entre(furo_norm[ponto], perfil_normalizado[0], perfil_normalizado[1]) == True:
                         perfil_tocado.append(index)
-                    break
-            if perfil_tocado[0] == perfil_tocado[1]:
-                coord_nova_1 = [furo[0], perfis_U_guia[perfil_tocado[0]]] 
-                coord_nova_2 = [perfis_U_guia[perfil_tocado[1]], furo[1]]
-                coordenadas_lado_redefinidas.extend(coord_nova_1, coord_nova_2)
+                    else:
+                        perfil_tocado.append('')
+
+            if perfil_tocado[0] == perfil_tocado[1] and perfil_tocado[0] != '':
+                coord_nova_1 = (furo[0], perfis_u_lado[perfil_tocado[0]][1])
+                coord_nova_2 = (perfis_u_lado[perfil_tocado[1]][0], furo[1])
+                print(coord_nova_1)
+                print(coord_nova_2)
+                coordenadas_lado_redefinidas.extend([coord_nova_1, coord_nova_2])
             else:
                 coordenadas_lado_redefinidas.append(furos_lado[i])
         coordenadas_redefinidas.append(coordenadas_lado_redefinidas)
     return coordenadas_redefinidas
 
-def distribuir_perfis_U_por_lado(medidas: list[list[tuple[float, float, float]]], coord_perfis_U: list[tuple[float, float, float]]) -> list[list[tuple[float, float, float]]]:
+def distribuir_furos_por_lado(coord_furos: list[tuple[float, float, float]], quant_furos_por_lado: list[list[tuple[float, float, float]]]) -> list[list[tuple[float, float, float]]]:
     """Distribui os vidros por lado da sacada.
     
     Args:
@@ -155,15 +168,10 @@ def distribuir_perfis_U_por_lado(medidas: list[list[tuple[float, float, float]]]
         Saída: [[1, 2, 3], [4, 5, 6, 7, 8], [9, 10]]
     """
     coordenadas = []
-    
-    quant_secoes = []
-    for lado in medidas:
-        quant_secoes.append(len(lado))
-
     cont = 0
-    for qtd in quant_secoes:
-        coord_lado = [coord_perfis_U[c] for c in range(cont, cont + qtd)]
+    for qtd in quant_furos_por_lado:
+        coord_lado = [coord_furos[c] for c in range(cont, cont + qtd)]
         coordenadas.append(coord_lado)
         cont += qtd
-
     return coordenadas
+

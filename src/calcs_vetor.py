@@ -45,7 +45,7 @@ def normalizar_coordenadas(ponto_inicial: tuple[float, float], p1: tuple[float, 
     return novo_p1, novo_p2
 
 def esta_entre(a: float, x: float, y: float) -> bool:
-    if a > min(x, y) and a < max(x, y):
+    if a >= min(x, y) and a <= max(x, y):
         return True
     else: 
         return False

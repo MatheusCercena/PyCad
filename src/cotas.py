@@ -20,15 +20,17 @@ def cotar_medida_total(perfis: list, tipo_cota: str = 'ISO-25', offset: int = 20
     Returns:
         None: Função cria cotas no AutoCAD sem retorno.
     """
-    
+
     for perfil in perfis:
         pontos, p1, p2 = obter_pontos_medida_total(perfil)
         a1 = APoint(*p1)
         a2 = APoint(*p2)
 
         # Ângulo da cota (do vetor do lado interno)
-        x0, y0, _ = perfil[0]
-        x1, y1, _ = perfil[1]
+        x0 = perfil[0][0]
+        y0 = perfil[0][1]
+        x1 = perfil[1][0] 
+        y1 = perfil[1][1]
         ang = angulo_do_vetor((x0, y0), (x1, y1))
 
         # Vetor perpendicular unitário

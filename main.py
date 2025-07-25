@@ -39,7 +39,6 @@ if __name__ == "__main__":
     # Início perfis U 
     handles_perfis_U = offset_perfis_U(handles_lcs)
     fillet_perfis_U(handles_perfis_U)
-    coord_perfis_U = definir_coord_perfis_U(handles_perfis_U)
 
     # Paredes
     parede_esq = fazer_parede_esq(pos_lcs[0], handles_perfis_U['externos'][0], handles_perfis_U['internos'][0], angs_paredes[0])
@@ -51,7 +50,6 @@ if __name__ == "__main__":
     # Reajustando perfis U
     coord_perfis_U = definir_coord_perfis_U(handles_perfis_U)
     aberturas_por_lado = associar_aberturas_aos_lados(quant_vidros, sentidos_abert)
-    print(aberturas_por_lado)
     medidas_perfis_U, coord_perfis_U = redefinir_coord_perfis_U(coord_perfis_U, aberturas_por_lado, elevador)
 
     # Ajustes de angulos de paredes
@@ -84,6 +82,7 @@ if __name__ == "__main__":
     # Furos
     coord_furos = definir_pontos_furos(coord_vidros, medidas_perfis_U, coord_perfis_U, folgas_vidros, quant_vidros, angs_in, angs_paredes, espessura_vidro)
     
+
     #Cotas
     cotar_medida_total(coord_vidros, 'Vidro', 246)
     cotar_medida_total(coord_leitos, 'Leito', 386)
@@ -92,3 +91,5 @@ if __name__ == "__main__":
     cotar_medida_total(coord_furos, 'Furos', 150)
 
     # puxar_cotas_drenos(handles_vidros)
+
+

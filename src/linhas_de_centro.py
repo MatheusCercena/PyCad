@@ -96,10 +96,8 @@ def redesenhar_linhas_de_centro(lcs: list[int], angs_in: list[float], sec_princ:
     
     lista_de_LCs = lcs.copy() 
     #desenha a seção principal a partir de (0, 0)
-    for tentativa in range(5):
-        pythoncom.PumpWaitingMessages()
-        linha = acad.model.AddLine(APoint(0, 0), APoint(lista_de_LCs[sec_princ], 0))
-        linha.Layer = 'Linha de Centro'
+    linha = acad.model.AddLine(APoint(0, 0), APoint(lista_de_LCs[sec_princ], 0))
+    linha.Layer = 'Linha de Centro'
     inicio = linha.StartPoint
     final = linha.EndPoint
     angs = 0
