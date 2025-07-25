@@ -5,38 +5,38 @@ Inclui operações com vetores, pontos, ângulos, distâncias, gaps e manipulaç
 """
 from math import sqrt, atan2
 
-def vetor_entre_pontos(p1: tuple[float, float], p2: tuple[float, float]) -> tuple[float, float]:
+def vetor_entre_pontos(p1: tuple[float, float, float], p2: tuple[float, float, float]) -> tuple[float, float, float]:
     """Calcula o vetor que vai de p1 até p2."""
-    return (p2[0] - p1[0], p2[1] - p1[1])
+    return (p2[0] - p1[0], p2[1] - p1[1], 0.0)
 
-def normalizar(vetor: tuple[float, float]) -> tuple[float, float]:
+def normalizar(vetor: tuple[float, float, float]) -> tuple[float, float, float]:
     """Normaliza um vetor para obter o vetor unitário."""
     norma = sqrt(vetor[0]**2 + vetor[1]**2)
-    return (vetor[0]/norma, vetor[1]/norma)
+    return (vetor[0]/norma, vetor[1]/norma, 0.0)
 
-def distancia_2d(p1: tuple, p2: tuple) -> float:
+def distancia_2d(p1: tuple[float, float, float], p2: tuple[float, float, float]) -> float:
     """Calcula a distância entre dois pontos 2D."""
     return sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
 
-def multiplicar_vetor(vetor: tuple[float, float], escalar: float) -> tuple[float, float]:
+def multiplicar_vetor(vetor: tuple[float, float, float], escalar: float) -> tuple[float, float, float]:
     """Multiplica um vetor por um escalar."""
-    return (vetor[0] * escalar, vetor[1] * escalar)
+    return (vetor[0] * escalar, vetor[1] * escalar, 0.0)
 
-def somar_pontos(p1: tuple[float, float], p2: tuple[float, float]) -> tuple[float, float]:
+def somar_pontos(p1: tuple[float, float, float], p2: tuple[float, float, float]) -> tuple[float, float, float]:
     """Soma dois pontos/vetores 2D."""
-    return (p1[0] + p2[0], p1[1] + p2[1])
+    return (p1[0] + p2[0], p1[1] + p2[1], 0.0)
 
-def ponto_medio(p1: tuple[float, float], p2: tuple[float, float]) -> tuple[float, float]:
+def ponto_medio(p1: tuple[float, float, float], p2: tuple[float, float, float]) -> tuple[float, float, float]:
     """Calcula o ponto médio entre dois pontos."""
-    return ((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2)
+    return ((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, 0.0)
 
-def angulo_do_vetor(p1: tuple[float, float], p2: tuple[float, float]) -> float:
+def angulo_do_vetor(p1: tuple[float, float, float], p2: tuple[float, float, float]) -> float:
     """Calcula o ângulo em radianos do vetor formado por p1 -> p2 em relação ao eixo X."""
     dx = p2[0] - p1[0]
     dy = p2[1] - p1[1]
     return atan2(dy, dx)
 
-def normalizar_coordenadas(ponto_inicial: tuple[float, float], p1: tuple[float, float], p2: tuple[float, float]) -> tuple[int, int]:
+def normalizar_coordenadas(ponto_inicial: tuple[float, float, float], p1: tuple[float, float, float], p2: tuple[float, float, float]) -> tuple[float, float]:
     '''
     Retorna as coordenadas de p1 e p2 como a distancia linear delas em relação ao ponto inicial.
     '''
@@ -50,14 +50,14 @@ def esta_entre(a: float, x: float, y: float) -> bool:
     else: 
         return False
 
-def vetor_perpendicular_unitario(p1: tuple[float, float], p2: tuple[float, float]) -> tuple[float, float]:
+def vetor_perpendicular_unitario(p1: tuple[float, float, float], p2: tuple[float, float, float]) -> tuple[float, float, float]:
     """Calcula o vetor unitário perpendicular ao vetor formado por p1 -> p2."""
     dx = p2[0] - p1[0]
     dy = p2[1] - p1[1]
     mod = sqrt(dx**2 + dy**2)
-    return (-dy / mod, dx / mod)
+    return (-dy / mod, dx / mod, 0.0)
 
-def linha_paralela_com_offset(p1: tuple[float, float], p2: tuple[float, float], offset: float) -> tuple[tuple[float, float], tuple[float, float]]:
+def linha_paralela_com_offset(p1: tuple[float, float, float], p2: tuple[float, float, float], offset: float) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
     """Retorna os dois pontos de uma linha paralela deslocada por um offset perpendicular"""
     vetor_perp = vetor_perpendicular_unitario(p1, p2)
     deslocamento = multiplicar_vetor(vetor_perp, offset)
@@ -67,7 +67,7 @@ def linha_paralela_com_offset(p1: tuple[float, float], p2: tuple[float, float], 
 
     return novo_p1, novo_p2
 
-def deslocar_pontos_direcao(p1: tuple[float, float], p2: tuple[float, float], desloc_p1: float, desloc_p2: float) -> tuple[tuple[float, float], tuple[float, float]]:
+def deslocar_pontos_direcao(p1: tuple[float, float, float], p2: tuple[float, float, float], desloc_p1: float, desloc_p2: float) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
     """Retorna dois pontos deslocados ao longo da direção do vetor p1 → p2, com deslocamentos independentes para cada extremidade."""
     vetor = vetor_entre_pontos(p1, p2)
     vetor_unitario = normalizar(vetor)
@@ -77,20 +77,21 @@ def deslocar_pontos_direcao(p1: tuple[float, float], p2: tuple[float, float], de
 
     return novo_p1, novo_p2
 
-def definir_pontos_na_secao(Inicio_secao: tuple[float, float], vetor_unitario: tuple[float, float], distancia: float) -> tuple[float, float]:
+def definir_pontos_na_secao(Inicio_secao: tuple[float, float, float], vetor_unitario: tuple[float, float, float], distancia: float) -> tuple[float, float, float]:
     """Define um ponto em uma seção a partir de um ponto inicial, vetor unitário e distância.
     
     Args:
-        Inicio_secao: Ponto inicial da seção (x, y).
-        vetor_unitario: Vetor unitário da direção (x, y).
+        Inicio_secao: Ponto inicial da seção (x, y, z).
+        vetor_unitario: Vetor unitário da direção (x, y, z).
         distancia: Distância a partir do ponto inicial.
     
     Returns:
-        tuple: Ponto calculado na seção (x, y).
+        tuple: Ponto calculado na seção (x, y, z).
     """
     return (
         Inicio_secao[0] + vetor_unitario[0] * distancia,
-        Inicio_secao[1] + vetor_unitario[1] * distancia
+        Inicio_secao[1] + vetor_unitario[1] * distancia,
+        0.0
     )
 
 def dentro_do_intervalo(valor: float, minimo: float, maximo: float, tol: float = 1e-6) -> bool:

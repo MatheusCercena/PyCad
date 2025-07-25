@@ -107,7 +107,7 @@ def distribuir_perfis_U_por_lado(medidas: list[list[tuple[float, float, float]]]
         cont += qtd
     return coordenadas
 
-def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float]]], aberturas_por_lado: list, elevador: int) -> tuple[list[list[float]], list[float]]:
+def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float]]], aberturas_por_lado: list, elevador: int) -> tuple[list[list[float]], list[list[tuple[float, float, float]]]]:
     """Redefine as coordenadas dos perfis U considerando aberturas e elevador.
     
     Args:
@@ -163,10 +163,10 @@ def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float
         for perfil in perfis_secao:
             distancia += perfil
             coord_perfil = []
-            coord_perfil.append(ini_perfil)
+            coord_perfil.append(tuple(ini_perfil))
 
             fim_perfil = definir_pontos_na_secao(p1, vetor_unitario, distancia)
-            coord_perfil.append(fim_perfil)
+            coord_perfil.append(tuple(fim_perfil))
             
             ini_perfil = fim_perfil
             coordenadas.append(coord_perfil)

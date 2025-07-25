@@ -62,12 +62,12 @@ def calcular_gaps_furos(ang: float) -> float:
     gap_vidro = round((tan(radians(abs(ang/2))) * cat_adj), 2)
     return gap_vidro
 
-def obter_pontos_medida_total(perfil: list[tuple[float, float, float]]) -> tuple[list[int], tuple[float, float], tuple[float, float]]:
+def obter_pontos_medida_total(perfil: list[tuple[float, float, float]]) -> tuple[list[int], tuple[float, float, float], tuple[float, float, float]]:
     """Obtém os pontos para cota de medida total de um perfil.
     
     Dado um perfil com 4 pontos [(x0,y0,z0), (x1,y1,z1), (x2,y2,z2), (x3,y3,z3)] 
     ou em outras palavras [(ini_int), (fim_int), (ini_ext), (fim_ext)], retorna 
-    dois pontos (x, y) que definem corretamente a cota entre os extremos, com 
+    dois pontos (x, y, z) que definem corretamente a cota entre os extremos, com 
     offset perpendicular ao vetor base e rotação compensada.
     
     Args:
@@ -76,8 +76,8 @@ def obter_pontos_medida_total(perfil: list[tuple[float, float, float]]) -> tuple
     Returns:
         tuple: Tupla contendo:
             - Lista com índices dos pontos extremos
-            - Ponto de início da cota (x, y)
-            - Ponto de fim da cota (x, y)
+            - Ponto de início da cota (x, y, z)
+            - Ponto de fim da cota (x, y, z)
     """
     # 1. Vetor base: ponto 0 (início interno) até ponto 1 (fim interno)
     base = perfil[0]
@@ -106,12 +106,12 @@ def obter_pontos_medida_total(perfil: list[tuple[float, float, float]]) -> tuple
     pontos = [ponto_ini_idx, ponto_fim_idx]
     x_rot_ini = x_ini * cos(-theta)
     y_rot_ini = x_ini * sin(-theta)
-    ponto_inicio = (x_rot_ini + base[0], y_rot_ini + base[1])
+    ponto_inicio = (x_rot_ini + base[0], y_rot_ini + base[1], 0.0)
 
     x_rot_fim = x_fim * cos(-theta)
     y_rot_fim = x_fim * sin(-theta)
 
-    ponto_fim = (x_rot_fim + base[0], y_rot_fim + base[1])
+    ponto_fim = (x_rot_fim + base[0], y_rot_fim + base[1], 0.0)
 
     return pontos, ponto_inicio, ponto_fim
 

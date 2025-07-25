@@ -11,6 +11,7 @@ from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
 from src.perfis_U import offset_perfis_U, fillet_perfis_U, definir_coord_perfis_U, redefinir_coord_perfis_U
 from src.recebimento_da_medicao import pedir_linhas_de_centro, pedir_quant_vidros, pedir_angSecoes, pedir_angParedes, pedir_prumos, definir_juncoes, solicitar_sentido_abertura, pedir_elevador
 from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros, desenhar_guias_vidros, remover_guias
+from src.drenos import definir_coord_drenos
 
 if __name__ == "__main__":
 
@@ -80,7 +81,10 @@ if __name__ == "__main__":
     remover_guias()
 
     # Furos
-    coord_furos = definir_pontos_furos(coord_vidros, medidas_perfis_U, coord_perfis_U, folgas_vidros, quant_vidros, angs_in, angs_paredes, espessura_vidro)
+    coord_furos = definir_pontos_furos(coord_vidros, folgas_vidros, quant_vidros, angs_in, angs_paredes, espessura_vidro)
+
+    # Drenos
+    coord_drenos = definir_coord_drenos()
     
 
     #Cotas
@@ -89,7 +93,4 @@ if __name__ == "__main__":
     cotar_medida_total(coord_lcs, 'Linha de centro', 550)
     cotar_medida_total(coord_perfis_U, 'Perfis U', 680)
     cotar_medida_total(coord_furos, 'Furos', 150)
-
-    # puxar_cotas_drenos(handles_vidros)
-
-
+    cotar_medida_total(coord_drenos, 'Drenos', 300)

@@ -5,22 +5,25 @@ Este módulo interage com o AutoCAD para criar offsets nos perfis U conforme a n
 """
 from src.autocad_conn import get_acad
 from src.calcs_vetor import linha_paralela_com_offset, deslocar_pontos_direcao, normalizar_coordenadas, esta_entre
-from pyautocad import APoint
 from src.aberturas import distribuir_vidros_por_lado
 from src.calcs_cad import calcular_gaps_furos, calcular_gaps_vidro
 from src.perfis_U import distribuir_perfis_U_por_lado
 
 acad, acad_ModelSpace = get_acad()
 
-def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], medidas_perfis_u: list[list[tuple[float, float, float]]], coord_perfis_U: list[list[float]], folgas_vidros: list[list[int, int]], quant_vidros: list[list[int]], angs_in: list[float], angs_paredes: list[float], espessura_v: int) -> list[list[tuple[float, float, float]]]:
+def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], folgas_vidros: list[list[int, int]], quant_vidros: list[list[int]], angs_in: list[float], angs_paredes: list[float], espessura_v: int) -> list[list[tuple[float, float, float]]]:
     """Define os pontos para furação dos perfis U.
     
     Args:
-        medidas_perfis_U: Lista contendo as medidas dos perfis U.
-        pontos_vidros: Lista contendo os pontos dos vidros.
+        coord_vidros: Lista contendo as coordenadas dos vidros por lado.
+        folgas_vidros: Lista contendo as folgas dos vidros por lado.
+        quant_vidros: Lista contendo a quantidade de vidros por lado.
+        angs_in: Lista contendo os ângulos internos.
+        angs_paredes: Lista contendo os ângulos das paredes.
+        espessura_v: Espessura do vidro em milímetros.
     
     Returns:
-        None: Função executa operações no AutoCAD sem retorno.
+        list: Lista de listas contendo as coordenadas dos pontos de furação por lado.
     """
 
     folga_parede = -12
@@ -80,32 +83,32 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], m
                 desloc_p2 = 1.5
 
             p1_final, p2_final = deslocar_pontos_direcao(novo_p1, novo_p2, desloc_p1, desloc_p2)
-            coord.append(APoint(*p1_final))
-            coord.append(APoint(*p2_final))
+            coord.append(p1_final)
+            coord.append(p2_final)
             coordenadas.append(coord)
             quant_lado += 1
 
             if cota_de_50_p2:
                 p2_50_ini = deslocar_pontos_direcao(p1_final, p2_final, -50, 0)[0]
                 p2_50_fim = p1_final
-                coord_50.append(APoint(*p2_50_ini))
-                coord_50.append(APoint(*p2_50_fim))
+                coord_50.append(p2_50_ini)
+                coord_50.append(p2_50_fim)
                 coordenadas.append(coord_50)
                 quant_lado += 1
 
             if cota_de_50_p1:
                 p2_50_ini = p2_final
                 p2_50_fim = deslocar_pontos_direcao(p1_final, p2_final, 0, +50)[1]
-                coord_50.append(APoint(*p2_50_ini))
-                coord_50.append(APoint(*p2_50_fim))
+                coord_50.append(p2_50_ini)
+                coord_50.append(p2_50_fim)
                 coordenadas.append(coord_50)
                 quant_lado += 1
         quant_furos_por_lado.append(quant_lado)
 
-    coordenadas_finais = redefinir_pontos_furos(coordenadas, quant_furos_por_lado, medidas_perfis_u, coord_perfis_U, offset, espessura_v)
-    return coordenadas_finais
+    # coordenadas_finais = redefinir_pontos_furos(coordenadas, quant_furos_por_lado, medidas_perfis_u, coord_perfis_U, offset, espessura_v)
+    return coordenadas
 
-def redefinir_pontos_furos(coord_furos: list[tuple[float, float, float]], quant_furos_lado: list[int], medidas_perfis_U, coord_perfis_U: list[list[float]], offset: int, espessura_v: int) -> list[list[tuple[float, float, float]]]:
+def redefinir_pontos_furos(coord_furos: list[list[tuple[float, float, float]]], quant_furos_lado: list[int], medidas_perfis_U, coord_perfis_U: list[list[tuple[float, float, float]]], offset: int, espessura_v: int) -> list[list[tuple[float, float, float]]]:
     espessura_perfil_U = 20
     offset_corrigido = offset + espessura_v - espessura_perfil_U
 
@@ -124,7 +127,7 @@ def redefinir_pontos_furos(coord_furos: list[tuple[float, float, float]], quant_
         furos_normalizados = []
 
         ini_secao = ''
-        ini_secao = linha_paralela_com_offset(perfis_u_lado[lado][0], perfis_u_lado[lado][1], offset_corrigido)[0]
+        ini_secao = linha_paralela_com_offset(perfis_u_lado[0][0], perfis_u_lado[0][1], offset_corrigido)[0]
         for s, perfil in enumerate(perfis_u_lado):  
             ini_perfil, fim_perfil = linha_paralela_com_offset(perfil[0], perfil[1], offset_corrigido)
             perfil_normalizado = normalizar_coordenadas(ini_secao, ini_perfil, fim_perfil)
@@ -144,13 +147,13 @@ def redefinir_pontos_furos(coord_furos: list[tuple[float, float, float]], quant_
                         perfil_tocado.append('')
 
             if perfil_tocado[0] == perfil_tocado[1] and perfil_tocado[0] != '':
-                coord_nova_1 = (furo[0], perfis_u_lado[perfil_tocado[0]][1])
-                coord_nova_2 = (perfis_u_lado[perfil_tocado[1]][0], furo[1])
-                print(coord_nova_1)
-                print(coord_nova_2)
-                coordenadas_lado_redefinidas.extend([coord_nova_1, coord_nova_2])
+                coord_nova_1 = (furo[0], perfis_u_lado[perfil_tocado[0]])
+                coord_nova_2 = (perfis_u_lado[perfil_tocado[1]], furo[1])
+                coordenadas_lado_redefinidas.append(coord_nova_1)
+                coordenadas_lado_redefinidas.append(coord_nova_2)
             else:
                 coordenadas_lado_redefinidas.append(furos_lado[i])
+        print(f'Coord reef: {coordenadas_lado_redefinidas}')
         coordenadas_redefinidas.append(coordenadas_lado_redefinidas)
     return coordenadas_redefinidas
 
