@@ -67,13 +67,29 @@ def linha_paralela_com_offset(p1: tuple[float, float, float], p2: tuple[float, f
 
     return novo_p1, novo_p2
 
-def deslocar_pontos_direcao(p1: tuple[float, float, float], p2: tuple[float, float, float], desloc_p1: float, desloc_p2: float) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
-    """Retorna dois pontos deslocados ao longo da direção do vetor p1 → p2, com deslocamentos independentes para cada extremidade."""
+def deslocar_pontos_direcao(
+    p1: tuple[float, float, float],
+    p2: tuple[float, float, float],
+    desloc_p1: float,
+    desloc_p2: float,
+    a_partir_de_p1: bool = False
+) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
+    """
+    Retorna dois pontos deslocados ao longo da direção do vetor p1 → p2.
+
+    Se `a_partir_de_p1` for False (padrão), desloca p1 a partir de p1, e p2 a partir de p2.
+    Se True, ambos os deslocamentos serão feitos a partir de p1.
+    """
     vetor = vetor_entre_pontos(p1, p2)
     vetor_unitario = normalizar(vetor)
 
+    if a_partir_de_p1:
+        base_ponto_2 = p1
+    else:
+        base_ponto_2 = p2
+
     novo_p1 = somar_pontos(p1, multiplicar_vetor(vetor_unitario, desloc_p1))
-    novo_p2 = somar_pontos(p2, multiplicar_vetor(vetor_unitario, desloc_p2))
+    novo_p2 = somar_pontos(base_ponto_2, multiplicar_vetor(vetor_unitario, desloc_p2))
 
     return novo_p1, novo_p2
 

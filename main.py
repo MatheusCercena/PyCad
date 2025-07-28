@@ -1,4 +1,5 @@
 from src.aberturas import associar_aberturas_aos_lados
+from src.alturas_e_niveis import definir_alturas
 from src.achar_secao_principal import descobrir_secao_principal
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
 from src.comandos_cad import carregar_comandos
@@ -9,7 +10,7 @@ from src.limpar import limpar_tudo
 from src.linhas_de_centro import definir_linhas_de_centro, redesenhar_linhas_de_centro, definir_coord_lcs
 from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
 from src.perfis_U import offset_perfis_U, fillet_perfis_U, definir_coord_perfis_U, redefinir_coord_perfis_U
-from src.recebimento_da_medicao import pedir_linhas_de_centro, pedir_quant_vidros, pedir_angSecoes, pedir_angParedes, pedir_prumos, definir_juncoes, solicitar_sentido_abertura, pedir_elevador
+from src.recebimento_da_medicao import pedir_linhas_de_centro, pedir_quant_vidros, pedir_angSecoes, pedir_angParedes, pedir_prumos, definir_juncoes, solicitar_sentido_abertura, pedir_elevador, pedir_alturas, pedir_niveis
 from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros, desenhar_guias_vidros, remover_guias
 from src.drenos import definir_coord_drenos
 
@@ -17,9 +18,21 @@ if __name__ == "__main__":
 
     # Informações de entrada
     limpar_tudo()
-    lcs = pedir_linhas_de_centro()
+
+    # lcs = pedir_linhas_de_centro()
+    lcs = [1000, 3000, 2000]
+
+    # alturas = pedir_alturas(lcs)
+    alturas = [[1570, 1574], [1575, 1578, 1582, 1579], [1577, 1580]]
+
+    # niveis = pedir_niveis(alturas)
+    niveis = [[0, -2], [-4, -9, -12, -16], [-15, -9]]
+
     quant_vidros = pedir_quant_vidros(lcs)
     sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
+
+    print(quant_vidros)
+    print(sentidos_abert, fixos)
     giratorios = [sentido[2] for sentido in sentidos_abert]
     adjacentes = [sentido[3] for sentido in sentidos_abert]
     sentidos = [sentido[4] for sentido in sentidos_abert]
@@ -29,6 +42,7 @@ if __name__ == "__main__":
     juncoes = definir_juncoes(lcs, angs_in)
     elevador = pedir_elevador()
     espessura_vidro = int(8)
+    espessura_ext_perfil_U = int(20)
     carregar_comandos()
 
     # Linhas de centro
@@ -84,8 +98,15 @@ if __name__ == "__main__":
     coord_furos = definir_pontos_furos(coord_vidros, folgas_vidros, quant_vidros, angs_in, angs_paredes, espessura_vidro)
 
     # Drenos
-    coord_drenos = definir_coord_drenos()
+    coord_drenos_por_lado, coord_drenos = definir_coord_drenos(coord_perfis_U, medidas_perfis_U, espessura_ext_perfil_U)
     
+    # Alturas
+    maior_altura, menor_altura, altura_vidro, sucata = definir_alturas(alturas, niveis, lcs)
+
+    print(maior_altura)
+    print(menor_altura)
+    print(altura_vidro)
+    print(sucata)
 
     #Cotas
     cotar_medida_total(coord_vidros, 'Vidro', 246)
@@ -93,4 +114,5 @@ if __name__ == "__main__":
     cotar_medida_total(coord_lcs, 'Linha de centro', 550)
     cotar_medida_total(coord_perfis_U, 'Perfis U', 680)
     cotar_medida_total(coord_furos, 'Furos', 150)
-    cotar_medida_total(coord_drenos, 'Drenos', 300)
+    cotar_medida_total(coord_drenos, 'Drenos', 150)
+

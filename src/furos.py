@@ -38,7 +38,9 @@ def definir_pontos_furos(coord_vidros: list[list[tuple[float, float, float]]], f
 
     coord_vidros_reorganizada = []
     for lado in distribuicao:
-        vidros_lado = [coord_vidros[i - 1] for i in lado]
+        vidros_lado = []
+        for vidro in lado:
+            vidros_lado.append(coord_vidros[vidro - 1])
         coord_vidros_reorganizada.append(vidros_lado)
 
     for index, lado in enumerate(coord_vidros_reorganizada):
@@ -153,7 +155,6 @@ def redefinir_pontos_furos(coord_furos: list[list[tuple[float, float, float]]], 
                 coordenadas_lado_redefinidas.append(coord_nova_2)
             else:
                 coordenadas_lado_redefinidas.append(furos_lado[i])
-        print(f'Coord reef: {coordenadas_lado_redefinidas}')
         coordenadas_redefinidas.append(coordenadas_lado_redefinidas)
     return coordenadas_redefinidas
 

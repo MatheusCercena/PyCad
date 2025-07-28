@@ -38,6 +38,90 @@ def pedir_linhas_de_centro() -> list[int]:
             break
     return linhas_de_centro
 
+def pedir_alturas(lcs):
+    """Solicita ao usuário as alturas de cada lado da sacada.
+    
+    Returns:
+        list: Lista com sublistas contendo as alturas das seções por lado.
+    """
+    alturas_da_sacada = []
+
+    print(f'''
+{' - '*10}ALTURAS{' - '*10}
+''')
+
+    for lado in range(len(lcs)):
+        alturas_lado = []
+        cont = 1
+        while True:
+            try:
+                altura = int(input(f'Digite a {cont}ª altura no vão {lado+1}: '))
+                alturas_lado.append(altura)
+                cont +=1
+            except:
+                print(f'[ERRO] O campo "alturas" precisa conter apenas numeros inteiros: ')
+                continue
+            alturas_da_sacada.append(alturas_lado)
+            res = input('Deseja digitar outra altura para este vão? Digite enter para sim ou qualquer tecla para não: \n')
+            if res != '':
+                break
+    return alturas_da_sacada
+
+def pedir_niveis(alturas):
+    """Solicita ao usuário as alturas de cada lado da sacada.
+    
+    Returns:
+        list: Lista com sublistas contendo as alturas das seções por lado.
+    """
+    print(f'''
+{' - '*10}NIVEIS{' - '*10}
+
+Como o nível está informado na medição?: 
+    [1] Nível ok (ou não informado)
+    [2] Nível Variável (adicionar manualmente)
+    [3] Desnível inferior (sem medidas)
+''')
+
+    niveis_da_sacada = []
+
+    opt = int(input(f'Digite a opção correspondente ao nível da sacada: '))
+    if opt == 1:
+        for lado in alturas:
+            niveis_lado = []
+            for altura in lado:
+                niveis_lado.append(0)
+            niveis_da_sacada.append(niveis_lado)
+    elif opt == 2:
+        for index, lado in enumerate(alturas):
+            niveis_lado = []
+            for i, altura in enumerate(lado):
+                while True:
+                    try:
+                        nivel = int(input(f'Digite o nível para a altura de {altura}, a {i}ª do vão {index}: '))
+                        niveis_lado.append(nivel)
+                        break
+                    except:
+                        print(f'[ERRO] O campo "alturas" precisa conter apenas numeros inteiros: ')
+                        continue
+            niveis_da_sacada.append(niveis_lado)
+        todos_niveis = [nivel for lado in niveis_da_sacada for nivel in lado]
+        maior_nivel = max(todos_niveis)
+        for index, lado in enumerate(niveis_da_sacada):
+            for i, nivel in enumerate(lado):
+                nivel_corrigido = nivel - maior_nivel
+                niveis_da_sacada[index][i] = nivel_corrigido
+    else:
+        todas_alturas = [altura for lado in alturas for altura in lado]
+        menor_altura = min(todas_alturas)
+        for lado in alturas:
+            niveis_lado = []
+            for altura in lado:
+                nivel = menor_altura - altura
+                niveis_lado.append(nivel)
+            niveis_da_sacada.append(niveis_lado)
+
+    return niveis_da_sacada
+
 def pedir_quant_vidros(lcs: list[int]) -> list[int]:
     """Solicita ao usuário a quantidade de vidros por seção.
     
@@ -75,15 +159,16 @@ def pedir_angSecoes(lcs: list[int]) -> list[float]:
     angs_in = []
     print(f'''
 {' - '*10}ANGULOS DAS SEÇÕES{' - '*10}
+
+Inserir o angulo medido no transferidor, sem conversão.
 ''')
 
     for c in range(0, len(lcs)-1):
-        #inserir o angulo medido no transferidor, sem conversão.
         while True:
             try:
                 ang_sec = float(input(f'Qual o angulo entre a S{c+1} e a S{c+2}: ').replace(',', '.'))
-                if ang_sec < 30:
-                    print('[ERRO] Angulo muito pequeno. ')
+                if not 40 <= ang_sec <= 320:
+                    print('[ERRO] Angulo inadequado, o valor digitado deve estar entre 40 e 320. ')
                     break
                 break
             except:
@@ -101,22 +186,32 @@ def pedir_angParedes() -> list[float]:
     angs_ex = []
     print(f'''
 {' - '*10}ANGULOS DAS PAREDES{' - '*10}
+
+Inserir o angulo medido no transferidor, sem conversão
 ''')
 
     while True:
         try:
-            ang_esq = 90 - float(input(f'Digite o angulo da extremidade esquerda: '))
+            ang_esq = float(input(f'Digite o angulo da extremidade esquerda: '))
+            if not  20 < ang_esq < 160:
+                print('[ERRO] Angulo inadequado, o valor digitado deve estar entre 40 e 320. ')
+                break
+            ang_esq_final = 90 - ang_esq
             break
         except:
             print(f'[ERRO] O campo "angulo parede esquerda" precisa conter apenas numeros: ')
     while True:
         try:
-            ang_dir = 90 - float(input(f'Digite o angulo da extremidade direita: '))
+            ang_dir = float(input(f'Digite o angulo da extremidade direita: '))
+            if not  20 < ang_dir < 160:
+                print('[ERRO] Angulo muito pequeno (< 30) ou muito grande (> 160). ')
+                break
+            ang_dir_final = 90 - ang_dir
             break
         except:
             print(f'[ERRO] O campo "angulo parede direita" precisa conter apenas numeros e ter 2 dígitos: ')
-    angs_ex.append(ang_esq)
-    angs_ex.append(ang_dir)
+    angs_ex.append(ang_esq_final)
+    angs_ex.append(ang_dir_final)
     return angs_ex
 
 def pedir_prumos() -> list[float]:

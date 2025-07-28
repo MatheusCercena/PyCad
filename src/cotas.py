@@ -22,7 +22,6 @@ def cotar_medida_total(perfis: list, tipo_cota: str = 'ISO-25', offset: int = 20
     """
 
     for perfil in perfis:
-        print(perfil)
         pontos, p1, p2 = obter_pontos_medida_total(perfil)
         a1 = APoint(*p1)
         a2 = APoint(*p2)
@@ -50,6 +49,6 @@ def cotar_medida_total(perfis: list, tipo_cota: str = 'ISO-25', offset: int = 20
         dim = acad.model.AddDimRotated(a1, a2, loc, ang)
         dim.TextRotation = ang
         dim.StyleName = tipo_cota
-        dim.TextMovement = 0
+        dim.TextMovement = 2
         dim.TextOutsideAlign = False
         dim.TextInsideAlign = True

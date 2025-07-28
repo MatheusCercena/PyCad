@@ -1,6 +1,7 @@
 '
 Necessário layers com os nomes exatos:
 
+0
 Linha de Centro
 Perfil U Externo
 Perfil U Interno
@@ -9,6 +10,7 @@ Vidro Interno
 Leito Externo
 Leito Interno
 Paredes
-
+Drenos
+Furos
 '
 
