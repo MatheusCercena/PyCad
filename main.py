@@ -28,19 +28,31 @@ if __name__ == "__main__":
     # niveis = pedir_niveis(alturas)
     niveis = [[0, -2], [-4, -9, -12, -16], [-15, -9]]
 
-    quant_vidros = pedir_quant_vidros(lcs)
-    sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
+    # quant_vidros = pedir_quant_vidros(lcs)
+    quant_vidros = [2, 6, 4] 
 
-    print(quant_vidros)
-    print(sentidos_abert, fixos)
+    # sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
+    sentidos_abert = [[1, 12, 1, 2, 'esquerda']]
+    # sentidos_abert = [[1, 5, 1, 4, 'esquerda'], [6, 12, 12, 11, 'direita']]
+
     giratorios = [sentido[2] for sentido in sentidos_abert]
     adjacentes = [sentido[3] for sentido in sentidos_abert]
     sentidos = [sentido[4] for sentido in sentidos_abert]
-    angs_in = pedir_angSecoes(lcs)
-    angs_paredes = pedir_angParedes()
+    
+    # angs_in = pedir_angSecoes(lcs)
+    angs_in = [-90.0, -90.0]
+
+    # angs_paredes = pedir_angParedes()
+    angs_paredes = [0.0, 0.0]
+    
     # prumos = pedir_prumos()
-    juncoes = definir_juncoes(lcs, angs_in)
-    elevador = pedir_elevador()
+    
+    # juncoes = definir_juncoes(lcs, angs_in)
+    juncoes = [[0, 2], [1, 1], [2, 0]]
+    
+    # elevador = pedir_elevador()
+    elevador = 2500
+    
     espessura_vidro = int(8)
     espessura_ext_perfil_U = int(20)
     carregar_comandos()
@@ -101,7 +113,7 @@ if __name__ == "__main__":
     coord_drenos_por_lado, coord_drenos = definir_coord_drenos(coord_perfis_U, medidas_perfis_U, espessura_ext_perfil_U)
     
     # Alturas
-    maior_altura, menor_altura, altura_vidro, sucata = definir_alturas(alturas, niveis, lcs)
+    maior_altura, menor_altura, altura_vidro, sucata = definir_alturas(alturas, niveis, lcs, quant_vidros, sentidos_abert)
 
     print(maior_altura)
     print(menor_altura)
