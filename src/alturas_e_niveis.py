@@ -86,7 +86,7 @@ def definir_alturas(
     dist_pedacos = dist_inteira = 0
 
     # Redefine de forma inicial as alturas com base no nível
-    alturas_redefinidas: List[List[int]] = [
+    alturas_redefinidas: list[list[int]] = [
         [altura + niveis[i][j] for j, altura in enumerate(lado)]
         for i, lado in enumerate(alturas)
     ]
@@ -124,7 +124,7 @@ def definir_alturas(
     # Calcular diferença inferior com base ajustada
     niveis_ajustados = [[nivel - ponto_mais_alto_embaixo for nivel in lado] for lado in niveis]
 
-    diferenca_inferior = diferenca_inferior = min(min(sublista) for sublista in niveis_ajustados)
+    diferenca_inferior = min(min(sublista) for sublista in niveis_ajustados)
 
     if diferenca_inferior > 12:
         print('Necessário usar sucata de trilho em pedaços na parte inferior.')

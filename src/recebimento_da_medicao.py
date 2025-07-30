@@ -101,15 +101,9 @@ Como o nível está informado na medição?:
                         niveis_lado.append(nivel)
                         break
                     except:
-                        print(f'[ERRO] O campo "alturas" precisa conter apenas numeros inteiros: ')
+                        print(f'[ERRO] O campo "niveis" precisa conter apenas numeros inteiros: ')
                         continue
             niveis_da_sacada.append(niveis_lado)
-        todos_niveis = [nivel for lado in niveis_da_sacada for nivel in lado]
-        maior_nivel = max(todos_niveis)
-        for index, lado in enumerate(niveis_da_sacada):
-            for i, nivel in enumerate(lado):
-                nivel_corrigido = nivel - maior_nivel
-                niveis_da_sacada[index][i] = nivel_corrigido
     else:
         todas_alturas = [altura for lado in alturas for altura in lado]
         menor_altura = min(todas_alturas)
