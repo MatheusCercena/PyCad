@@ -1,5 +1,5 @@
 from src.aberturas import associar_aberturas_aos_lados
-# from src.alturas_niveis import definir_alturas
+from src.alturas_niveis import definir_niveis, alturas_por_nivel, diferença_alturas
 from src.achar_secao_principal import descobrir_secao_principal
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
 from src.comandos_cad import carregar_comandos
@@ -19,44 +19,48 @@ if __name__ == "__main__":
     # Informações de entrada
     limpar_tudo()
 
-    lcs = pedir_linhas_de_centro()
-    # lcs = [1000, 3000, 2000]
+    # lcs = pedir_linhas_de_centro()
+    lcs = [1000, 3000, 2000]
 
-    alturas = pedir_alturas(lcs)
-    # alturas = [[1570, 1574], [1575, 1578, 1582, 1579], [1577, 1580]]
+    # alturas = pedir_alturas(lcs)
+    alturas = [[1570, 1574], [1575, 1578, 1582, 1579], [1577, 1580]]
 
-    niveis = pedir_niveis(alturas)
-    # niveis = [[0, -2], [-4, -9, -12, -16], [-15, -9]]
+    # niveis = pedir_niveis(alturas)
+    niveis = [[0, -2], [-4, -9, -12, -16], [-15, -9]]
 
-    quant_vidros = pedir_quant_vidros(lcs)
-    # quant_vidros = [2, 6, 4] 
+    # quant_vidros = pedir_quant_vidros(lcs)
+    quant_vidros = [2, 6, 4] 
 
-    sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
+    # sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
     # sentidos_abert = [[1, 12, 1, 2, 'esquerda']]
-    # sentidos_abert = [[1, 5, 1, 4, 'esquerda'], [6, 12, 12, 11, 'direita']]
+    sentidos_abert = [[1, 5, 5, 4, 'direita'], [6, 12, 12, 11, 'direita']]
 
     giratorios = [sentido[2] for sentido in sentidos_abert]
     adjacentes = [sentido[3] for sentido in sentidos_abert]
     sentidos = [sentido[4] for sentido in sentidos_abert]
     
-    angs_in = pedir_angSecoes(lcs)
-    # angs_in = [-90.0, -90.0]
+    # angs_in = pedir_angSecoes(lcs)
+    angs_in = [-90.0, -90.0]
 
-    angs_paredes = pedir_angParedes()
-    # angs_paredes = [0.0, 0.0]
+    # angs_paredes = pedir_angParedes()
+    angs_paredes = [0.0, 0.0]
     
     # prumos = pedir_prumos()
     
-    juncoes = definir_juncoes(lcs, angs_in)
-    # juncoes = [[0, 2], [1, 1], [2, 0]]
+    # juncoes = definir_juncoes(lcs, angs_in)
+    juncoes = [[0, 2], [1, 1], [2, 0]]
     
-    elevador = pedir_elevador()
-    # elevador = 2500
+    # elevador = pedir_elevador()
+    elevador = 2500
     
     espessura_vidro = int(8)
     espessura_ext_perfil_U = int(20)
     carregar_comandos()
 
+    niveis_finais = definir_niveis(niveis, lcs, quant_vidros, sentidos_abert)
+    print(niveis_finais)
+    alturas_finais = alturas_por_nivel(alturas, niveis_finais)
+    print(alturas_finais)
     # Linhas de centro
     pos_lcs = definir_linhas_de_centro(lcs, angs_in)
     sec_princ = descobrir_secao_principal(pos_lcs)

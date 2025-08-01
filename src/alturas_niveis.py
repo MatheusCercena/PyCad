@@ -1,33 +1,41 @@
-def niveis(niveis, lcs, quant_vidros, sentidos_abert):
-    def maior_valor(lista):
-        return max(max(sublista) for sublista in lista)
+def maior_valor(lista):
+    return max(max(sublista) for sublista in lista)
+
+def menor_valor(lista):
+    return min(min(sublista) for sublista in lista)
     
+def definir_niveis(niveis: list[list[int]], lcs: list[int], quant_vidros: list[int], sentidos_abert: list[list[int, int, int, int, str]]):
+    '''
+    Ajusta os níveis da sacada conforme a posição dos giratórios.
+    '''
     # Ajustando niveis para padrao de base 0 
     maior_nivel = maior_valor(niveis)
     niveis_base_0 = [[nivel - maior_nivel for nivel in lado] for lado in niveis]
     
     # Ajustando niveis pelo giratorio
-    niveis_giratorios = obter_altura_giratorios(sentidos_abert, quant_vidros, niveis, lcs)
+    niveis_giratorios = obter_altura_giratorios(sentidos_abert, quant_vidros, niveis_base_0, lcs)
     maior_nivel_giratório = max(niveis_giratorios)
     niveis_base_giratorio = [[nivel + abs(maior_nivel_giratório) for nivel in lado] for lado in niveis_base_0]
     maior_nivel_base_giratorio = maior_valor(niveis_base_giratorio)
 
     # Reajustando niveis para evitar trilho socado
     if maior_nivel_base_giratorio >= 12:
+        mnbg = maior_nivel_base_giratorio
         diferenca = maior_nivel_base_giratorio - 12
-        niveis_finais = [[nivel + diferenca for nivel in lado] for lado in niveis_base_giratorio]
-        maior_nivel_base_giratorio = maior_valor(niveis_finais)
+        niveis_temporario = [[nivel + diferenca if nivel != mnbg else mnbg for nivel in lado] for lado in niveis_base_giratorio]
+        maior_nivel = maior_valor(niveis_finais)
+        niveis_finais = [[nivel_temporario - maior_nivel for nivel_temporario in lado] for lado in niveis_temporario]
     else:
         niveis_finais = niveis_base_giratorio
 
     # Definição da sucata inferior
-    diferenca_inferior = min(min(lado) for lado in niveis_finais)
-    if diferenca_inferior <= -12 and maior_nivel_base_giratorio <= 9:
-        print(f"Diferença de nível de {abs(diferenca_inferior)} e o ponto com giratório mais alto na parte de baixo é o 'x'. Necessário usar sucata de trilho na parte inferior.")
+    maior_nivel_final = maior_valor(niveis_finais)
+    menor_nivel_final = menor_valor(niveis_finais)
+    if menor_nivel_final <= -12 and maior_nivel_final < 9:
+        print(f"Diferença de nível de {abs(menor_nivel_final)}. Necessário usar sucata de trilho na parte inferior.")
         opt = input('Deseja aumentar a altura dos vidros em +3mm para embutir a contrafechadura? [s/n]').strip().lower()
         if opt == 's':
-            diferenca = 3
-            niveis_finais = [[nivel - diferenca for nivel in lado] for lado in niveis_finais]
+            niveis_finais = [[nivel + 3 if nivel < 0 else nivel for nivel in lado] for lado in niveis_finais]
         elif opt == 'n':
             pass
         else:
@@ -36,24 +44,31 @@ def niveis(niveis, lcs, quant_vidros, sentidos_abert):
     return niveis_finais
 
 def alturas_por_nivel(alturas, niveis_finais):
-    alturas_com_base_0 = [[altura + niveis_finais[i][j] for j, altura in enumerate(lado)] for i, lado in enumerate(alturas)]
-    return alturas_com_base_0
+    alturas_finais = [[altura + niveis_finais[i][j] for j, altura in enumerate(lado)] for i, lado in enumerate(alturas)]
+    return alturas_finais
 
-def diferença_alturas(alturas_com_base_0, lcs, quant_vidros, sentidos_abert):
+
+def diferença_alturas(alturas_finais, lcs, quant_vidros, sentidos_abert):
+    # Ajustando alturas para padrao de base 0 
+    menor_altura = menor_valor(alturas_finais)
+    alturas_base_0 = [[altura - menor_altura for altura in lado] for lado in alturas_finais]
+
     # 2.1 Ajustando alturas pelo giratorio    
-    alturas_giratorios = obter_altura_giratorios(sentidos_abert, quant_vidros, alturas_com_base_0, lcs)
+    alturas_giratorios = obter_altura_giratorios(sentidos_abert, quant_vidros, alturas_base_0, lcs)
     menor_altura_giratorio = min(alturas_giratorios)
     diferencas_de_altura = [altura - menor_altura_giratorio for altura in alturas_giratorios]
     menor_altura_ajustada = min(diferencas_de_altura)
 
     # 2.2 Reajustando alturas para evitar trilho socado
     if menor_altura_ajustada <= -12:
+        maa = menor_altura_ajustada
         diferenca = menor_altura_giratorio + 12
-        menor_altura_ajustada = 12
-        diferencas_finais = [[nivel + diferenca for nivel in lado] for lado in diferencas_de_altura]
+        diferencas_de_altura_temporaria = [[altura + diferenca if altura != maa else maa for altura in lado] for lado in diferencas_de_altura]
+        menor_altura = menor_valor(diferencas_de_altura_temporaria)
+        diferencas_finais = [[altura_temporaria + menor_altura for altura_temporaria in lado] for lado in diferencas_de_altura_temporaria]
     else:
         diferencas_finais = diferencas_de_altura
-
+    # aquiiiiiii
     # 2.3 Definição de sucata superior
     diferenca_superior = max(diferencas_finais)
     if diferenca_superior >= 12 and menor_altura_ajustada >= -9:
@@ -84,7 +99,7 @@ def necessidade_de_sucata(niveis_finais, alturas_finais, lcs):
     # Reverificando diferença pra ver se ainda há necessidade da sucata
     diferenca_inferior = min(min(lado) for lado in niveis_finais)
     if diferenca_inferior <= -12:
-        sp, si = calcular_sucata(niveis, lcs)
+        sp, si = calcular_sucata(definir_niveis, lcs)
         dist_pedacos += sp
         dist_inteira += si
 
