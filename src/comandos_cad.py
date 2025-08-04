@@ -37,3 +37,17 @@ def carregar_comandos() -> None:
     caminho_lisp = os.path.normpath(dir_lisp).replace("\\", "\\\\")
     acad.SendCommand(f'(load "{caminho_lisp}")\n')
     sleep(3)
+
+def remover_guias() -> None:
+    """Remove as guias dos vidros do AutoCAD.
+    
+    Returns:
+        None: Função remove elementos do AutoCAD sem retorno.
+    """   
+    for i in range(acad_ModelSpace.Count - 1, -1, -1):  # reverso
+        try:
+            entidade = acad_ModelSpace.Item(i)
+            if entidade.EntityName == 'AcDbLine' and entidade.Layer == '0':
+                entidade.Delete()
+        except Exception as e:
+            print(f"Erro ao deletar entidade {i}: {e}")

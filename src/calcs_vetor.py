@@ -5,6 +5,12 @@ Inclui operações com vetores, pontos, ângulos, distâncias, gaps e manipulaç
 """
 from math import sqrt, atan2
 
+def maior_valor(lista):
+    return max(max(sublista) for sublista in lista)
+
+def menor_valor(lista):
+    return min(min(sublista) for sublista in lista)
+
 def vetor_entre_pontos(p1: tuple[float, float, float], p2: tuple[float, float, float]) -> tuple[float, float, float]:
     """Calcula o vetor que vai de p1 até p2."""
     return (p2[0] - p1[0], p2[1] - p1[1], 0.0)
@@ -66,6 +72,35 @@ def linha_paralela_com_offset(p1: tuple[float, float, float], p2: tuple[float, f
     novo_p2 = somar_pontos(p2, deslocamento)
 
     return novo_p1, novo_p2
+
+def interpolar_valor_em_x(pontos: list[float], valores: list[float], x: float) -> float:
+    """
+    Interpola linearmente o valor em uma posição x a partir de pontos e valores dados.
+
+    Args:
+        pontos: Lista de coordenadas X dos pontos (ex: posições dos pontos de medição).
+        valores: Lista de alturas ou níveis correspondentes.
+        x: A posição X alvo onde queremos saber o valor interpolado.
+
+    Returns:
+        Valor interpolado na posição X.
+    """
+    if len(pontos) == 1:
+        return valores[0]
+
+    for i in range(len(pontos) - 1):
+        x0, x1 = pontos[i], pontos[i + 1]
+        y0, y1 = valores[i], valores[i + 1]
+        if x0 <= x <= x1:
+            # Interpolação linear
+            t = (x - x0) / (x1 - x0)
+            return y0 + t * (y1 - y0)
+
+    # Fora da faixa → extrapola no final
+    if x <= pontos[0]:
+        return valores[0]
+    return valores[-1]
+
 
 def deslocar_pontos_direcao(
     p1: tuple[float, float, float],

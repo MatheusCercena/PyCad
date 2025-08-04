@@ -1,9 +1,11 @@
 from src.aberturas import associar_aberturas_aos_lados
-from src.alturas_niveis import definir_niveis, alturas_por_nivel, diferença_alturas
+from src.alturas_niveis import definir_niveis, alturas_por_nivel, diferença_alturas, folga_altura_vidro
 from src.achar_secao_principal import descobrir_secao_principal
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
-from src.comandos_cad import carregar_comandos
+from src.comandos_cad import carregar_comandos, remover_guias
+from src.calcs_vetor import menor_valor, maior_valor
 from src.cotas import cotar_medida_total
+from src.drenos import definir_coord_drenos
 from src.furos import definir_pontos_furos
 from src.leitos import *
 from src.limpar import limpar_tudo
@@ -11,8 +13,9 @@ from src.linhas_de_centro import definir_linhas_de_centro, redesenhar_linhas_de_
 from src.paredes import fazer_parede_esq, fazer_parede_dir, fillet_paredes
 from src.perfis_U import offset_perfis_U, fillet_perfis_U, definir_coord_perfis_U, redefinir_coord_perfis_U
 from src.recebimento_da_medicao import pedir_linhas_de_centro, pedir_quant_vidros, pedir_angSecoes, pedir_angParedes, pedir_prumos, definir_juncoes, solicitar_sentido_abertura, pedir_elevador, pedir_alturas, pedir_niveis
-from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros, desenhar_guias_vidros, remover_guias
-from src.drenos import definir_coord_drenos
+from src.sucata import necessidade_de_sucata, calcular_sucata
+from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros, desenhar_guias_vidros
+from src.layout_ferragens import adicionar_ferragem
 
 if __name__ == "__main__":
 
@@ -57,10 +60,6 @@ if __name__ == "__main__":
     espessura_ext_perfil_U = int(20)
     carregar_comandos()
 
-    niveis_finais = definir_niveis(niveis, lcs, quant_vidros, sentidos_abert)
-    print(niveis_finais)
-    alturas_finais = alturas_por_nivel(alturas, niveis_finais)
-    print(alturas_finais)
     # Linhas de centro
     pos_lcs = definir_linhas_de_centro(lcs, angs_in)
     sec_princ = descobrir_secao_principal(pos_lcs)
@@ -116,13 +115,28 @@ if __name__ == "__main__":
     # Drenos
     coord_drenos_por_lado, coord_drenos = definir_coord_drenos(coord_perfis_U, medidas_perfis_U, espessura_ext_perfil_U)
     
-    # # Alturas
-    # maior_altura, menor_altura, altura_vidro, sucata = definir_alturas(alturas, niveis, lcs, quant_vidros, sentidos_abert)
+    # Alturas
+    dif_niveis, nivel_base = definir_niveis(niveis, lcs, quant_vidros, sentidos_abert)
+    alturas_finais = alturas_por_nivel(alturas, dif_niveis)
+    dif_altura, altura_base = diferença_alturas(alturas_finais, lcs, quant_vidros, sentidos_abert)
+    altura_vao = round(menor_valor(alturas_finais), 0) + altura_base - nivel_base
+    maior_altura = maior_valor(alturas)
+    menor_altura = menor_valor(alturas)
+    print(f'A altura do vão para o calculo do vidro é {altura_vao}')
+    print(f'A maior altura do vão é: {maior_altura}')
+    print(f'A menor altura do vão é: {menor_altura}')
+    folga_vidro = folga_altura_vidro(dif_altura, dif_niveis)
+    altura_vidro = altura_vao - folga_vidro
+    altura_painel = altura_vidro + 33
+    altura_pe3 = altura_painel + 98
 
-    # print(maior_altura)
-    # print(menor_altura)
-    # print(altura_vidro)
-    # print(sucata)
+    # Definir sucata
+    sucata_pedacos_inferior, sucata_inteira_inferior = necessidade_de_sucata(dif_niveis, lcs, 'nivel', nivel_base)
+    sucata_pedacos_superior, sucata_inteira_superior = necessidade_de_sucata(dif_altura, lcs, 'altura', altura_base)
+    sucata_pedacos = sucata_pedacos_inferior + sucata_pedacos_superior
+    sucata_inteira = sucata_inteira_inferior + sucata_inteira_superior
+    print(f'A quantidade de sucata em pedaços necessária é {sucata_pedacos}, sendo {sucata_pedacos_inferior} para a parte inferior e {sucata_pedacos_superior} para a parte superior.')
+    print(f'A quantidade de sucata interira necessária é {sucata_inteira}, sendo {sucata_inteira_superior} para a parte inferior e {sucata_inteira_inferior} para a parte superior.')
 
     #Cotas
     cotar_medida_total(coord_vidros, 'Vidro', 246)
@@ -132,3 +146,5 @@ if __name__ == "__main__":
     cotar_medida_total(coord_furos, 'Furos', 150)
     cotar_medida_total(coord_drenos, 'Drenos', 150)
 
+    posicao = APoint(0, 0, 0)
+    adicionar_ferragem(posicao, 'HAHHA')

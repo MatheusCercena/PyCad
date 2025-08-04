@@ -10,7 +10,6 @@ Funções para definir as coordenadas das linhas de centro com base nos inputs d
 from pyautocad import Autocad, APoint
 from math import radians
 from src.autocad_conn import get_acad
-import pythoncom
 
 cad, acad_ModelSpace = get_acad()
 

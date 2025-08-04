@@ -30,9 +30,8 @@ def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
     Returns:
         None: Função desenha elementos no AutoCAD sem retorno.
     """
-    for i, linha_de_centro in enumerate(handles_lcs):
-        
-        for tentativa in range(5):
+    for i, linha_de_centro in enumerate(handles_lcs):  
+        for _ in range(5):
             try:
                 pythoncom.PumpWaitingMessages()
                 ini_linha_de_centro = linha_de_centro.StartPoint
@@ -49,20 +48,6 @@ def desenhar_guias_vidros(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
             inicio = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, comeco_vidro)
             fim = definir_pontos_na_secao(ini_linha_de_centro, vetores_unitarios, fim_vidro)
             acad2.model.AddLine(APoint(inicio[0], inicio[1]), APoint(fim[0], fim[1]))
-
-def remover_guias() -> None:
-    """Remove as guias dos vidros do AutoCAD.
-    
-    Returns:
-        None: Função remove elementos do AutoCAD sem retorno.
-    """   
-    for i in range(acad_ModelSpace.Count - 1, -1, -1):  # reverso
-        try:
-            entidade = acad_ModelSpace.Item(i)
-            if entidade.EntityName == 'AcDbLine' and entidade.Layer == '0':
-                entidade.Delete()
-        except Exception as e:
-            print(f"Erro ao deletar entidade {i}: {e}")
 
 def definir_folgas_vidros(juncoes: list, gaps_lcs: list, angs_in: list, espessura_vidro: int) -> list[list[int, int]]:
     """Define as folgas dos vidros para cada seção da sacada.
@@ -204,4 +189,22 @@ def offset_vidros(espessura_vidro: int) -> tuple[list[str], list[tuple[float, fl
             int.Layer = lat_esq.Layer = lat_dir.Layer = 'Vidro Interno'
 
     return handles_vidros, coord_vidros
+
+def achar_posicao_vidro(quant_vidros: list[int]) -> dict[int, tuple[int, int]]:
+    """
+    Mapeia o número absoluto do vidro para (lado, índice local).
+
+    Args:
+        quant_vidros: Lista com quantidade de vidros por lado.
+
+    Returns:
+        Mapa: vidro absoluto (1-based) → (lado, índice_local no lado)
+    """
+    mapa = {}
+    contador = 1
+    for lado, qtd in enumerate(quant_vidros):
+        for i in range(qtd):
+            mapa[contador] = (lado, i)
+            contador += 1
+    return mapa
 

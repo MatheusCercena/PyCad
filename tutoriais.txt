@@ -3,6 +3,3 @@ adicionar linha no bloco: line = block.AddLine(APoint(0, 0), APoint(50, 50))
 
 inserir bloco: acad.model.InsertBlock(APoint(0, 0), "MeuBloco", 1, 1, 1, 0) #Insere o bloco "MeuBloco" na posição (0,0), escala 1:1, rotação 0°.
 
-mtext = acad.model.AddMText(APoint(10, 10), 50, "Texto Exemplo")# posição (10,10), largura 50 e altura 5
-# altura do mtext = mtext.Height = 5  
-# enviar comando aleatorio acad.doc.SendCommand('FILLET\nR\n10\n\n')  # Define raio 10 e entra no comando FILLET

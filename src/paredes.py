@@ -27,7 +27,7 @@ def fazer_parede_esq(lcs: list[float], perfil_U_ext: str, perfil_U_int: str, ang
     Returns:
         str: Handle da parede esquerda criada.
     """
-    for tentativa in range(5):
+    for _ in range(5):
         try:
             pythoncom.PumpWaitingMessages()
             ini = acad.HandleToObject(perfil_U_ext).StartPoint
@@ -52,7 +52,7 @@ def fazer_parede_dir(handles_lcs: list[float], perfil_U_ext: str, perfil_U_int: 
     Returns:
         str: Handle da parede direita criada.
     """
-    for tentativa in range(5):
+    for _ in range(5):
         try:
             pythoncom.PumpWaitingMessages()
             ini = acad.HandleToObject(perfil_U_ext).EndPoint
