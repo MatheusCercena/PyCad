@@ -1,6 +1,15 @@
 from math import ceil
 from src.calcs_vetor import maior_valor, menor_valor
 
+def definir_diferencas(dif_niveis, base_niv, dif_alturas, base_alt):
+    diferencas_niv = [[dif - base_niv if dif != base_niv else dif for dif in lado] for lado in dif_niveis]
+    diferenca_niv = menor_valor( diferencas_niv)
+
+    diferencas_alt = [[dif + base_alt if dif != base_alt else dif for dif in lado] for lado in dif_alturas]
+    diferenca_alt = maior_valor(diferencas_alt)
+
+    return diferenca_niv, diferenca_alt
+
 def necessidade_de_sucata(diferencas, lcs, posicao, base):
     dist_pedacos = 0
     dist_inteira = 0
@@ -12,6 +21,7 @@ def necessidade_de_sucata(diferencas, lcs, posicao, base):
     if posicao == 'altura':
         diferencas = [[dif + base if dif != base else dif for dif in lado] for lado in diferencas]
         diferenca = maior_valor( diferencas)
+        
     if diferenca <= -12 or diferenca >= 12:
         sp, si = calcular_sucata(diferencas, lcs)
         dist_pedacos += ceil(sp/500)

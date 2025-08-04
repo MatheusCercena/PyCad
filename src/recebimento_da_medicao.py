@@ -61,10 +61,11 @@ def pedir_alturas(lcs):
             except:
                 print(f'[ERRO] O campo "alturas" precisa conter apenas numeros inteiros: ')
                 continue
-            alturas_da_sacada.append(alturas_lado)
             res = input('Deseja digitar outra altura para este vão? Digite enter para sim ou qualquer tecla para não: \n')
             if res != '':
                 break
+        alturas_da_sacada.append(alturas_lado)
+
     return alturas_da_sacada
 
 def pedir_niveis(alturas):

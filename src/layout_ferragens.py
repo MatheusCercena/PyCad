@@ -10,10 +10,15 @@ def adicionar_ferragem(texto: str, posicao: tuple[float, float]):
 # FAZER AS FORMULAS DAS FERRAGENS
 # VER O QUE PRECISA PEGAR DO ECG PELO SELENIUM E DA AUTOMACAO DE TRTS
 
-def formula_tampa_de_leito():
-    posicao = (0, 0)
+def formula_tampa_de_leito(juncoes):
+    juncoes_lista = [juncao for lado in juncoes for juncao in lado]
     quantidade = 0
-    pass
+    for juncao in juncoes_lista:
+        if juncao == 1 or juncao == 2:
+            quantidade += 1
+    juncoes_45 = quantidade/2
+    quant_tampinhas_45 = juncoes_45*2
+    return quant_tampinhas_45
 
 def formula_molduras():
     pass
