@@ -96,9 +96,11 @@ Como o nível está informado na medição?:
             niveis_lado = []
             for i, altura in enumerate(lado):
                 while True:
+                    cont = 1
                     try:
-                        nivel = int(input(f'Digite o nível para a altura de {altura}, a {i}ª do vão {index}: '))
+                        nivel = int(input(f'Digite o nível para a altura de {altura}, a {i+cont}ª do vão {index+cont}: '))
                         niveis_lado.append(nivel)
+                        cont += 1 
                         break
                     except:
                         print(f'[ERRO] O campo "niveis" precisa conter apenas numeros inteiros: ')
