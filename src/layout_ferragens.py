@@ -1,10 +1,11 @@
 from pyautocad import Autocad, APoint
+from math import ceil
 
 acad = Autocad()
 layout_space = acad.doc.PaperSpace 
 
-def adicionar_ferragem(texto: str, posicao: tuple[float, float]):
-    layout_space.AddText(texto, posicao, 1.75)
+def adicionar_texto(texto, posicao: tuple[float, float, float]):
+    layout_space.AddText(texto, posicao, 2.2)
 
 # PEGAR TODAS AS POSICOES DO PAPERSPACE
 # FAZER AS FORMULAS DAS FERRAGENS
@@ -23,16 +24,30 @@ def formula_tampa_de_leito(juncoes):
 def formula_molduras():
     pass
 
-def formula_molas():
-    pass
+def formula_molas(sentidos_abert):
+    molas = 0
+    for sentido in sentidos_abert:
+        quant_vidros_abertura = contar_entre_numeros(sentido[0], sentido[1])
+        quant_molas = ceil((quant_vidros_abertura - 1)/3)
+        molas += quant_molas
+    return molas
 
-def formula_aparador():
-    pass
+def contar_entre_numeros(a: int, b: int) -> int:
+    return max(0, abs(b - a) - 1)
 
-def formula_tubo_aparador():
-    pass
+def formula_tubo_aparador(sentidos_abert):
+    tubos = []
+    for sentido in sentidos_abert:
+        quant_vidros = contar_entre_numeros(sentido[0], sentido[1])
+        tamanho_aparador = 30*(quant_vidros + 2)
+        tubos.append(tamanho_aparador)
+    return tubos
 
+def formula_kit_aparador(giratorios):
+    return len(giratorios)
+    
 def formula_estacionamento():
+    
     pass
 
 def formula_giratorio():

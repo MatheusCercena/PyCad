@@ -22,45 +22,47 @@ if __name__ == "__main__":
     # Informações de entrada
     limpar_tudo()
 
-    # lcs = pedir_linhas_de_centro()
+    lcs = pedir_linhas_de_centro()
     # lcs = [1000, 3000, 2000]
-    lcs = [590, 2505]
+    # lcs = [590, 2505]
 
-    # alturas = pedir_alturas(lcs)
+    alturas = pedir_alturas(lcs)
     # alturas = [[1570, 1574], [1575, 1578, 1582, 1579], [1577, 1580]]
-    alturas = [[1137, 1138], [1138, 1141]]
+    # alturas = [[1137, 1138], [1138, 1141]]
 
-    # niveis = pedir_niveis(alturas)
+    niveis = pedir_niveis(alturas)
     # niveis = [[0, -2], [-4, -9, -12, -16], [-15, -9]]
-    niveis = [[5, 0], [0, -5]]
+    # niveis = [[5, 0], [0, -5]]
 
-    # quant_vidros = pedir_quant_vidros(lcs)
+    quant_vidros = pedir_quant_vidros(lcs)
     # quant_vidros = [2, 6, 4] 
-    quant_vidros = [2, 5] 
+    # quant_vidros = [2, 5] 
 
     sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
     # sentidos_abert = [[1, 12, 1, 2, 'esquerda']]
     # sentidos_abert = [[1, 5, 5, 4, 'direita'], [6, 12, 12, 11, 'direita']]
-    sentidos_abert = [[1, 2, 2, 1, 'direita'], [3, 7, 3, 4, 'esquerda']]
+    # sentidos_abert = [[1, 2, 2, 1, 'direita'], [3, 7, 3, 4, 'esquerda']]
 
     giratorios = [sentido[2] for sentido in sentidos_abert]
     adjacentes = [sentido[3] for sentido in sentidos_abert]
     sentidos = [sentido[4] for sentido in sentidos_abert]
     
-    # angs_in = pedir_angSecoes(lcs)
+    angs_in = pedir_angSecoes(lcs)
     # angs_in = [-90.0, -90.0]
-    angs_in = [-89.6]
+    # angs_in = [-89.6]
 
-    # angs_paredes = pedir_angParedes()
-    angs_paredes = [-1.0, -46.0]
+    angs_paredes = pedir_angParedes()
+    # angs_paredes = [-1.0, -46.0]
     
     # prumos = pedir_prumos()
     
     juncoes = definir_juncoes(lcs, angs_in)
     # juncoes = [[0, 2], [1, 1], [2, 0]]
+    # juncoes = [[0, 2], [1, 0]]
     
-    # elevador = pedir_elevador()
-    elevador = 2600
+    
+    elevador = pedir_elevador()
+    # elevador = 2600
     
     espessura_vidro = int(8)
     espessura_ext_perfil_U = int(20)
@@ -156,6 +158,9 @@ if __name__ == "__main__":
     print(f'A quantidade de sucata em pedaços necessária é {sucata_pedacos}, sendo {sucata_pedacos_inferior} para a parte inferior e {sucata_pedacos_superior} para a parte superior.')
     print(f'A quantidade de sucata interira necessária é {sucata_inteira}, sendo {sucata_inteira_superior} para a parte inferior e {sucata_inteira_inferior} para a parte superior.')
 
-    posicao = (-5.6, 3.6)
-    adicionar_ferragem(formula_tampa_de_leito(juncoes), posicao)
+
+    # posicao = APoint(-5.6, 3.6, 0)
+    # tampa_leito = formula_tampa_de_leito(juncoes)
+    # adicionar_texto(tampa_leito, posicao)
     
+    input('A sacada foi desenhada no autocad, aperte qualquer tecla pra fechar essa janela: ')
