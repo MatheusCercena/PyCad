@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # quant_vidros = [2, 6, 4] 
     quant_vidros = [2, 5] 
 
-    # sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
+    sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
     # sentidos_abert = [[1, 12, 1, 2, 'esquerda']]
     # sentidos_abert = [[1, 5, 5, 4, 'direita'], [6, 12, 12, 11, 'direita']]
     sentidos_abert = [[1, 2, 2, 1, 'direita'], [3, 7, 3, 4, 'esquerda']]
@@ -57,6 +57,8 @@ if __name__ == "__main__":
     
     # prumos = pedir_prumos()
     
+    juncoes = definir_juncoes(lcs, angs_in)
+    # juncoes = [[0, 2], [1, 1], [2, 0]]
     juncoes = definir_juncoes(lcs, angs_in)
     # juncoes = [[0, 2], [1, 1], [2, 0]]
     
