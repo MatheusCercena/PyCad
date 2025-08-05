@@ -43,7 +43,6 @@ if __name__ == "__main__":
     # sentidos_abert = [[1, 5, 5, 4, 'direita'], [6, 12, 12, 11, 'direita']]
     sentidos_abert = [[1, 2, 2, 1, 'direita'], [3, 7, 3, 4, 'esquerda']]
 
-
     giratorios = [sentido[2] for sentido in sentidos_abert]
     adjacentes = [sentido[3] for sentido in sentidos_abert]
     sentidos = [sentido[4] for sentido in sentidos_abert]
@@ -57,8 +56,6 @@ if __name__ == "__main__":
     
     # prumos = pedir_prumos()
     
-    juncoes = definir_juncoes(lcs, angs_in)
-    # juncoes = [[0, 2], [1, 1], [2, 0]]
     juncoes = definir_juncoes(lcs, angs_in)
     # juncoes = [[0, 2], [1, 1], [2, 0]]
     
