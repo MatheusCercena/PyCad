@@ -98,7 +98,6 @@ def definir_bocas(
         sentidos: list[int, int, int, int, tuple[int]],
         medidas_vidros: list[float], 
         pontos_vidros: list[list[float]], 
-        juncoes: list[list[int]], 
         pivos: list[int]
         ):
     for i, sentido in enumerate(sentidos):
@@ -108,7 +107,13 @@ def definir_bocas(
         medida_vidros_da_abertura = obter_medidas_intervalo(medidas_vidros, vidro_ini, vidro_fim)
         posicao_vidros_da_abertura = obter_pontos_intervalo(pontos_vidros, vidro_ini, vidro_fim)
         quant_vidros_da_abertura = contar_entre_numeros(vidro_ini, vidro_fim)
-        folga_vidro_giratorio = 0.0
+        final_do_giratorio = posicao_vidros_da_abertura[0][0] + pivo if sentido[4] == 'esquerda' else posicao_vidros_da_abertura[0][1]
+        boca1 = final_do_giratorio + 30.0 if sentido[4] == 'esquerda' else final_do_giratorio - 30.0
+        meio_dos_vidros = [pivo]
+        contador = 0
+        for vidro in range(quant_vidros_da_abertura):
+            meio = pivo - 30*contador if sentido[4] == 'esquerda' else pivo + 30*contador
+            meio_dos_vidros.append(meio)
         def definir_distancia_bocas():
             pass
         def definir_quantidade_bocas():
