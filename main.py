@@ -15,7 +15,7 @@ from src.perfis_U import offset_perfis_U, fillet_perfis_U, definir_coord_perfis_
 from src.recebimento_da_medicao import pedir_linhas_de_centro, pedir_quant_vidros, pedir_angSecoes, pedir_angParedes, pedir_prumos, definir_juncoes, solicitar_sentido_abertura, pedir_elevador, pedir_alturas, pedir_niveis
 from src.sucata import necessidade_de_sucata, definir_diferencas
 from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros, desenhar_guias_vidros
-from src.layout_ferragens import *
+from src.ferragens import *
 
 if __name__ == "__main__":
 
@@ -104,7 +104,6 @@ if __name__ == "__main__":
 
     # Vidros
     folgas_vidros = definir_folgas_vidros(juncoes, gaps_lcs, angs_in, espessura_vidro)
-
     vidros = medida_dos_vidros(lcs, quant_vidros, folgas_vidros)
     pontos_vidros = pontos_dos_vidros(vidros, folgas_vidros)
     desenhar_guias_vidros(handles_lcs, vidros, pontos_vidros)

@@ -6,8 +6,11 @@ Inclui função para carregar rotinas LISP personalizadas, facilitando operaçõ
 import os
 from time import sleep
 from src.autocad_conn import get_acad
+from pyautocad import Autocad
 
 acad, acad_ModelSpace = get_acad()
+autocad = Autocad()
+layout_space = autocad.doc.PaperSpace 
 
 def carregar_comandos() -> None:
     """Carrega comandos customizados no AutoCAD.
@@ -51,3 +54,6 @@ def remover_guias() -> None:
                 entidade.Delete()
         except Exception as e:
             print(f"Erro ao deletar entidade {i}: {e}")
+
+def adicionar_texto(texto, posicao: tuple[float, float, float]):
+    layout_space.AddText(texto, posicao, 2.2)

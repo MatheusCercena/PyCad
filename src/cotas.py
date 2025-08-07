@@ -7,7 +7,7 @@ from pyautocad import Autocad, APoint
 from src.calcs_vetor import ponto_medio, somar_pontos, multiplicar_vetor, vetor_perpendicular_unitario, angulo_do_vetor
 from src.calcs_cad import obter_pontos_medida_total
 
-acad = Autocad(create_if_not_exists=True)
+autocad = Autocad(create_if_not_exists=True)
 
 def cotar_medida_total(perfis: list, tipo_cota: str = 'ISO-25', offset: int = 200) -> None:
     """Cria cotas de medida total para os perfis no AutoCAD.
@@ -46,7 +46,7 @@ def cotar_medida_total(perfis: list, tipo_cota: str = 'ISO-25', offset: int = 20
         loc = APoint(*deslocado)
 
         # Criar a cota
-        dim = acad.model.AddDimRotated(a1, a2, loc, ang)
+        dim = autocad.model.AddDimRotated(a1, a2, loc, ang)
         dim.TextRotation = ang
         dim.StyleName = tipo_cota
         dim.TextMovement = 2

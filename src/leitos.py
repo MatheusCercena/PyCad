@@ -179,7 +179,7 @@ def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], girato
     for index, secao in enumerate(handles_guias):
         for i, linha_guia in enumerate(secao):
             #Offsets
-            for _ in range(5):
+            for tentativa in range(5):
                 try:
                     pythoncom.PumpWaitingMessages()
                     ext = linha_guia.Offset(14)[0]
@@ -187,8 +187,9 @@ def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], girato
                     ext.Layer = 'Leito Externo'
                     break
                 except:
+                    print(' ERRO\n')
                     sleep(0.5)
-            for _ in range(5):
+            for tentativa in range(5):
                 try:
                     pythoncom.PumpWaitingMessages()
                     int = linha_guia.Offset(-14)[0]
@@ -196,6 +197,7 @@ def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], girato
                     int.Layer = 'Leito Interno'
                     break
                 except:
+                    print(' ERRO\n')
                     sleep(0.5)
             
             #Guias
@@ -263,17 +265,20 @@ def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], girato
                 if pos_vidro-1 in giratorios:
                     pos_sentido += 1
 
-            for _ in range(5):
+            for tentativa in range(5):
                 try:
                     pythoncom.PumpWaitingMessages()
                     acad.SendCommand(f'(c:custom_fillet "{handles_leitos['externos'][pos_vidro-1]}" "{handles_leitos['lat_esq'][pos_vidro-1]}")\n')
+                    pythoncom.PumpWaitingMessages()
                     acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_esq'][pos_vidro-1]}" "{handles_leitos['internos'][pos_vidro-1]}")\n')
+                    pythoncom.PumpWaitingMessages()
                     acad.SendCommand(f'(c:custom_fillet "{handles_leitos['internos'][pos_vidro-1]}" "{handles_leitos['lat_dir'][pos_vidro-1]}")\n')
+                    pythoncom.PumpWaitingMessages()
                     acad.SendCommand(f'(c:custom_fillet "{handles_leitos['lat_dir'][pos_vidro-1]}" "{handles_leitos['externos'][pos_vidro-1]}")\n')
                     break
                 except:
                     sleep(0.5)
-            for _ in range(5):
+            for tentativa in range(5):
                 try:
                     pythoncom.PumpWaitingMessages()
                     ext_ini, ext_fim, int_ini, int_fim = ext.StartPoint, ext.EndPoint, int.StartPoint, int.EndPoint

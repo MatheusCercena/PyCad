@@ -5,6 +5,9 @@ Inclui operações com vetores, pontos, ângulos, distâncias, gaps e manipulaç
 """
 from math import sqrt, atan2
 
+def contar_entre_numeros(a: int, b: int) -> int:
+    return max(0, abs(b - a) - 1)
+
 def maior_valor(lista):
     return max(max(sublista) for sublista in lista)
 
