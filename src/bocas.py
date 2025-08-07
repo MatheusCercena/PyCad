@@ -109,13 +109,33 @@ def definir_bocas(
         quant_vidros_da_abertura = contar_entre_numeros(vidro_ini, vidro_fim)
         final_do_giratorio = posicao_vidros_da_abertura[0][0] + pivo if sentido[4] == 'esquerda' else posicao_vidros_da_abertura[0][1]
         boca1 = final_do_giratorio + 30.0 if sentido[4] == 'esquerda' else final_do_giratorio - 30.0
+        
+        # Definindo o meio dos vidros
         meio_dos_vidros = [pivo]
         contador = 0
         for vidro in range(quant_vidros_da_abertura):
             meio = pivo - 30*contador if sentido[4] == 'esquerda' else pivo + 30*contador
             meio_dos_vidros.append(meio)
-        def definir_distancia_bocas():
-            pass
+        
+        # Definindo posicao das molas e espaco que nao pode ir bocas
+        molas = []
+        for vidro in range(len(meio_dos_vidros), 0, -3):
+            ponto_mola = vidro - 90 if sentido[4] == 'esquerda' else vidro + 90
+            # espaco_sem_boca_ini = ponto_mola - 30 if sentido[4] == 'esquerda' else ponto_mola + 30
+            # espaco_sem_boca_fim = ponto_mola + 30 if sentido[4] == 'esquerda' else ponto_mola - 30
+            # molas.append((ponto_mola, espaco_sem_boca_ini, espaco_sem_boca_fim))
+            molas.append(ponto_mola)
+
+        def ver_se_boca_bate_na_mola(molas, boca):
+            for mola in molas:
+                if mola-34 <= boca <= mola +34:#boca está batendo na mola
+                    if sentido[4] == 'esquerda':
+                        distancia_boca = mola + 45
+                    else:
+                        distancia_boca = mola - 45
+                    return distancia_boca
+            
+            if mol <= mola boca1 - 45 in molas: 
         def definir_quantidade_bocas():
             pass
 
