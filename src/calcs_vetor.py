@@ -104,6 +104,19 @@ def interpolar_valor_em_x(pontos: list[float], valores: list[float], x: float) -
         return valores[0]
     return valores[-1]
 
+def obter_dados_intervalo(dados: list, valor_inicial: int, valor_final: int):
+    """
+    Retorna os dados entre valor_inicial e valor_final (inclusive).
+    Assume que o valor 1 está no índice 0 da lista.
+
+    Exemplo:
+    medidas_vidros = [1000, 1010, 1020, 1030, 1040]
+    obter_medidas_intervalo(medidas_vidros, 2, 4) -> [1010, 1020, 1030]
+    """
+    inicio = valor_inicial - 1
+    fim = valor_final     
+
+    return dados[inicio:fim]
 
 def deslocar_pontos_direcao(
     p1: tuple[float, float, float],
