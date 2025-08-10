@@ -1,25 +1,21 @@
 """
 Módulo para desenho e manipulação de perfis U no AutoCAD.
-
-Inclui funções para criar offsets, aplicar fillets, distribuir vidros, associar aberturas e calcular coordenadas dos perfis U.
-"""
-"""
-Desenha os perfis U, através de offsets chamados via COM e fillets por lisp.
 """
 
 from copy import deepcopy
 from src.autocad_conn import get_acad
 from src.calcs_vetor import distancia_2d, normalizar, definir_pontos_na_secao, vetor_entre_pontos
 from src.calcs_cad import obter_pontos_medida_total
+import pythoncom
 
 acad, acad_ModelSpace = get_acad()
 
 def offset_perfis_U(handles_lcs: list) -> dict[str, list[str]]:
     """Cria offsets dos perfis U externos e internos.
-    
+
     Args:
         handles_lcs: Lista de handles das linhas de centro.
-    
+
     Returns:
         dict: Dicionário com handles dos perfis U externos e internos.
             - 'externos': Lista de handles dos perfis U externos
@@ -30,6 +26,7 @@ def offset_perfis_U(handles_lcs: list) -> dict[str, list[str]]:
 
     handles = {'externos': [], 'internos': []}
     for linha in handles_lcs:
+        pythoncom.PumpWaitingMessages()
         linha_ext = linha.Offset(offset_ext)#.Offset retorna uma tupla
         linha_ext[0].Layer = 'Perfil U Externo'
         handles['externos'].append(linha_ext[0].Handle)
@@ -41,10 +38,10 @@ def offset_perfis_U(handles_lcs: list) -> dict[str, list[str]]:
 
 def fillet_perfis_U(handles: dict[str, list[str]]) -> None:
     """Aplica fillets nos perfis U externos e internos.
-    
+
     Args:
         handles: Dicionário contendo handles dos perfis U externos e internos.
-    
+
     Returns:
         None: Função executa comandos no AutoCAD sem retorno.
     """
@@ -57,10 +54,10 @@ def fillet_perfis_U(handles: dict[str, list[str]]) -> None:
 
 def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[float, float, float]]]:
     """Define as coordenadas dos perfis U.
-    
+
     Args:
         handles: Dicionário contendo handles dos perfis U externos e internos.
-    
+
     Returns:
         list: Lista de sublistas que contém 4 tuplas com os pontos x, y, z de cada extremidade do perfil U.
     """
@@ -70,27 +67,30 @@ def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[flo
 
     for linha in range(len(linhas_externas)):
         coord = []
-        
-        linha_ext = acad.HandleToObject(linhas_externas[linha])
-        coord.append(linha_ext.StartPoint)
-        coord.append(linha_ext.EndPoint)
-    
-        linha_int = acad.HandleToObject(linhas_internas[linha])
-        coord.append(linha_int.StartPoint)
-        coord.append(linha_int.EndPoint)
 
+        try:
+            pythoncom.PumpWaitingMessages()
+            linha_ext = acad.HandleToObject(linhas_externas[linha])
+            coord.append(linha_ext.StartPoint)
+            coord.append(linha_ext.EndPoint)
+
+            linha_int = acad.HandleToObject(linhas_internas[linha])
+            coord.append(linha_int.StartPoint)
+            coord.append(linha_int.EndPoint)
+        except Exception as e:
+            input(f'Erro ao obter coordenadas do perfil U: {e}')
         coordenadas.append(coord)
     return coordenadas
 
 def distribuir_perfis_U_por_lado(medidas: list[list[tuple[float, float, float]]], coord_perfis_U: list[tuple[float, float, float]]) -> list[list[tuple[float, float, float]]]:
     """Distribui os vidros por lado da sacada.
-    
+
     Args:
         quant_vidros: Lista com a quantidade de vidros por lado.
 
     Returns:
         list: Lista de sublistas com números sequenciais dos vidros de cada lado.
-        
+
     Example:
         Entrada: [3, 5, 2]
         Saída: [[1, 2, 3], [4, 5, 6, 7, 8], [9, 10]]
@@ -109,12 +109,12 @@ def distribuir_perfis_U_por_lado(medidas: list[list[tuple[float, float, float]]]
 
 def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float]]], aberturas_por_lado: list, elevador: int) -> tuple[list[list[float]], list[list[tuple[float, float, float]]]]:
     """Redefine as coordenadas dos perfis U considerando aberturas e elevador.
-    
+
     Args:
         coord_perfis_U: Lista com coordenadas dos perfis U.
         aberturas_por_lado: Lista com aberturas por lado.
         elevador: Altura máxima do elevador.
-    
+
     Returns:
         tuple: Tupla contendo:
             - Lista de listas com medidas dos perfis por seção
@@ -126,7 +126,7 @@ def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float
         pontos = obter_pontos_medida_total(lado)
         p1 = pontos[1]
         p2 = pontos[2]
-        
+
         comprimento_perfil = distancia_2d(p1, p2)
         comprimento_restante = comprimento_perfil
 
@@ -167,7 +167,7 @@ def redefinir_coord_perfis_U(coord_perfis_U: list[list[tuple[float, float, float
 
             fim_perfil = definir_pontos_na_secao(p1, vetor_unitario, distancia)
             coord_perfil.append(tuple(fim_perfil))
-            
+
             ini_perfil = fim_perfil
             coordenadas.append(coord_perfil)
     return medidas, coordenadas

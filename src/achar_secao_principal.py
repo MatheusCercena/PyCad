@@ -15,13 +15,13 @@ x, y, b = symbols('x y b')
 
 def definir_linha_perpendicular(pos_lcs: list) -> tuple[float, float, float, float]:
     """Define uma linha perpendicular às linhas de centro.
-    
+
     A partir das posições das linhas de centro, define dois pontos (C1 e C2) sobre uma reta
     perpendicular à reta formada entre o início da primeira e o final da última seção.
-    
+
     Args:
         pos_lcs: Lista com as posições das linhas de centro.
-    
+
     Returns:
         tuple: Coordenadas dos pontos C1 e C2 (x1, y1, x2, y2).
     """
@@ -49,12 +49,12 @@ def definir_linha_perpendicular(pos_lcs: list) -> tuple[float, float, float, flo
 
 def def_eq_reta(secao: list) -> Eq:
     """Define a equação da reta de uma seção.
-    
+
     Define a equação da reta a ser usada para verificar se a seção intercepta a linha perpendicular.
-    
+
     Args:
         secao: Lista com as coordenadas da seção [x1, y1, x2, y2].
-    
+
     Returns:
         Eq: Equação da reta da seção.
     """
@@ -65,37 +65,37 @@ def def_eq_reta(secao: list) -> Eq:
     valor_b = solve(eq_b, b)[0]
 
     return Eq(y, valor_m*x + valor_b)
-   
+
 def verificar_se_intercepta(secao: list, interseccao: dict) -> bool:
     """Verifica se uma seção intercepta a linha guia.
-    
+
     Args:
         secao: Lista com as coordenadas da seção [x1, y1, x2, y2].
         interseccao: Dicionário com chaves x e y da interseção.
-    
+
     Returns:
         bool: True se a seção intercepta a guia, False caso contrário.
     """
-    
+
     intervalo_x = sorted([secao[0], secao[2]])
     intervalo_y = sorted([secao[1], secao[3]])
-    
+
     condicao1 = dentro_do_intervalo(interseccao[x], intervalo_x[0], intervalo_x[1])
     condicao2 = dentro_do_intervalo(interseccao[y], intervalo_y[0], intervalo_y[1])
 
-    if (condicao1 == True) and (condicao2 == True): 
+    if (condicao1 == True) and (condicao2 == True):
         return True
     else:
         return False
 
 def descobrir_secao_principal(pos_lcs: list) -> int:
     """Descobre a linha de centro principal.
-    
+
     Descobre a linha de centro principal dentro de uma lista de linhas de centro (pos_lcs).
-    
+
     Args:
         pos_lcs: Lista com as posições das linhas de centro.
-    
+
     Returns:
         int: Índice da seção principal.
     """
@@ -108,7 +108,7 @@ def descobrir_secao_principal(pos_lcs: list) -> int:
             interseccao = solve((def_eq_reta(pos_lcs[secao]), def_eq_reta(coord_c)), (x, y))
             # verificar se intercepta / solve ou def eq reta esta dando problema, verificar
             verificacao = verificar_se_intercepta(pos_lcs[secao], interseccao)
-            if verificacao == True: 
+            if verificacao == True:
                 return int(secao)
             else:
                 continue

@@ -12,22 +12,21 @@ from math import radians
 from src.autocad_conn import get_acad
 
 cad, acad_ModelSpace = get_acad()
-
 acad = Autocad(create_if_not_exists=True)
 
-def definir_linhas_de_centro(lcs: list[int], angs_in: list[float]) -> list[list[float]]:
+def definir_linhas_de_centro(lcs: list[int], angs_in: list[float]) -> list[list[float, float, float, float]]:
     """Define as posições das linhas de centro no plano cartesiano.
-    
-    Define as posições iniciais e finais nos eixos x e y para cada uma das linhas de centro 
+
+    Define as posições iniciais e finais nos eixos x e y para cada uma das linhas de centro
     entregues no parâmetro lcs.
-    
+
     Args:
         lcs: Lista com as linhas de centro a serem definidas.
-        angs_in: Lista com ângulos internos entre cada linha de centro. 
+        angs_in: Lista com ângulos internos entre cada linha de centro.
                 Note que angs_in[0] equivale ao ângulo entre lcs[0] e lcs[1].
-    
+
     Returns:
-        list: Lista com as posições definidas para cada linha de centro, 
+        list: Lista com as posições definidas para cada linha de centro,
               no formato [[xi1, yi1, xf1, yf1], [xi2, yi2, xf2, yf2], [xin, yin, xfn, yfn]].
     """
     lista_de_LCs = lcs.copy()
@@ -46,7 +45,7 @@ def definir_linhas_de_centro(lcs: list[int], angs_in: list[float]) -> list[list[
         angs += angs_in[l-1]
         inicio = linha.StartPoint
         final = linha.EndPoint
-        
+
         coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
         coord_de_linhas_de_centro.append(coord_linhas)
         linha.Delete()
@@ -55,11 +54,11 @@ def definir_linhas_de_centro(lcs: list[int], angs_in: list[float]) -> list[list[
 
 def ordem_lcs(lcs: list, sec_princ: int) -> list[int]:
     """Define a ordem de processamento das linhas de centro.
-    
+
     Args:
         lcs: Lista com as linhas de centro.
         sec_princ: Índice da seção principal.
-    
+
     Returns:
         list: Lista com a ordem de processamento das linhas de centro.
     """
@@ -67,33 +66,33 @@ def ordem_lcs(lcs: list, sec_princ: int) -> list[int]:
     lista.append(sec_princ)
     if sec_princ < len(lcs)-1:
         for c in range(sec_princ + 1, len(lcs)):
-            lista.append(c) 
+            lista.append(c)
     if sec_princ >= 1:
-        lista.append(sec_princ-1) 
+        lista.append(sec_princ-1)
         if sec_princ >= 1:
             for c in reversed(range(sec_princ-1)):
-                lista.append(c) 
+                lista.append(c)
     return lista
 
 def redesenhar_linhas_de_centro(lcs: list[int], angs_in: list[float], sec_princ: int) -> tuple[list[list[float]], list]:
     """Redesenha as linhas de centro no AutoCAD a partir da seção principal.
-    
-    Desenha as linhas de centro na instância de AutoCAD e retorna uma lista com as posições 
+
+    Desenha as linhas de centro na instância de AutoCAD e retorna uma lista com as posições
     iniciais e finais nos eixos x e y para cada uma das linhas de centro.
-    
+
     Args:
         lcs: Lista com as linhas de centro a serem definidas.
-        angs_in: Lista com ângulos internos entre cada linha de centro. 
+        angs_in: Lista com ângulos internos entre cada linha de centro.
                 Note que angs_in[0] equivale ao ângulo entre lcs[0] e lcs[1].
         sec_princ: Índice da seção principal.
-    
+
     Returns:
         tuple: Tupla contendo:
             - Lista com as posições corrigidas para cada linha de centro
             - Lista de handles das linhas de centro desenhadas
     """
-    
-    lista_de_LCs = lcs.copy() 
+
+    lista_de_LCs = lcs.copy()
     #desenha a seção principal a partir de (0, 0)
     linha = acad.model.AddLine(APoint(0, 0), APoint(lista_de_LCs[sec_princ], 0))
     linha.Layer = 'Linha de Centro'
@@ -102,7 +101,7 @@ def redesenhar_linhas_de_centro(lcs: list[int], angs_in: list[float], sec_princ:
     angs = 0
     coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
     lista_de_LCs[sec_princ] = coord_linhas
- 
+
     #desenha as seções depois da seção principal, SE existirem | se a seção principal for 0 e só tiver uma seção, ignora
     if sec_princ < len(lcs)-1:
         for l in range(sec_princ + 1, len(lista_de_LCs)):
@@ -112,10 +111,10 @@ def redesenhar_linhas_de_centro(lcs: list[int], angs_in: list[float], sec_princ:
             angs += angs_in[l-1]
             inicio = linha.StartPoint
             final = linha.EndPoint
-            
+
             coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
             lista_de_LCs[l] = coord_linhas
-    
+
     #desenha a primeira seção antes da seção principal, SE existirem
     if sec_princ >= 1:
         linha = acad.model.AddLine(APoint(0 - lista_de_LCs[sec_princ-1], 0), APoint(0, 0))
@@ -136,7 +135,7 @@ def redesenhar_linhas_de_centro(lcs: list[int], angs_in: list[float], sec_princ:
                 angs += angs_in[l]
                 inicio = linha.StartPoint
                 final = linha.EndPoint
-    
+
                 coord_linhas = [inicio[0], inicio[1], final[0], final[1]]
                 lista_de_LCs[l] = coord_linhas
 
@@ -154,10 +153,10 @@ def redesenhar_linhas_de_centro(lcs: list[int], angs_in: list[float], sec_princ:
 
 def definir_coord_lcs(pos_lcs: list[list[float]]) -> list[tuple[float, float, float]]:
     """Define as coordenadas 3D das linhas de centro.
-    
+
     Args:
         pos_lcs: Lista com as posições 2D das linhas de centro.
-    
+
     Returns:
         list: Lista com as coordenadas 3D das linhas de centro.
     """

@@ -1,4 +1,7 @@
 from src.aberturas import distribuir_vidros_por_lado
+from src.comandos_cad import adicionar_mtext_modelspace
+from src.calcs_vetor import ponto_perpendicular_a_vetor, ponto_medio
+from pyautocad import APoint
 
 def definir_pivos(
         quant_vidros: list[int],
@@ -19,6 +22,7 @@ def definir_pivos(
     pivos = []
     for sentido in sentidos:
         giratorio = sentido[2]
+        direcao = sentido[4]
         for i, lado in enumerate(vidros_mapeados):
             perfis_secao = medidas_perfis_U[i]
             perfis_linear = []
@@ -32,17 +36,17 @@ def definir_pivos(
                 if vidro == giratorio:
                     if j == 0:
                         if juncoes[i][0] == 0:
-                            pivos.append(70)
+                            pivos.append(70 if direcao == 'esquerda' else -70)
                             break
                         else:
-                            pivos.append(85)
+                            pivos.append(85 if direcao == 'esquerda' else -85)
                             break
                     elif j == len(lado)-1:
                         if juncoes[i][1] == 0:
-                            pivos.append(70)
+                            pivos.append(70 if direcao == 'esquerda' else -70)
                             break
                         else:
-                            pivos.append(85)
+                            pivos.append(85 if direcao == 'esquerda' else -85)
                             break
                     else:
                         # Achar lado que começa o vidro giratório
@@ -50,18 +54,49 @@ def definir_pivos(
                             ponto_ini_vidro = pontos_vidros[i][j][0]
                         else:
                             ponto_ini_vidro = pontos_vidros[i][j][1]
-                        # Achar em qual perfil está o vidro giratório 
+                        # Achar em qual perfil está o vidro giratório
                         secao_do_giratorio = ''
                         for i, perfil in enumerate(perfis_linear):
                             if perfil[0] <= ponto_ini_vidro <= perfil[1]:
                                 secao_do_giratorio = perfil
                                 break
                         # Verifica qual das extremidades da secao do giratorio está mais próxima do vidro
-                        dist_inicio = ponto_ini_vidro - secao_do_giratorio[0] 
+                        dist_inicio = ponto_ini_vidro - secao_do_giratorio[0]
                         dist_fim = secao_do_giratorio[1] - ponto_ini_vidro
                         if dist_inicio < dist_fim:
                             distancia_usada = dist_inicio + 30
                         else:
                             distancia_usada = dist_fim - 30
-                        pivos.append(30 + distancia_usada)
+                        pivos.append(30 + distancia_usada if direcao == 'esquerda' else -30 - distancia_usada)
     return pivos
+
+def posicionar_pivos(pos_lcs, sec_princ, pivos: list[int], giratorios: list[int]):
+    """
+    Posiciona os pivos no CAD.
+    """
+    ponto_ini = (pos_lcs[sec_princ][0], pos_lcs[sec_princ][1])
+    ponto_fim = (pos_lcs[sec_princ][2], pos_lcs[sec_princ][3])
+    ponto_base = ponto_medio(ponto_ini, ponto_fim)
+    ponto_base = (ponto_base[0] - 450, ponto_base[1])
+    ponto_base_pivo = ponto_perpendicular_a_vetor(ponto_base, ponto_ini, ponto_fim, -600)
+
+    linhas = []
+
+    for pivo, giratorio in zip(pivos, giratorios):
+        if pivo not in [70, 85, 30, -70, -85, -30]:
+            if pivo < 0:
+                extra = "puxar da esquerda"
+            elif pivo > 0:
+                extra = "puxar da direita"
+            else:
+                extra = ""
+        else:
+            extra = ""
+
+        linhas.append(f"Pivo V{giratorio}: {abs(pivo)} mm {extra}")
+
+    texto_final = "\n".join(linhas)
+    texto = adicionar_mtext_modelspace(texto_final, APoint(*ponto_base_pivo), 70, 1700)
+    texto.AttachmentPoint = 2  # Middle Center
+    ponto_base_pivo = (ponto_base_pivo[0] + 600, ponto_base_pivo[1])
+    texto.InsertionPoint = APoint(*ponto_base_pivo)  # reposiciona após mudar o AttachmentPoint

@@ -21,7 +21,7 @@ def vetor_entre_pontos(p1: tuple[float, float, float], p2: tuple[float, float, f
     """Calcula o vetor que vai de p1 até p2."""
     return (p2[0] - p1[0], p2[1] - p1[1], 0.0)
 
-def normalizar(vetor: tuple[float, float, float]) -> tuple[float, float, float]:
+def normalizar(vetor: tuple[float, float]) -> tuple[float, float, float]:
     """Normaliza um vetor para obter o vetor unitário."""
     norma = sqrt(vetor[0]**2 + vetor[1]**2)
     return (vetor[0]/norma, vetor[1]/norma, 0.0)
@@ -69,6 +69,22 @@ def vetor_perpendicular_unitario(p1: tuple[float, float, float], p2: tuple[float
     dy = p2[1] - p1[1]
     mod = sqrt(dx**2 + dy**2)
     return (-dy / mod, dx / mod, 0.0)
+
+def ponto_perpendicular_a_vetor(ponto_base: tuple[float, float, float], p1: tuple[float, float, float], p2: tuple[float, float, float], comprimento: float) -> tuple[float, float, float]:
+    """
+    Retorna o ponto final de uma linha perpendicular ao vetor p1->p2, começando em ponto_base e com o comprimento desejado.
+    Útil para traçar linhas perpendiculares em CAD.
+    Args:
+        ponto_base: ponto de origem da perpendicular (sobre o vetor original)
+        p1, p2: pontos que definem o vetor original
+        comprimento: comprimento da perpendicular
+    Returns:
+        ponto_final: coordenada do ponto final da perpendicular
+    """
+    perp = vetor_perpendicular_unitario(p1, p2)
+    ponto_final = somar_pontos(ponto_base, multiplicar_vetor(perp, comprimento))
+    return ponto_final
+
 
 def linha_paralela_com_offset(p1: tuple[float, float, float], p2: tuple[float, float, float], offset: float) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
     """Retorna os dois pontos de uma linha paralela deslocada por um offset perpendicular"""
@@ -119,7 +135,7 @@ def obter_dados_intervalo(dados: list, valor_inicial: int, valor_final: int):
     """
     dados = [dado for sublista in dados for dado in sublista]
     inicio = valor_inicial - 1
-    fim = valor_final     
+    fim = valor_final
 
     return dados[inicio:fim]
 
@@ -151,12 +167,12 @@ def deslocar_pontos_direcao(
 
 def definir_pontos_na_secao(inicio_secao: tuple[float, float, float], vetor_unitario: tuple[float, float, float], distancia: float) -> tuple[float, float, float]:
     """Define um ponto em uma seção a partir de um ponto inicial, vetor unitário e distância.
-    
+
     Args:
         Inicio_secao: Ponto inicial da seção (x, y, z).
         vetor_unitario: Vetor unitário da direção (x, y, z).
         distancia: Distância a partir do ponto inicial.
-    
+
     Returns:
         tuple: Ponto calculado na seção (x, y, z).
     """
@@ -168,15 +184,15 @@ def definir_pontos_na_secao(inicio_secao: tuple[float, float, float], vetor_unit
 
 def dentro_do_intervalo(valor: float, minimo: float, maximo: float, tol: float = 1e-6) -> bool:
     """Verifica se um valor está dentro de um intervalo fechado.
-    
+
     Considera uma margem de tolerância para evitar erros causados por imprecisão de ponto flutuante.
-    
+
     Args:
         valor: Valor a ser testado.
         minimo: Limite inferior do intervalo.
         maximo: Limite superior do intervalo.
         tol: Tolerância permitida na comparação. Padrão: 1e-6.
-    
+
     Returns:
         bool: True se valor estiver dentro do intervalo (com tolerância), False caso contrário.
     """
@@ -187,3 +203,4 @@ def dentro_do_intervalo(valor: float, minimo: float, maximo: float, tol: float =
 
     # Verificação com margem de tolerância
     return (limite_inferior - tol) <= valor <= (limite_superior + tol)
+

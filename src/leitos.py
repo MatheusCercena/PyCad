@@ -23,19 +23,19 @@ x, y, b = symbols('x y b')
 
 def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vidros: list, folgas_leitos: list) -> list:
     """Desenha as guias dos leitos no AutoCAD.
-    
+
     Args:
         handles_lcs: Lista de handles das linhas de centro.
         vidros_sacada: Lista com os vidros da sacada.
         posicao_dos_vidros: Lista com as posições dos vidros.
         folgas_leitos: Lista com as folgas dos leitos.
-    
+
     Returns:
         list: Lista com handles das guias dos leitos.
     """
     handles_guias_leitos = []
     for i, linha_de_centro in enumerate(handles_lcs):
-        
+
         ini_linha_de_centro = linha_de_centro.StartPoint
         fim_linha_de_centro = linha_de_centro.EndPoint
 
@@ -53,13 +53,13 @@ def desenhar_guias_leitos(handles_lcs: list, vidros_sacada: list, posicao_dos_vi
 
 def folgas_leitos(vidros: list, folgas_vidros: list, angs_in: list[float], aberturas: list) -> list:
     """Calcula as folgas dos leitos para cada vidro em cada seção da sacada.
-    
+
     Args:
         vidros: Lista de listas, cada sublista representa os vidros de uma seção.
         folgas_vidros: Mesma estrutura que vidros, mas com folgas esquerda/direita.
         angs_in: Lista com ângulos de entrada das seções.
         aberturas: Lista com informações das aberturas.
-    
+
     Returns:
         list: Lista com as folgas dos leitos por seção e vidro.
     """
@@ -72,13 +72,13 @@ def folgas_leitos(vidros: list, folgas_vidros: list, angs_in: list[float], abert
                 if lado == 0:
                     if index == 0:
                         if folgas_vidros[secao][0] == 2:
-                            folga_esq = calcular_gaps_leito(angs_in[secao-1]) + 3 
+                            folga_esq = calcular_gaps_leito(angs_in[secao-1]) + 3
                         elif folgas_vidros[secao][0] == -7:
                             folga_esq = calcular_gaps_leito(angs_in[secao-1]) - 7
                         elif folgas_vidros[secao][0] == -1:
                             if abs(angs_in[secao-1])/2 < 20:
                                 folga_esq = 1.5
-                            else: 
+                            else:
                                 folga_esq = 0
                         else:
                             folga_esq = 1.5
@@ -87,7 +87,7 @@ def folgas_leitos(vidros: list, folgas_vidros: list, angs_in: list[float], abert
                     # if aberturas[2]
                     folgas_leitos_vidro.append(folga_esq)
                 if lado == 1:
-                    if index+1 == len(vidros[secao]):                            
+                    if index+1 == len(vidros[secao]):
                         if folgas_vidros[secao][1] == 2:
                             folga_dir = calcular_gaps_leito(angs_in[secao]) + 3
                         elif folgas_vidros[secao][1] == -7:
@@ -95,7 +95,7 @@ def folgas_leitos(vidros: list, folgas_vidros: list, angs_in: list[float], abert
                         elif folgas_vidros[secao][1] == -1:
                             if abs(angs_in[secao-1])/2 < 20:
                                 folga_dir = 1.5
-                            else: 
+                            else:
                                 folga_dir = 0
                         else:
                             folga_dir = 1.5
@@ -109,11 +109,11 @@ def folgas_leitos(vidros: list, folgas_vidros: list, angs_in: list[float], abert
 
 def converter_ordem_para_secoes(vidros: list, lista: list) -> list:
     """Converte uma lista ordenada para estrutura de seções.
-    
+
     Args:
         vidros: Lista com estrutura de vidros por seção.
         lista: Lista ordenada a ser convertida.
-    
+
     Returns:
         list: Lista convertida para estrutura de seções.
     """
@@ -129,13 +129,13 @@ def converter_ordem_para_secoes(vidros: list, lista: list) -> list:
 
 def def_eq_reta_leitos(ponto_a: tuple[float, float], ponto_b: tuple[float, float]) -> Eq:
     """Define a equação da reta entre dois pontos para leitos.
-    
+
     Define a equação da reta a ser usada para verificar se a seção intercepta a linha perpendicular.
-    
+
     Args:
         ponto_a: Primeiro ponto (x, y).
         ponto_b: Segundo ponto (x, y).
-    
+
     Returns:
         Eq: Equação da reta entre os pontos.
     """
@@ -155,7 +155,7 @@ def def_eq_reta_leitos(ponto_a: tuple[float, float], ponto_b: tuple[float, float
 
 def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], giratorios: list[int], adjacentes: list[int], sentidos: list[str]) -> tuple[dict[str, list[str]], list[tuple[float, float, float]]]:
     """Desenha os leitos no AutoCAD com todas as suas características.
-    
+
     Args:
         handles_guias: Lista de handles das guias dos leitos.
         vidros: Lista com os vidros por seção.
@@ -163,7 +163,7 @@ def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], girato
         giratorios: Lista com índices dos vidros giratórios.
         adjacentes: Lista com índices dos vidros adjacentes aos giratórios.
         sentidos: Lista com sentidos de abertura ('direita' ou 'esquerda').
-    
+
     Returns:
         tuple: Tupla contendo:
             - Dicionário com handles dos leitos organizados por tipo
@@ -172,7 +172,7 @@ def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], girato
     handles_leitos = {'externos': [], 'internos': [], 'lat_esq': [], 'lat_dir': []}
     coordenadas_leitos = []
     handles_guias = converter_ordem_para_secoes(vidros, handles_guias)
-    
+
     pos_vidro = 1
     pos_sentido = 0
 
@@ -199,7 +199,7 @@ def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], girato
                 except:
                     print(' ERRO\n')
                     sleep(0.5)
-            
+
             #Guias
             guia_ext = linha_guia.Offset(4)[0]
             guia_int = linha_guia.Offset(-4)[0]
@@ -243,7 +243,7 @@ def desenhar_leitos(handles_guias: list, vidros: list, angs: list[float], girato
             # rotacoes lado direito
             if index != len(handles_guias)-1:
                 if i == len(secao)-1 and angs[index] > 0 and not (70 < abs(angs[index]) < 110):
-                    lat_dir.Rotate(APoint(float(interseccao_dir_sup[x]), float(interseccao_dir_sup[y])), radians((angs[index])/2)*-1)      
+                    lat_dir.Rotate(APoint(float(interseccao_dir_sup[x]), float(interseccao_dir_sup[y])), radians((angs[index])/2)*-1)
                 elif i == len(secao)-1 and angs[index] < 0 and not (70 < abs(angs[index]) < 110):
                     lat_dir.Rotate(APoint(float(interseccao_dir_inf[x]), float(interseccao_dir_inf[y])), radians((angs[index])/2))
 

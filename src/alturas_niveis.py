@@ -1,12 +1,14 @@
 '''Módulo para definir e ajustar os níveis dos vidros de uma sacada, considerando a posição dos giratórios e as alturas dos trilhos.'''
-from src.calcs_vetor import maior_valor, menor_valor, interpolar_valor_em_x
+from src.calcs_vetor import maior_valor, menor_valor, interpolar_valor_em_x, ponto_medio, ponto_perpendicular_a_vetor
 from src.vidros import achar_posicao_vidro
+from src.comandos_cad import adicionar_texto_modelspace
+from pyautocad import APoint
 
 def definir_niveis(niveis: list[list[int]], lcs: list[int], quant_vidros: list[int], sentidos_abert: list[list[int, int, int, int, str]]):
     '''
     Ajusta os níveis da sacada conforme a posição dos giratórios.
     '''
-    # Ajustando niveis para padrao de base 0 
+    # Ajustando niveis para padrao de base 0
     maior_nivel = maior_valor(niveis)
     niveis_base_0 = [[nivel - maior_nivel for nivel in lado] for lado in niveis]
 
@@ -39,7 +41,7 @@ def definir_niveis(niveis: list[list[int]], lcs: list[int], quant_vidros: list[i
             pass
         else:
             print('Por favor, digite apenas o caracteres "s" ou "n".')
-  
+
     return niveis_finais, ponto_base
 
 def alturas_por_nivel(alturas, niveis_finais):
@@ -49,11 +51,11 @@ def alturas_por_nivel(alturas, niveis_finais):
 
 def diferenca_alturas(alturas_finais, lcs, quant_vidros, sentidos_abert):
     ''' Calcula a diferença de alturas entre os vidros e o nível, conforme o sentido de abertura.'''
-    # Ajustando alturas para padrao de base 0 
+    # Ajustando alturas para padrao de base 0
     menor_altura = menor_valor(alturas_finais)
     alturas_base_0 = [[altura - menor_altura for altura in lado] for lado in alturas_finais]
 
-    # 2.1 Ajustando alturas pelo giratorio    
+    # 2.1 Ajustando alturas pelo giratorio
     alturas_giratorios = obter_altura_giratorios(sentidos_abert, quant_vidros, alturas_base_0, lcs)
     altura_sistema = min(alturas_giratorios)
     diferencas_de_altura = [[altura - altura_sistema for altura in lado] for lado in alturas_base_0]
@@ -89,9 +91,9 @@ def diferenca_alturas(alturas_finais, lcs, quant_vidros, sentidos_abert):
 def folga_altura_vidro(diferenca_superior, diferenca_inferior):
     '''Calcula a folga de altura do vidro com base nas diferenças de altura superior e inferior.'''
     if diferenca_superior <= 7 and diferenca_inferior >= -7:
-        folga_vidro = 165
+        folga_vidro = int(165)
     else:
-        folga_vidro = 160
+        folga_vidro = int(160)
 
     return folga_vidro
 
@@ -135,3 +137,27 @@ def obter_altura_giratorios(
         resultado.append(altura_interpolada)
 
     return resultado
+
+def posicionar_alturas(
+        pos_lcs: list[list[float, float, float, float]],
+        sec_princ: int,
+        maior_altura: int,
+        menor_altura: int,
+        altura_vidro: int
+        ):
+    """Posiciona alturas de vidro, vao e painel no CAD.
+    """
+    ponto_ini = (pos_lcs[sec_princ][0], pos_lcs[sec_princ][1])
+    ponto_fim = (pos_lcs[sec_princ][2], pos_lcs[sec_princ][3])
+    ponto_base = ponto_medio(ponto_ini, ponto_fim)
+    ponto_base = (ponto_base[0] - 450, ponto_base[1])
+
+    ponto_base_vidro = ponto_perpendicular_a_vetor(ponto_base, ponto_ini, ponto_fim, 1200)
+    adicionar_texto_modelspace(f'Altura do vidro: {altura_vidro}', APoint(*ponto_base_vidro), 70)
+
+    ponto_base_painel = ponto_perpendicular_a_vetor(ponto_base, ponto_ini, ponto_fim, 1320)
+    adicionar_texto_modelspace(f'Altura do painel: {altura_vidro+33}', APoint(*ponto_base_painel), 70)
+
+    ponto_base_vao = ponto_perpendicular_a_vetor(ponto_base, ponto_ini, ponto_fim, -500)
+    adicionar_texto_modelspace(f'Alturas do vão: {maior_altura} / {menor_altura}', APoint(*ponto_base_vao), 70)
+

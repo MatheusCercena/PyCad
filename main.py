@@ -2,7 +2,7 @@ from src.aberturas import associar_aberturas_aos_lados
 from src.alturas_niveis import definir_niveis, alturas_por_nivel, diferenca_alturas, folga_altura_vidro
 from src.achar_secao_principal import descobrir_secao_principal
 from src.cant_ajustes_angulo import necessidade_cant_ajuste, infos_cant_ajuste
-from src.comandos_cad import carregar_comandos, remover_guias
+from src.comandos_cad import carregar_comandos, remover_guias, adicionar_texto_modelspace
 from src.calcs_vetor import menor_valor, maior_valor
 from src.cotas import cotar_medida_total
 from src.drenos import definir_coord_drenos
@@ -16,8 +16,9 @@ from src.perfis_U import offset_perfis_U, fillet_perfis_U, definir_coord_perfis_
 from src.sucata import necessidade_de_sucata, definir_diferencas
 from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros, desenhar_guias_vidros
 # from src.ferragens import *
-from src.bocas import definir_bocas
-from src.pivos import definir_pivos
+from src.bocas import definir_aberturas, desenhar_bocas
+from src.pivos import definir_pivos, posicionar_pivos
+from src.alturas_niveis import posicionar_alturas
 
 if __name__ == "__main__":
 
@@ -58,6 +59,7 @@ if __name__ == "__main__":
     angs_paredes = [0.0, 0.0]
 
     # prumos = pedir_prumos()
+    prumos = [0, 0]
 
     # juncoes = definir_juncoes(lcs, angs_in)
     juncoes = [[0, 2], [1, 1], [2, 0]]
@@ -137,38 +139,54 @@ if __name__ == "__main__":
     dif_niveis, nivel_base = definir_niveis(niveis, lcs, quant_vidros, sentidos_abert)
     alturas_finais = alturas_por_nivel(alturas, dif_niveis)
     dif_altura, altura_base = diferenca_alturas(alturas_finais, lcs, quant_vidros, sentidos_abert)
-    altura_vao = round(menor_valor(alturas_finais), 0) + altura_base - nivel_base
+    altura_vao = int(round(menor_valor(alturas_finais), 0) + altura_base - nivel_base)
     maior_altura = maior_valor(alturas)
     menor_altura = menor_valor(alturas)
-    print(f'A altura do vão para o calculo do vidro é {altura_vao}')
-    print(f'A maior altura do vão é: {maior_altura}')
-    print(f'A menor altura do vão é: {menor_altura}')
     dif_superior, dif_inferior = definir_diferencas(dif_niveis, nivel_base, dif_altura, altura_base)
     folga_vidro = folga_altura_vidro(dif_superior, dif_inferior)
     altura_vidro = altura_vao - folga_vidro
     altura_painel = altura_vidro + 33
     altura_pe3 = altura_painel + 98
-    print(f'A altura do vidro é: {altura_vidro}')
-    print(f'A altura do painel é: {altura_painel}')
-    print(f'A medida da cantoneira com escova é: {altura_pe3}')
 
     # Definir sucata
     sucata_pedacos_inferior, sucata_inteira_inferior = necessidade_de_sucata(dif_niveis, lcs, 'nivel', nivel_base)
     sucata_pedacos_superior, sucata_inteira_superior = necessidade_de_sucata(dif_altura, lcs, 'altura', altura_base)
     sucata_pedacos = sucata_pedacos_inferior + sucata_pedacos_superior
     sucata_inteira = sucata_inteira_inferior + sucata_inteira_superior
-    print(f'A quantidade de sucata em pedaços necessária é {sucata_pedacos}, sendo {sucata_pedacos_inferior} para a parte inferior e {sucata_pedacos_superior} para a parte superior.')
-    print(f'A quantidade de sucata interira necessária é {sucata_inteira}, sendo {sucata_inteira_superior} para a parte inferior e {sucata_inteira_inferior} para a parte superior.')
+
+    print(f'{' - '*10}SUCATA{' - '*10}')
+    if sucata_pedacos > 0:
+        print(f'A quantidade de sucata em pedaços necessária é {sucata_pedacos}, sendo {sucata_pedacos_inferior} para a parte inferior e {sucata_pedacos_superior} para a parte superior.')
+    else:
+        print('Não é necessário sucata em pedaços.')
+    if sucata_inteira > 0:
+        print(f'A quantidade de sucata interira necessária é {sucata_inteira}, sendo {sucata_inteira_superior} para a parte inferior e {sucata_inteira_inferior} para a parte superior.')
+    else:
+        print('Não é necessário sucata inteira.')
+    # Pivos
+    pivos = definir_pivos(quant_vidros, sentidos_abert, juncoes, medidas_perfis_U, pontos_vidros)
+    print(f'Pivos: {pivos}')
+
+    # Bocas
+    medidas_bocas, quant_vidro_por_boca = definir_aberturas(sentidos_abert, vidros, pontos_vidros, pivos, quant_vidros, lcs)
+    desenhar_bocas(medidas_bocas, quant_vidro_por_boca, pos_lcs, quant_vidros, sentidos_abert)
+
+    # Informacoes
+    posicionar_alturas(pos_lcs, sec_princ, maior_altura, menor_altura, altura_vidro)
+    posicionar_pivos(pos_lcs, sec_princ, pivos, giratorios)
+
+    input('A sacada foi desenhada no autocad, aperte qualquer tecla pra fechar essa janela: ')
+
+
+    # adicionar angulos das secoes, angulos das paredes, prumos e pivos ao desenho
+    # adicionar as ferragens no layout e puxar as formulas
+    # finalizar interface
+    # depois de tudo fazer listagem de materiais para cadastrar
+    # cadastrar materiais no ecg
+    # corrigir erros de calculos na funcao de folgas/alturas e niveis
+
+    # corrigir instabilidades
 
     # posicao = APoint(-5.6, 3.6, 0)
     # tampa_leito = formula_tampa_de_leito(juncoes)
     # adicionar_texto(tampa_leito, posicao)
-    pivos = definir_pivos(quant_vidros, sentidos_abert, juncoes, medidas_perfis_U, pontos_vidros)
-    print(f'Pivos: {pivos}')
-    bocas = definir_bocas(sentidos_abert, vidros, pontos_vidros, pivos)
-    print(bocas)
-
-    input('A sacada foi desenhada no autocad, aperte qualquer tecla pra fechar essa janela: ')
-
-    # ja esta fazendo o calculo das bocas agora tem que desenhar elas e puxar as medidas
-    # corrgir buga para bocas sentido direito

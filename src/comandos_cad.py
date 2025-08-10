@@ -6,18 +6,20 @@ Inclui função para carregar rotinas LISP personalizadas, facilitando operaçõ
 import os
 from time import sleep
 from src.autocad_conn import get_acad
-from pyautocad import Autocad
+from pyautocad import Autocad, APoint
 
 acad, acad_ModelSpace = get_acad()
 autocad = Autocad()
-layout_space = autocad.doc.PaperSpace 
+layout_space = autocad.doc.PaperSpace
+model_space = autocad.doc.ModelSpace
+
 
 def carregar_comandos() -> None:
     """Carrega comandos customizados no AutoCAD.
-    
-    Carrega comandos customizados no AutoCAD. Usar preferivelmente no começo do código, 
+
+    Carrega comandos customizados no AutoCAD. Usar preferivelmente no começo do código,
     para evitar erros de difícil identificação.
-    
+
     Returns:
         None: Função carrega comandos no AutoCAD sem retorno.
     """
@@ -43,10 +45,10 @@ def carregar_comandos() -> None:
 
 def remover_guias() -> None:
     """Remove as guias dos vidros do AutoCAD.
-    
+
     Returns:
         None: Função remove elementos do AutoCAD sem retorno.
-    """   
+    """
     for i in range(acad_ModelSpace.Count - 1, -1, -1):  # reverso
         try:
             entidade = acad_ModelSpace.Item(i)
@@ -55,5 +57,15 @@ def remover_guias() -> None:
         except Exception as e:
             print(f"Erro ao deletar entidade {i}: {e}")
 
-def adicionar_texto(texto, posicao: tuple[float, float, float]):
-    layout_space.AddText(texto, posicao, 2.2)
+def adicionar_texto_layout(texto, posicao: tuple[float, float, float], altura: float) -> None:
+    texto = layout_space.AddText(texto, posicao, altura)
+    return texto
+
+def adicionar_texto_modelspace(texto, posicao: tuple[float, float, float], altura: float) -> None:
+    texto = model_space.AddText(texto, posicao, altura)
+    return texto
+
+def adicionar_mtext_modelspace(texto, posicao: tuple[float, float, float], altura: float, largura: float) -> None:
+    texto = model_space.AddMText(posicao, largura, texto)
+    texto.Height = altura
+    return texto
