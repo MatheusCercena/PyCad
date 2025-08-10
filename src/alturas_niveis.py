@@ -1,3 +1,4 @@
+'''Módulo para definir e ajustar os níveis dos vidros de uma sacada, considerando a posição dos giratórios e as alturas dos trilhos.'''
 from src.calcs_vetor import maior_valor, menor_valor, interpolar_valor_em_x
 from src.vidros import achar_posicao_vidro
 
@@ -8,11 +9,11 @@ def definir_niveis(niveis: list[list[int]], lcs: list[int], quant_vidros: list[i
     # Ajustando niveis para padrao de base 0 
     maior_nivel = maior_valor(niveis)
     niveis_base_0 = [[nivel - maior_nivel for nivel in lado] for lado in niveis]
-    
+
     # Ajustando niveis pelo giratorio
     niveis_giratorios = obter_altura_giratorios(sentidos_abert, quant_vidros, niveis_base_0, lcs)
-    maior_nivel_giratório = max(niveis_giratorios)
-    niveis_base_giratorio = [[nivel + abs(maior_nivel_giratório) for nivel in lado] for lado in niveis_base_0] # Deixa como ponto 0 o giratorio mais alto
+    maior_nivel_giratorio = max(niveis_giratorios)
+    niveis_base_giratorio = [[nivel + abs(maior_nivel_giratorio) for nivel in lado] for lado in niveis_base_0] # Deixa como ponto 0 o giratorio mais alto
     trilho_mais_socado = maior_valor(niveis_base_giratorio)
 
     # Reajustando niveis para evitar trilho socado
@@ -42,10 +43,12 @@ def definir_niveis(niveis: list[list[int]], lcs: list[int], quant_vidros: list[i
     return niveis_finais, ponto_base
 
 def alturas_por_nivel(alturas, niveis_finais):
+    ''' Adiciona os níveis finais às alturas dos vidros. '''
     alturas_finais = [[altura + niveis_finais[i][j] for j, altura in enumerate(lado)] for i, lado in enumerate(alturas)]
     return alturas_finais
 
-def diferença_alturas(alturas_finais, lcs, quant_vidros, sentidos_abert):
+def diferenca_alturas(alturas_finais, lcs, quant_vidros, sentidos_abert):
+    ''' Calcula a diferença de alturas entre os vidros e o nível, conforme o sentido de abertura.'''
     # Ajustando alturas para padrao de base 0 
     menor_altura = menor_valor(alturas_finais)
     alturas_base_0 = [[altura - menor_altura for altura in lado] for lado in alturas_finais]
@@ -84,6 +87,7 @@ def diferença_alturas(alturas_finais, lcs, quant_vidros, sentidos_abert):
     return diferencas_finais, altura_base
 
 def folga_altura_vidro(diferenca_superior, diferenca_inferior):
+    '''Calcula a folga de altura do vidro com base nas diferenças de altura superior e inferior.'''
     if diferenca_superior <= 7 and diferenca_inferior >= -7:
         folga_vidro = 165
     else:

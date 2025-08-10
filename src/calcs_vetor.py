@@ -1,17 +1,20 @@
 """
 Módulo de funções matemáticas e geométricas auxiliares para cálculos de projetos CAD.
 
-Inclui operações com vetores, pontos, ângulos, distâncias, gaps e manipulação de coordenadas para uso em outros módulos do projeto.
+Inclui operações com vetores e manipulação de coordenadas para uso em outros módulos do projeto.
 """
 from math import sqrt, atan2
 
 def contar_entre_numeros(a: int, b: int) -> int:
+    '''Conta quantos números existem entre dois valores inteiros, excluindo os próprios valores.'''
     return max(0, abs(b - a) - 1)
 
 def maior_valor(lista):
+    '''Retorna o maior valor de uma lista de listas.'''
     return max(max(sublista) for sublista in lista)
 
 def menor_valor(lista):
+    """Retorna o menor valor de uma lista de listas."""
     return min(min(sublista) for sublista in lista)
 
 def vetor_entre_pontos(p1: tuple[float, float, float], p2: tuple[float, float, float]) -> tuple[float, float, float]:
@@ -54,9 +57,10 @@ def normalizar_coordenadas(ponto_inicial: tuple[float, float, float], p1: tuple[
     return novo_p1, novo_p2
 
 def esta_entre(a: float, x: float, y: float) -> bool:
+    '''Verifica se o valor a está entre x e y, inclusive nas extremidades.'''
     if a >= min(x, y) and a <= max(x, y):
         return True
-    else: 
+    else:
         return False
 
 def vetor_perpendicular_unitario(p1: tuple[float, float, float], p2: tuple[float, float, float]) -> tuple[float, float, float]:
@@ -113,6 +117,7 @@ def obter_dados_intervalo(dados: list, valor_inicial: int, valor_final: int):
     medidas_vidros = [1000, 1010, 1020, 1030, 1040]
     obter_medidas_intervalo(medidas_vidros, 2, 4) -> [1010, 1020, 1030]
     """
+    dados = [dado for sublista in dados for dado in sublista]
     inicio = valor_inicial - 1
     fim = valor_final     
 
@@ -144,7 +149,7 @@ def deslocar_pontos_direcao(
 
     return novo_p1, novo_p2
 
-def definir_pontos_na_secao(Inicio_secao: tuple[float, float, float], vetor_unitario: tuple[float, float, float], distancia: float) -> tuple[float, float, float]:
+def definir_pontos_na_secao(inicio_secao: tuple[float, float, float], vetor_unitario: tuple[float, float, float], distancia: float) -> tuple[float, float, float]:
     """Define um ponto em uma seção a partir de um ponto inicial, vetor unitário e distância.
     
     Args:
@@ -156,8 +161,8 @@ def definir_pontos_na_secao(Inicio_secao: tuple[float, float, float], vetor_unit
         tuple: Ponto calculado na seção (x, y, z).
     """
     return (
-        Inicio_secao[0] + vetor_unitario[0] * distancia,
-        Inicio_secao[1] + vetor_unitario[1] * distancia,
+        inicio_secao[0] + vetor_unitario[0] * distancia,
+        inicio_secao[1] + vetor_unitario[1] * distancia,
         0.0
     )
 

@@ -51,16 +51,17 @@ def definir_pivos(
                         else:
                             ponto_ini_vidro = pontos_vidros[i][j][1]
                         # Achar em qual perfil está o vidro giratório 
-                        secao_do_giratorio = []
+                        secao_do_giratorio = ''
                         for i, perfil in enumerate(perfis_linear):
                             if perfil[0] <= ponto_ini_vidro <= perfil[1]:
-                                secao_do_giratorio = perfil[i]
+                                secao_do_giratorio = perfil
                                 break
                         # Verifica qual das extremidades da secao do giratorio está mais próxima do vidro
                         dist_inicio = ponto_ini_vidro - secao_do_giratorio[0] 
                         dist_fim = secao_do_giratorio[1] - ponto_ini_vidro
                         if dist_inicio < dist_fim:
-                            distancia_usada = dist_inicio
+                            distancia_usada = dist_inicio + 30
                         else:
-                            distancia_usada = dist_fim
+                            distancia_usada = dist_fim - 30
                         pivos.append(30 + distancia_usada)
+    return pivos
