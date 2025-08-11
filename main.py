@@ -17,8 +17,8 @@ from src.sucata import necessidade_de_sucata, definir_diferencas
 from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros, desenhar_guias_vidros
 # from src.ferragens import *
 from src.bocas import definir_aberturas, desenhar_bocas
-from src.pivos import definir_pivos, posicionar_pivos
-from src.alturas_niveis import posicionar_alturas
+from src.pivos import definir_pivos
+from src.adicionar_informacoes import posicionar_alturas, posicionar_pivos, posicionar_angulos
 
 if __name__ == "__main__":
 
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     sentidos = [sentido[4] for sentido in sentidos_abert]
 
     # angs_in = pedir_angSecoes(lcs)
-    angs_in = [-90.0, -90.0]
+    angs_in = [-45.0, -45.0]
     # angs_in = [-89.6]
 
     # angs_paredes = pedir_angParedes()
@@ -174,17 +174,19 @@ if __name__ == "__main__":
     # Informacoes
     posicionar_alturas(pos_lcs, sec_princ, maior_altura, menor_altura, altura_vidro)
     posicionar_pivos(pos_lcs, sec_princ, pivos, giratorios)
+    # posicionar_angulos(pos_lcs, angs_in)
 
     input('A sacada foi desenhada no autocad, aperte qualquer tecla pra fechar essa janela: ')
 
-
-    # adicionar angulos das secoes, angulos das paredes, prumos e pivos ao desenho
+    # Adicionar desenhos dos pivos individuais dos vidros
+    # Finalizar/conserar insercao de angulos
+    # adicionar angulos das paredes, prumos
     # adicionar as ferragens no layout e puxar as formulas
     # finalizar interface
     # depois de tudo fazer listagem de materiais para cadastrar
     # cadastrar materiais no ecg
-    # corrigir erros de calculos na funcao de folgas/alturas e niveis
 
+    # corrigir erros de calculos na funcao de folgas/alturas e niveis
     # corrigir instabilidades
 
     # posicao = APoint(-5.6, 3.6, 0)

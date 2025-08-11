@@ -137,27 +137,3 @@ def obter_altura_giratorios(
         resultado.append(altura_interpolada)
 
     return resultado
-
-def posicionar_alturas(
-        pos_lcs: list[list[float, float, float, float]],
-        sec_princ: int,
-        maior_altura: int,
-        menor_altura: int,
-        altura_vidro: int
-        ):
-    """Posiciona alturas de vidro, vao e painel no CAD.
-    """
-    ponto_ini = (pos_lcs[sec_princ][0], pos_lcs[sec_princ][1])
-    ponto_fim = (pos_lcs[sec_princ][2], pos_lcs[sec_princ][3])
-    ponto_base = ponto_medio(ponto_ini, ponto_fim)
-    ponto_base = (ponto_base[0] - 450, ponto_base[1])
-
-    ponto_base_vidro = ponto_perpendicular_a_vetor(ponto_base, ponto_ini, ponto_fim, 1200)
-    adicionar_texto_modelspace(f'Altura do vidro: {altura_vidro}', APoint(*ponto_base_vidro), 70)
-
-    ponto_base_painel = ponto_perpendicular_a_vetor(ponto_base, ponto_ini, ponto_fim, 1320)
-    adicionar_texto_modelspace(f'Altura do painel: {altura_vidro+33}', APoint(*ponto_base_painel), 70)
-
-    ponto_base_vao = ponto_perpendicular_a_vetor(ponto_base, ponto_ini, ponto_fim, -500)
-    adicionar_texto_modelspace(f'Alturas do vão: {maior_altura} / {menor_altura}', APoint(*ponto_base_vao), 70)
-
