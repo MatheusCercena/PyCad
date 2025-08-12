@@ -16,7 +16,7 @@ from src.perfis_U import offset_perfis_U, fillet_perfis_U, definir_coord_perfis_
 from src.sucata import necessidade_de_sucata, definir_diferencas
 from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, pontos_dos_vidros, desenhar_guias_vidros
 # from src.ferragens import *
-from src.bocas import definir_aberturas, desenhar_bocas
+from src.bocas import definir_aberturas, desenhar_bocas, desenhar_pivos_individuais
 from src.pivos import definir_pivos
 from src.adicionar_informacoes import posicionar_alturas, posicionar_pivos, posicionar_angulos
 
@@ -168,13 +168,14 @@ if __name__ == "__main__":
     print(f'Pivos: {pivos}')
 
     # Bocas
-    medidas_bocas, quant_vidro_por_boca = definir_aberturas(sentidos_abert, vidros, pontos_vidros, pivos, quant_vidros, lcs)
+    medidas_bocas, quant_vidro_por_boca, pivos_individuais = definir_aberturas(sentidos_abert, vidros, pontos_vidros, pivos, quant_vidros, lcs)
     desenhar_bocas(medidas_bocas, quant_vidro_por_boca, pos_lcs, quant_vidros, sentidos_abert)
+    desenhar_pivos_individuais(pivos_individuais, pos_lcs, quant_vidros, sentidos_abert)
 
     # Informacoes
     posicionar_alturas(pos_lcs, sec_princ, maior_altura, menor_altura, altura_vidro)
     posicionar_pivos(pos_lcs, sec_princ, pivos, giratorios)
-    # posicionar_angulos(pos_lcs, angs_in)
+    posicionar_angulos(pos_lcs, angs_in)
 
     input('A sacada foi desenhada no autocad, aperte qualquer tecla pra fechar essa janela: ')
 

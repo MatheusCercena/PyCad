@@ -102,6 +102,7 @@ def definir_aberturas(
     ''' Define as bocas para os sentidos de aberutra com base nos sentidos de abertura e medidas. '''
     medidas_bocas = []
     quant_vidro_por_boca = []
+    pivos_individuais_sacada = []
     for i, sentido in enumerate(sentidos):
         # inicio conversao de dados
         vidro_ini = sentido[0]
@@ -118,6 +119,7 @@ def definir_aberturas(
         # fim conversao de dados
 
         pivos_individuais = definir_pivos_individuais(pivo, quant_vidros_da_abertura, direcao)
+        pivos_individuais_sacada.append(pivos_individuais)
         molas = definir_molas(pivos_individuais, direcao)
 
         limite = 0.6
@@ -134,7 +136,8 @@ def definir_aberturas(
 
         medidas_bocas.append(medidas_lado)
         quant_vidro_por_boca.append(quant_vidro_lado)
-    return medidas_bocas, quant_vidro_por_boca
+
+    return medidas_bocas, quant_vidro_por_boca, pivos_individuais_sacada
 
 def desenhar_bocas(
         medidas_bocas: list[list[float]],
@@ -200,4 +203,22 @@ def desenhar_bocas(
             medida.Rotation = angulo_lcs
             quantidade = adicionar_texto_modelspace(f"{quant_vidros_boca:02}", APoint(*ponto_ref_quantidade), 60)
             quantidade.Rotation = angulo_lcs
+
+def desenhar_pivos_individuais(pivos_individuais, pos_lcs, quant_vidros, sentidos_abert):
+    for i, abertura in enumerate(sentidos_abert):
+        pivos_individuais_lado = pivos_individuais[i]
+        direcao = abertura[4]
+        lcs_giratorio = localizar_giratorio(quant_vidros, abertura[2])
+        x_ini, y_ini, x_fim, y_fim = pos_lcs[lcs_giratorio]
+        p1 = (x_ini, y_ini)
+        p2 = (x_fim, y_fim)
+        vetor_lcs = vetor_entre_pontos(p1, p2)
+        vetor_unitario = normalizar(vetor_lcs)
+        onde_puxar_bocas = p1 if direcao == 'esquerda' else p2
+
+        for pivo in pivos_individuais_lado:
+            coord_pivo = definir_pontos_na_secao(onde_puxar_bocas, vetor_unitario, pivo)
+            p3 = ponto_perpendicular_a_vetor(coord_pivo, p1, p2, -32)
+            l = acad.model.AddLine(APoint(*coord_pivo), APoint(*p3))
+            l.Layer = 'Pivo'
 
