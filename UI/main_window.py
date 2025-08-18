@@ -20,7 +20,7 @@ ETAPAS_NOMES = [
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle('PyCad - Interface Gráfica')
+        self.setWindowTitle('SPEV - SISTEMA PARA PROJETOS DE ENVIDRAÇAMENTO VERSATEEL')
         self.setGeometry(100, 100, 900, 700)
         self.showMaximized()  # Abrir em tela cheia
 
@@ -105,14 +105,14 @@ class MainWindow(QMainWindow):
         """Navega diretamente para uma etapa específica"""
         if etapa_idx == self.current_step:
             return  # Já está na etapa
-        
+
         # Sempre permite navegar para qualquer etapa
         self.current_step = etapa_idx
         self.stack.setCurrentIndex(self.current_step)
-        
+
         # Atualizar dados da etapa atual
         self.atualizar_etapa_atual()
-        
+
         self.update_nav_buttons()
         self.update_menu_etapas()
 

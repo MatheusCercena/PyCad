@@ -3,6 +3,7 @@
 from src.calcs_vetor import obter_dados_intervalo, vetor_entre_pontos, normalizar, definir_pontos_na_secao, ponto_perpendicular_a_vetor, angulo_do_vetor
 from pyautocad import Autocad, APoint
 from src.comandos_cad import adicionar_texto_modelspace
+from src.logs import log_spev
 
 acad = Autocad(create_if_not_exists=True)
 
@@ -43,7 +44,7 @@ def criar_nova_boca(meio_do_estacionamento, vidro, sentido):
     if sentido == 'esquerda':
         nova_boca = meio_do_estacionamento + (vidro - 15.0) - 15
     else:
-        nova_boca = meio_do_estacionamento - (vidro + 15.0) + 15
+        nova_boca = meio_do_estacionamento - (vidro - 15.0) + 15
     return nova_boca
 
 
@@ -74,7 +75,7 @@ def definir_bocas(final_do_giratorio, direcao, medida_vidros_da_abertura, pivos_
     boca1 = final_do_giratorio - 30.0 if direcao == 'esquerda' else final_do_giratorio + 30.0
     boca1_final = verificar_se_boca_bate_na_mola(molas, boca1, direcao)
     bocas_lado.append(boca1_final)
-    quant_lado.append(1)
+    quant_lado.append(0)
 
     # Definindo as outras bocas
     for i, vidro in enumerate(medida_vidros_da_abertura):
@@ -147,78 +148,84 @@ def desenhar_bocas(
         sentidos_abert: list[int, int, int, int, tuple[int]]
         ):
     ''' Desenha as bocas com base nas medidas e quantidade de vidros por boca. '''
-    for i, abertura in enumerate(sentidos_abert):
-        medidas_bocas_lado = medidas_bocas[i]
-        quant_vidro_por_lado = quant_vidro_por_boca[i]
-        direcao = abertura[4]
-        lcs_giratorio = localizar_giratorio(quant_vidros, abertura[2])
-        x_ini, y_ini, x_fim, y_fim = pos_lcs[lcs_giratorio]
-        p1 = (x_ini, y_ini)
-        p2 = (x_fim, y_fim)
-        vetor_lcs = vetor_entre_pontos(p1, p2)
-        vetor_unitario = normalizar(vetor_lcs)
-        onde_puxar_bocas = p1 if direcao == 'esquerda' else p2
-        angulo_lcs = angulo_do_vetor(p1, p2)
-        ponto_ref_medida = None
-        ponto_guia = 0
+    try:
+        for i, abertura in enumerate(sentidos_abert):
+            medidas_bocas_lado = medidas_bocas[i]
+            quant_vidro_por_lado = quant_vidro_por_boca[i]
+            direcao = abertura[4]
+            lcs_giratorio = localizar_giratorio(quant_vidros, abertura[2])
+            x_ini, y_ini, x_fim, y_fim = pos_lcs[lcs_giratorio]
+            p1 = (x_ini, y_ini)
+            p2 = (x_fim, y_fim)
+            vetor_lcs = vetor_entre_pontos(p1, p2)
+            vetor_unitario = normalizar(vetor_lcs)
+            onde_puxar_bocas = p1 if direcao == 'esquerda' else p2
+            angulo_lcs = angulo_do_vetor(p1, p2)
+            ponto_ref_medida = None
+            ponto_guia = 0
 
-        for j, boca in enumerate(medidas_bocas_lado):
-            #desenhando guias das bocas
-            quant_vidros_boca = quant_vidro_por_lado[j]
-            coord_boca = definir_pontos_na_secao(onde_puxar_bocas, vetor_unitario, boca)
-            p3 = ponto_perpendicular_a_vetor(coord_boca, p1, p2, -32)
-            ponto_guia = p3 if ponto_guia == 0 else ponto_guia
-            l = acad.model.AddLine(APoint(*coord_boca), APoint(*p3))
-            l.Layer = 'Bocas'
+            for j, boca in enumerate(medidas_bocas_lado):
+                #desenhando guias das bocas
+                quant_vidros_boca = quant_vidro_por_lado[j]
+                coord_boca = definir_pontos_na_secao(onde_puxar_bocas, vetor_unitario, boca)
+                p3 = ponto_perpendicular_a_vetor(coord_boca, p1, p2, -32)
+                ponto_guia = p3 if ponto_guia == 0 else ponto_guia
+                l = acad.model.AddLine(APoint(*coord_boca), APoint(*p3))
+                l.Layer = 'Bocas'
 
-            #desenhando simbolos de puxar as bocas
-            vetor_guia = vetor_entre_pontos(coord_boca, p3)
-            vetor_unitario_guia = normalizar(vetor_guia)
+                #desenhando simbolos de puxar as bocas
+                vetor_guia = vetor_entre_pontos(coord_boca, p3)
+                vetor_unitario_guia = normalizar(vetor_guia)
 
-            deslocamento_perpendicular_guia = 50
-            deslocamento_paralelo_guia = -50 if direcao == 'esquerda' else 50
-            deslocamento_perpendicular = 50
-            deslocamento_paralelo = -50 if direcao == 'esquerda' else 50
+                deslocamento_perpendicular_guia = 50
+                deslocamento_paralelo_guia = -50 if direcao == 'esquerda' else 50
+                deslocamento_perpendicular = 50
+                deslocamento_paralelo = -50 if direcao == 'esquerda' else 50
 
-            #adicionando textos de medidas e quantidade
-            if ponto_ref_medida is None:
-                ponto_l_meio = definir_pontos_na_secao(p3, vetor_unitario_guia, deslocamento_perpendicular_guia)
-                ponto_l_fim = definir_pontos_na_secao(ponto_l_meio, vetor_unitario, deslocamento_paralelo_guia)
-                ponto_ref_medida = definir_pontos_na_secao(ponto_l_fim, vetor_unitario, deslocamento_paralelo*3 if direcao == 'esquerda' else deslocamento_paralelo*0.2)
-                ponto_ref_medida = definir_pontos_na_secao(ponto_ref_medida, vetor_unitario_guia, 30)
-                ponto_ref_quantidade = definir_pontos_na_secao(ponto_ref_medida, vetor_unitario_guia, deslocamento_perpendicular*2)
-            else:
-                p3 = definir_pontos_na_secao(ponto_guia, vetor_unitario, -deslocamento_paralelo_guia*5*j)
-                ponto_l_meio = definir_pontos_na_secao(ponto_l_meio, vetor_unitario, -deslocamento_paralelo_guia*5*j)
-                ponto_l_fim = definir_pontos_na_secao(ponto_l_fim, vetor_unitario, -deslocamento_paralelo_guia*5*j)
-                ponto_ref_medida = definir_pontos_na_secao(ponto_ref_medida, vetor_unitario, deslocamento_paralelo*j*-5 if direcao == 'esquerda' else deslocamento_paralelo*j*-5)
-                ponto_ref_quantidade = definir_pontos_na_secao(ponto_ref_quantidade, vetor_unitario, deslocamento_paralelo*j*-5 if direcao == 'esquerda' else deslocamento_paralelo*j*-5)
+                #adicionando textos de medidas e quantidade
+                if ponto_ref_medida is None:
+                    ponto_l_meio = definir_pontos_na_secao(p3, vetor_unitario_guia, deslocamento_perpendicular_guia)
+                    ponto_l_fim = definir_pontos_na_secao(ponto_l_meio, vetor_unitario, deslocamento_paralelo_guia)
+                    ponto_ref_medida = definir_pontos_na_secao(ponto_l_fim, vetor_unitario, deslocamento_paralelo*3 if direcao == 'esquerda' else deslocamento_paralelo*0.2)
+                    ponto_ref_medida = definir_pontos_na_secao(ponto_ref_medida, vetor_unitario_guia, 30)
+                    ponto_ref_quantidade = definir_pontos_na_secao(ponto_ref_medida, vetor_unitario_guia, deslocamento_perpendicular*2)
+                else:
+                    p3 = definir_pontos_na_secao(ponto_guia, vetor_unitario, -deslocamento_paralelo_guia*5*j)
+                    ponto_l_meio = definir_pontos_na_secao(ponto_l_meio, vetor_unitario, -deslocamento_paralelo_guia*5*j)
+                    ponto_l_fim = definir_pontos_na_secao(ponto_l_fim, vetor_unitario, -deslocamento_paralelo_guia*5*j)
+                    ponto_ref_medida = definir_pontos_na_secao(ponto_ref_medida, vetor_unitario, deslocamento_paralelo*j*-5 if direcao == 'esquerda' else deslocamento_paralelo*j*-5)
+                    ponto_ref_quantidade = definir_pontos_na_secao(ponto_ref_quantidade, vetor_unitario, deslocamento_paralelo*j*-5 if direcao == 'esquerda' else deslocamento_paralelo*j*-5)
 
-            l1 = acad.model.AddLine(APoint(*p3), APoint(*ponto_l_meio))
-            l1.Layer = 'Bocas guias'
-            l2 = acad.model.AddLine(APoint(*ponto_l_meio), APoint(*ponto_l_fim))
-            l2.Layer = 'Bocas guias'
+                l1 = acad.model.AddLine(APoint(*p3), APoint(*ponto_l_meio))
+                l1.Layer = 'Bocas guias'
+                l2 = acad.model.AddLine(APoint(*ponto_l_meio), APoint(*ponto_l_fim))
+                l2.Layer = 'Bocas guias'
 
-            medida = adicionar_texto_modelspace(abs(boca), APoint(*ponto_ref_medida), 60)
-            medida.Rotation = angulo_lcs
-            quantidade = adicionar_texto_modelspace(f"{quant_vidros_boca:02}", APoint(*ponto_ref_quantidade), 60)
-            quantidade.Rotation = angulo_lcs
+                medida = adicionar_texto_modelspace(abs(boca), APoint(*ponto_ref_medida), 60)
+                medida.Rotation = angulo_lcs
+                quantidade = adicionar_texto_modelspace(f"{quant_vidros_boca:02}", APoint(*ponto_ref_quantidade), 60)
+                quantidade.Rotation = angulo_lcs
+    except Exception as e:
+        log_spev(f"Erro ao adicionar texto de ângulo: {e}")
 
 def desenhar_pivos_individuais(pivos_individuais, pos_lcs, quant_vidros, sentidos_abert):
-    for i, abertura in enumerate(sentidos_abert):
-        pivos_individuais_lado = pivos_individuais[i]
-        direcao = abertura[4]
-        lcs_giratorio = localizar_giratorio(quant_vidros, abertura[2])
-        x_ini, y_ini, x_fim, y_fim = pos_lcs[lcs_giratorio]
-        p1 = (x_ini, y_ini)
-        p2 = (x_fim, y_fim)
-        vetor_lcs = vetor_entre_pontos(p1, p2)
-        vetor_unitario = normalizar(vetor_lcs)
-        onde_puxar_bocas = p1 if direcao == 'esquerda' else p2
+    try:
+        for i, abertura in enumerate(sentidos_abert):
+            pivos_individuais_lado = pivos_individuais[i]
+            direcao = abertura[4]
+            lcs_giratorio = localizar_giratorio(quant_vidros, abertura[2])
+            x_ini, y_ini, x_fim, y_fim = pos_lcs[lcs_giratorio]
+            p1 = (x_ini, y_ini)
+            p2 = (x_fim, y_fim)
+            vetor_lcs = vetor_entre_pontos(p1, p2)
+            vetor_unitario = normalizar(vetor_lcs)
+            onde_puxar_bocas = p1 if direcao == 'esquerda' else p2
 
-        for pivo in pivos_individuais_lado:
-            coord_pivo = definir_pontos_na_secao(onde_puxar_bocas, vetor_unitario, pivo)
-            p3 = ponto_perpendicular_a_vetor(coord_pivo, p1, p2, -32)
-            l = acad.model.AddLine(APoint(*coord_pivo), APoint(*p3))
-            l.Layer = 'Pivo'
+            for pivo in pivos_individuais_lado:
+                coord_pivo = definir_pontos_na_secao(onde_puxar_bocas, vetor_unitario, pivo)
+                p3 = ponto_perpendicular_a_vetor(coord_pivo, p1, p2, -32)
+                l = acad.model.AddLine(APoint(*coord_pivo), APoint(*p3))
+                l.Layer = 'Pivo'
+    except Exception as e:
+        log_spev(f"Erro ao desenhar pivos individuais: {e}")
 

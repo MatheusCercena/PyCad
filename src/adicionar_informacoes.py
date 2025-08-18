@@ -1,7 +1,7 @@
 from src.calcs_vetor import ponto_perpendicular_a_vetor, ponto_medio, definir_pontos_na_secao, normalizar, angulo_do_vetor, vetor_entre_pontos
 from src.comandos_cad import adicionar_mtext_modelspace, adicionar_texto_modelspace
 from pyautocad import APoint, Autocad
-from math import radians
+from src.logs import log_spev
 
 acad = Autocad(create_if_not_exists=True)
 
@@ -32,10 +32,11 @@ def posicionar_pivos(pos_lcs, sec_princ, pivos: list[int], giratorios: list[int]
 
     texto_final = "\n".join(linhas)
     texto_pivo = adicionar_mtext_modelspace(texto_final, APoint(*ponto_base_pivo), 70, 1700)
-    texto_pivo.AttachmentPoint = 2
-    ponto_base_pivo = (ponto_base_pivo[0] + 600, ponto_base_pivo[1])
-    texto_pivo.InsertionPoint = APoint(*ponto_base_pivo)  # reposiciona após mudar o AttachmentPoint
     texto_pivo.Rotation = 0
+    # texto_pivo.AttachmentPoint = 2
+    # ponto_base_pivo = (ponto_base_pivo[0] + 600, ponto_base_pivo[1])
+    # texto_pivo.InsertionPoint = APoint(*ponto_base_pivo)  # reposiciona após mudar o AttachmentPoint
+    # texto_pivo.Rotation = 0
 
 def posicionar_alturas(
         pos_lcs: list[list[float, float, float, float]],
@@ -61,14 +62,14 @@ def posicionar_alturas(
     adicionar_texto_modelspace(f'Alturas do vão: {maior_altura} / {menor_altura}', APoint(*ponto_base_vao), 70)
 
 def posicionar_angulos(pos_lcs, angulos):
-    #pos_lcs está errado,
     angulo_real_lcs = []
     inicios = []
     lcss = []
     for i, linha in enumerate(pos_lcs):
-        x_ini, y_ini, x_fim, y_fim = linha
-        p1 = (x_ini, y_ini)
-        p2 = (x_fim, y_fim)
+        ini = linha[0]
+        fim = linha[1]
+        p1 = ini
+        p2 = fim
         vetor = vetor_entre_pontos(p1, p2)
         vetor_unitario = normalizar(vetor)
         p100_inicial = definir_pontos_na_secao(p1, vetor_unitario, 100)
@@ -86,11 +87,13 @@ def posicionar_angulos(pos_lcs, angulos):
         p2 = lcss[i + 1][0]
         ponto_base = inicios[i+1]
         vetor = vetor_entre_pontos(p1, p2)
-        vetor_unitario_guia = normalizar(vetor)
         ponto_texto = ponto_perpendicular_a_vetor(ponto_base, p1, p2, -125)
-        ponto_texto = definir_pontos_na_secao(ponto_texto, vetor_unitario_guia, -80)
 
         if not 70 < abs(angulo) < 110:
-            texto = adicionar_mtext_modelspace(round((angulo/2), 1), APoint(*ponto_texto), 50, 200)
-            texto.AttachmentPoint = 5
-            texto.Rotation = angulo_medio
+            try:
+                texto = adicionar_mtext_modelspace(round((angulo/2)*-1, 1), APoint(*ponto_texto), 50, 200)
+                texto.AttachmentPoint = 5
+                texto.InsertionPoint = APoint(*ponto_texto)
+                texto.Rotation = angulo_medio
+            except Exception as e:
+                log_spev(f"Erro ao adicionar texto de ângulo: {e}")

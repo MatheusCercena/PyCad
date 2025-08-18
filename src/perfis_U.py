@@ -7,6 +7,8 @@ from src.autocad_conn import get_acad
 from src.calcs_vetor import distancia_2d, normalizar, definir_pontos_na_secao, vetor_entre_pontos
 from src.calcs_cad import obter_pontos_medida_total
 import pythoncom
+from time import sleep
+from src.logs import log_spev
 
 acad, acad_ModelSpace = get_acad()
 
@@ -26,14 +28,20 @@ def offset_perfis_U(handles_lcs: list) -> dict[str, list[str]]:
 
     handles = {'externos': [], 'internos': []}
     for linha in handles_lcs:
-        pythoncom.PumpWaitingMessages()
-        linha_ext = linha.Offset(offset_ext)#.Offset retorna uma tupla
-        linha_ext[0].Layer = 'Perfil U Externo'
-        handles['externos'].append(linha_ext[0].Handle)
+        for tentativa in range(5):
+            try:
+                pythoncom.PumpWaitingMessages()
+                linha_ext = linha.Offset(offset_ext)#.Offset retorna uma tupla
+                linha_ext[0].Layer = 'Perfil U Externo'
+                handles['externos'].append(linha_ext[0].Handle)
 
-        linha_int = linha.Offset(-offset_int)
-        linha_int[0].Layer = 'Perfil U Interno'
-        handles['internos'].append(linha_int[0].Handle)
+                linha_int = linha.Offset(-offset_int)
+                linha_int[0].Layer = 'Perfil U Interno'
+                handles['internos'].append(linha_int[0].Handle)
+                break
+            except Exception as e:
+                sleep(0.5)
+                log_spev(f'Tentativa {tentativa+1} de 5 falhou ao tentar offset nos perfis U com erro: {e}')
     return handles
 
 def fillet_perfis_U(handles: dict[str, list[str]]) -> None:
@@ -49,8 +57,15 @@ def fillet_perfis_U(handles: dict[str, list[str]]) -> None:
     linhas_internas = deepcopy(handles['internos'])
 
     for index in range(0, len(linhas_externas)-1):
-        acad.SendCommand(f'(c:custom_fillet "{linhas_externas[index]}" "{linhas_externas[index+1]}")\n')
-        acad.SendCommand(f'(c:custom_fillet "{linhas_internas[index]}" "{linhas_internas[index+1]}")\n')
+        for tentativa in range(5):
+            try:
+                pythoncom.PumpWaitingMessages()
+                acad.SendCommand(f'(c:custom_fillet "{linhas_externas[index]}" "{linhas_externas[index+1]}")\n')
+                acad.SendCommand(f'(c:custom_fillet "{linhas_internas[index]}" "{linhas_internas[index+1]}")\n')
+                break
+            except Exception as e:
+                sleep(0.5)
+                log_spev(f'Tentativa {tentativa+1} de 5 falhou ao tentar offset nos perfis U com erro: {e}')
 
 def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[float, float, float]]]:
     """Define as coordenadas dos perfis U.
@@ -67,18 +82,20 @@ def definir_coord_perfis_U(handles: dict[str, list[str]]) -> list[list[tuple[flo
 
     for linha in range(len(linhas_externas)):
         coord = []
+        for tentativa in range(5):
+            try:
+                pythoncom.PumpWaitingMessages()
+                linha_ext = acad.HandleToObject(linhas_externas[linha])
+                coord.append(linha_ext.StartPoint)
+                coord.append(linha_ext.EndPoint)
 
-        try:
-            pythoncom.PumpWaitingMessages()
-            linha_ext = acad.HandleToObject(linhas_externas[linha])
-            coord.append(linha_ext.StartPoint)
-            coord.append(linha_ext.EndPoint)
-
-            linha_int = acad.HandleToObject(linhas_internas[linha])
-            coord.append(linha_int.StartPoint)
-            coord.append(linha_int.EndPoint)
-        except Exception as e:
-            input(f'Erro ao obter coordenadas do perfil U: {e}')
+                linha_int = acad.HandleToObject(linhas_internas[linha])
+                coord.append(linha_int.StartPoint)
+                coord.append(linha_int.EndPoint)
+                break
+            except Exception as e:
+                sleep(0.5)
+                log_spev(f'Tentativa {tentativa+1} de 5 falhou ao tentar offset nos perfis U com erro: {e}')
         coordenadas.append(coord)
     return coordenadas
 
