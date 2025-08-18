@@ -195,7 +195,6 @@ if __name__ == "__main__":
         # cadastrar materiais no ecg
         # corrigir erros de calculos na funcao de folgas/alturas e niveis
 
-
     except Exception as e:
         log_spev(f'Erro: {e} não rastreado - {traceback.format_exc()}')
         log_spev(f'Fim da execução ID: {id}')

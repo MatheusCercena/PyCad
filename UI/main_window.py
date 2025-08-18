@@ -11,9 +11,6 @@ from widgets.resumo import ResumoWidget
 ETAPAS_NOMES = [
     'Vãos',
     'Sentidos de Abertura',
-    'Ângulos Seções',
-    'Ângulos Paredes',
-    'Elevador',
     'Resumo'
 ]
 
@@ -58,48 +55,38 @@ class MainWindow(QMainWindow):
 
         # Navegação inferior
         nav_layout = QHBoxLayout()
+
         self.btn_prev = QPushButton('Anterior')
-        self.btn_next = QPushButton('Próximo')
         self.btn_prev.setFixedHeight(35)
-        self.btn_next.setFixedHeight(35)
+        self.btn_prev.clicked.connect(self.go_prev)
         nav_layout.addWidget(self.btn_prev)
+
+        self.btn_next = QPushButton('Próximo')
+        self.btn_next.setFixedHeight(35)
+        self.btn_next.clicked.connect(self.go_next)
         nav_layout.addWidget(self.btn_next)
+
         self.layout.addLayout(nav_layout)
 
         # Etapas reais
         self.current_step = 0
         self.init_steps()
-        self.setup_sync_connections()
         self.update_nav_buttons()
         self.update_menu_etapas()
-
-        self.btn_prev.clicked.connect(self.go_prev)
-        self.btn_next.clicked.connect(self.go_next)
 
     def init_steps(self):
         self.vaos_widget = VaosWidget()
         self.sentidos_widget = SentidosAberturaWidget()
-        self.ang_secoes_widget = AngSecoesWidget()
-        self.ang_paredes_widget = AngParedesWidget()
-        self.elevador_widget = ElevadorWidget()
         self.resumo_widget = ResumoWidget()
 
         self.steps = [
-            self.vaos_widget,         # 0
-            self.sentidos_widget,      # 1
-            self.ang_secoes_widget,    # 2
-            self.ang_paredes_widget,   # 3
-            self.elevador_widget,      # 4
-            self.resumo_widget         # 5
+            self.vaos_widget, # 0
+            self.sentidos_widget, # 1
+            self.resumo_widget # 2
         ]
         for w in self.steps:
             self.stack.addWidget(w)
         self.stack.setCurrentIndex(0)
-
-    def setup_sync_connections(self):
-        """Configura as conexões para sincronização automática entre widgets"""
-        # Conectar mudanças nos vãos para sincronizar outros widgets
-        # (Implementar quando necessário)
 
     def ir_para_etapa(self, etapa_idx):
         """Navega diretamente para uma etapa específica"""
@@ -127,16 +114,7 @@ class MainWindow(QMainWindow):
                     self.sentidos_widget.quant_vidros = quant_vidros
                     self.sentidos_widget.sentidos = []
                     self.sentidos_widget.update_list()
-        elif self.current_step == 2:  # Ângulos das Seções
-            lcs = self.vaos_widget.get_linhas_centro()
-            if lcs:
-                # Preservar ângulos existentes se já existem
-                angulos_existentes = self.ang_secoes_widget.get_angulos()
-                if not angulos_existentes:  # Só resetar se não há dados
-                    self.ang_secoes_widget.lcs = lcs
-                    self.ang_secoes_widget.angulos = []
-                    self.ang_secoes_widget.update_list()
-        elif self.current_step == 5:  # Resumo
+        elif self.current_step == 2:  # Resumo
             # Atualizar resumo com dados atuais
             dados = {
                 'linhas_de_centro': self.vaos_widget.get_linhas_centro(),
@@ -144,9 +122,9 @@ class MainWindow(QMainWindow):
                 'niveis': self.vaos_widget.get_niveis(),
                 'quantidade_vidros': self.vaos_widget.get_quantidade_vidros(),
                 'sentidos_abertura': self.sentidos_widget.get_sentidos(),
-                'angulos_secoes': self.ang_secoes_widget.get_angulos(),
-                'angulos_paredes': self.ang_paredes_widget.get_angulos(),
-                'elevador': self.elevador_widget.get_elevador()
+                'angulos_secoes': self.vaos_widget.get_angulos(),
+                'angulos_paredes': self.vaos_widget.get_angulos(),
+                'elevador': self.vaos_widget.get_elevador()
             }
             self.resumo_widget.set_dados(dados)
 
@@ -172,39 +150,21 @@ class MainWindow(QMainWindow):
             # Sentidos não tem validação específica, avança direto
             self.passar_dados_para_proxima_etapa()
             self.avancar_etapa()
-        elif self.current_step == 2:  # Ângulos das Seções
-            # Ângulos não tem validação específica, avança direto
-            self.passar_dados_para_proxima_etapa()
-            self.avancar_etapa()
-        elif self.current_step == 3:  # Ângulos das Paredes
-            # Ângulos das paredes não tem validação específica, avança direto
-            self.passar_dados_para_proxima_etapa()
-            self.avancar_etapa()
-        elif self.current_step == 4:  # Elevador
-            # Elevador não tem validação específica, avança direto
-            self.passar_dados_para_proxima_etapa()
-            self.avancar_etapa()
         elif self.current_step == 5:  # Resumo
             pass  # Última etapa
 
     def passar_dados_para_proxima_etapa(self):
         """Passa os dados para a próxima etapa conforme necessário"""
         if self.current_step == 0:
-            # Vãos já contém todos os dados necessários
-            pass
-        elif self.current_step == 1:
             quant_vidros = self.vaos_widget.get_quantidade_vidros()
-            self.sentidos_widget.quant_vidros = quant_vidros
-            self.sentidos_widget.sentidos = []
-            self.sentidos_widget.update_list()
-        elif self.current_step == 2:
             lcs = self.vaos_widget.get_linhas_centro()
-            self.ang_secoes_widget.lcs = lcs
-            self.ang_secoes_widget.angulos = []
-            self.ang_secoes_widget.update_list()
-        elif self.current_step == 3:
-            pass  # Ângulos das paredes não afetam widgets seguintes
-        elif self.current_step == 4:
+            self.sentidos_widget.update_list()
+            # self.ang_secoes_widget.lcs = lcs
+            # self.ang_secoes_widget.angulos = []
+            # self.ang_secoes_widget.update_list()
+
+        elif self.current_step == 2:
+            self.sentidos_widget.sentidos = []
             # Coletar todos os dados e exibir no resumo
             dados = {
                 'linhas_de_centro': self.vaos_widget.get_linhas_centro(),
@@ -212,9 +172,9 @@ class MainWindow(QMainWindow):
                 'niveis': self.vaos_widget.get_niveis(),
                 'quantidade_vidros': self.vaos_widget.get_quantidade_vidros(),
                 'sentidos_abertura': self.sentidos_widget.get_sentidos(),
-                'angulos_secoes': self.ang_secoes_widget.get_angulos(),
-                'angulos_paredes': self.ang_paredes_widget.get_angulos(),
-                'elevador': self.elevador_widget.get_elevador()
+                'angulos_secoes': self.vaos_widget.get_angulos(),
+                'angulos_paredes': self.vaos_widget.get_angulos(),
+                'elevador': self.vaos_widget.get_elevador()
             }
             self.resumo_widget.set_dados(dados)
 
