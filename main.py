@@ -32,48 +32,48 @@ if __name__ == "__main__":
 
         # Informações de entrada
 
-        # lcs = pedir_linhas_de_centro()
-        lcs = [1000, 3000, 2000]
+        lcs = pedir_linhas_de_centro()
+        # lcs = [1000, 3000, 2000]
         # lcs = [590, 2505]
 
-        # alturas = pedir_alturas(lcs)
-        alturas = [[1570, 1574], [1575, 1578, 1582, 1579], [1577, 1580]]
+        alturas = pedir_alturas(lcs)
+        # alturas = [[1570, 1574], [1575, 1578, 1582, 1579], [1577, 1580]]
         # alturas = [[1137, 1138], [1138, 1141]]
 
-        # niveis = pedir_niveis(alturas)
-        niveis = [[0, -2], [-4, -9, -12, -12], [-12, -9]]
+        niveis = pedir_niveis(alturas)
+        # niveis = [[0, -2], [-4, -9, -12, -12], [-12, -9]]
         # niveis = [[5, 0], [0, -5]]
 
-        # quant_vidros = pedir_quant_vidros(lcs)
-        quant_vidros = [2, 6, 4]
+        quant_vidros = pedir_quant_vidros(lcs)
+        # quant_vidros = [2, 6, 4]
         # quant_vidros = [2, 5]
 
-        # sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
+        sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
         # sentidos_abert = [[1, 12, 1, 2, 'esquerda']]
-        sentidos_abert = [[1, 5, 1, 2, 'esquerda'], [6, 12, 12, 11, 'direita']]
+        # sentidos_abert = [[1, 5, 1, 2, 'esquerda'], [6, 12, 12, 11, 'direita']]
         # sentidos_abert = [[1, 2, 2, 1, 'direita'], [3, 7, 3, 4, 'esquerda']]
 
         giratorios = [sentido[2] for sentido in sentidos_abert]
         adjacentes = [sentido[3] for sentido in sentidos_abert]
         sentidos = [sentido[4] for sentido in sentidos_abert]
 
-        # angs_in = pedir_angSecoes(lcs)
-        angs_in = [-45.0, -45.0]
+        angs_in = pedir_angSecoes(lcs)
+        # angs_in = [-45.0, -45.0]
         # angs_in = [-90]
 
-        # angs_paredes = pedir_angParedes()
+        angs_paredes = pedir_angParedes()
         # print(f'Angulos de paredes: {angs_paredes}')
-        angs_paredes = [0.0, 0.0]
+        # angs_paredes = [0.0, 0.0]
 
         # prumos = pedir_prumos()
-        prumos = [0, 0]
-#
-        # juncoes = definir_juncoes(lcs, angs_in)
-        juncoes = [[0, 2], [1, 1], [2, 0]]
+        # prumos = [0, 0]
+
+        juncoes = definir_juncoes(lcs, angs_in)
+        # juncoes = [[0, 2], [1, 1], [2, 0]]
         # juncoes = [[0, 2], [1, 0]]
 
-        # elevador = pedir_elevador()
-        elevador = 2600
+        elevador = pedir_elevador()
+        # elevador = 2600
 
         espessura_vidro = int(8)
         espessura_ext_perfil_U = int(20)

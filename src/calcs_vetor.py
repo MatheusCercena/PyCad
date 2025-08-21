@@ -85,7 +85,6 @@ def ponto_perpendicular_a_vetor(ponto_base: tuple[float, float, float], p1: tupl
     ponto_final = somar_pontos(ponto_base, multiplicar_vetor(perp, comprimento))
     return ponto_final
 
-
 def linha_paralela_com_offset(p1: tuple[float, float, float], p2: tuple[float, float, float], offset: float) -> tuple[tuple[float, float, float], tuple[float, float, float]]:
     """Retorna os dois pontos de uma linha paralela deslocada por um offset perpendicular"""
     vetor_perp = vetor_perpendicular_unitario(p1, p2)

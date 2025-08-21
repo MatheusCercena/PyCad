@@ -25,9 +25,9 @@ def log_spev(mensagem: str, nome_arquivo="spev.log"):
     """
     try:
         # Pega o diretório do executável atual
-        pasta_spev = os.path.dirname(os.path.abspath(__file__))
+        # pasta_spev = os.path.dirname(os.path.abspath(__file__))
         # Caso esteja rodando como exe (pyinstaller), use:
-        # pasta_spev = os.path.dirname(sys.executable)
+        pasta_spev = os.path.dirname(sys.executable)
 
         caminho_log = os.path.join(pasta_spev, nome_arquivo)
 
