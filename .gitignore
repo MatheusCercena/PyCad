@@ -1,0 +1,56 @@
+# Arquivos de build e distribuição
+build/
+dist/
+*.spec
+
+# Arquivos Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Arquivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.bak
+
+# Arquivos de configuração local
+.env
+.env.local
+.env.*.local
+
+# Arquivos de cache
+.cache/
+.pytest_cache/
+
+# Arquivos de cobertura de teste
+htmlcov/
+.coverage
+.coverage.*
+
+# Arquivos de backup do AutoCAD
+*.bak
+
+# Arquivos de exportação (opcional - remova se quiser versionar)
+exportacoes/*.json
