@@ -165,7 +165,7 @@ if __name__ == "__main__":
         else:
             print('Não é necessário sucata em pedaços.')
         if sucata_inteira > 0:
-            print(f'A quantidade de sucata interira necessária é {sucata_inteira}, sendo {sucata_inteira_superior} para a parte inferior e {sucata_inteira_inferior} para a parte superior.')
+            print(f'A quantidade de sucata inteira necessária é {sucata_inteira}, sendo {sucata_inteira_inferior} para a parte inferior e {sucata_inteira_superior} para a parte superior.')
         else:
             print('Não é necessário sucata inteira.')
         # Pivos
@@ -188,6 +188,7 @@ if __name__ == "__main__":
 
         input('A sacada foi desenhada no autocad, aperte qualquer tecla pra fechar essa janela: ')
 
+        # TODO
         # finalizar interface
         # adicionar angulos das paredes, prumos
         # adicionar as ferragens no layout e puxar as formulas

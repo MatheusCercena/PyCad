@@ -33,10 +33,6 @@ def posicionar_pivos(pos_lcs, sec_princ, pivos: list[int], giratorios: list[int]
     texto_final = "\n".join(linhas)
     texto_pivo = adicionar_mtext_modelspace(texto_final, APoint(*ponto_base_pivo), 70, 1700)
     texto_pivo.Rotation = 0
-    # texto_pivo.AttachmentPoint = 2
-    # ponto_base_pivo = (ponto_base_pivo[0] + 600, ponto_base_pivo[1])
-    # texto_pivo.InsertionPoint = APoint(*ponto_base_pivo)  # reposiciona após mudar o AttachmentPoint
-    # texto_pivo.Rotation = 0
 
 def posicionar_alturas(
         pos_lcs: list[list[float, float, float, float]],

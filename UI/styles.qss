@@ -1,0 +1,59 @@
+
+QWidget {
+    font-size: 16px;
+}
+
+QLineEdit, QComboBox, QListWidget, QTextEdit {
+    font-size: 16px;
+}
+
+QPushButton {
+    font-size: 16px;
+    min-width: 90px;
+    padding: 6px;
+}
+
+QLabel {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+QFrame {
+    margin: 2px; p
+    adding: 2px;
+}
+
+QPushButton#btnRemoveVao {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 30px;
+}
+
+QPushButton#btnRemoveVao:hover {
+    background-color: #ff6666;
+}
+
+QPushButton#btnRemoveAltura {
+    background-color: #ff4444;
+    color: white;
+    border: 1px solid red;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+QPushButton#btnRemoveAltura:hover {
+    background-color: #ff6666;
+}
+
+QLabel#TituloVao {
+    font-weight: bold;
+    font-size: 30px;
+    color: #005080;
+    margin: 5px 0;
+    border: none;
+}
+
