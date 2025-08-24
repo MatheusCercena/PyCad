@@ -1,5 +1,4 @@
-'
-Necessário layers com os nomes exatos:
+Necessário layers com esses nomes exatos:
 
 0
 Linha de Centro
@@ -12,5 +11,6 @@ Leito Interno
 Paredes
 Drenos
 Furos
-'
+
+
 

@@ -1,3 +1,3 @@
 """
-Pacote de módulo para a interface grafica.
+Módulo de widgets para o pacote UI.
 """

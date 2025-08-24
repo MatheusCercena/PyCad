@@ -57,3 +57,6 @@ QLabel#TituloVao {
     border: none;
 }
 
+QLabel#sentidosAberturaElementos, QLineEdit#sentidosAberturaElementos , QPushButton#sentidosAberturaElementos, QComboBox#sentidosAberturaElementos {
+    font-size: 25px;
+}

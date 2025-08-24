@@ -9,7 +9,7 @@ Funções para pedir os dados principais das medições para serem usadas pelas 
 
 def pedir_linhas_de_centro() -> list[int]:
     """Solicita ao usuário as linhas de centro das seções.
-    
+
     Returns:
         list: Lista com as linhas de centro das seções em milímetros.
     """
@@ -40,7 +40,7 @@ def pedir_linhas_de_centro() -> list[int]:
 
 def pedir_alturas(lcs):
     """Solicita ao usuário as alturas de cada lado da sacada.
-    
+
     Returns:
         list: Lista com sublistas contendo as alturas das seções por lado.
     """
@@ -70,14 +70,14 @@ def pedir_alturas(lcs):
 
 def pedir_niveis(alturas):
     """Solicita ao usuário as alturas de cada lado da sacada.
-    
+
     Returns:
         list: Lista com sublistas contendo as alturas das seções por lado.
     """
     print(f'''
 {' - '*10}NIVEIS{' - '*10}
 
-Como o nível está informado na medição?: 
+Como o nível está informado na medição?:
     [1] Nível ok (ou não informado)
     [2] Nível Variável (adicionar manualmente)
     [3] Desnível inferior (sem medidas)
@@ -101,7 +101,7 @@ Como o nível está informado na medição?:
                     try:
                         nivel = int(input(f'Digite o nível para a altura de {altura}, a {i+cont}ª do vão {index+cont}: '))
                         niveis_lado.append(nivel)
-                        cont += 1 
+                        cont += 1
                         break
                     except:
                         print(f'[ERRO] O campo "niveis" precisa conter apenas numeros inteiros: ')
@@ -121,10 +121,10 @@ Como o nível está informado na medição?:
 
 def pedir_quant_vidros(lcs: list[int]) -> list[int]:
     """Solicita ao usuário a quantidade de vidros por seção.
-    
+
     Args:
         lcs: Lista com as linhas de centro das seções.
-    
+
     Returns:
         list: Lista com a quantidade de vidros de cada lado.
     """
@@ -146,10 +146,10 @@ def pedir_quant_vidros(lcs: list[int]) -> list[int]:
 
 def pedir_angSecoes(lcs: list[int]) -> list[float]:
     """Solicita ao usuário os ângulos internos entre as seções.
-    
+
     Args:
         lcs: Lista com as linhas de centro das seções.
-    
+
     Returns:
         list: Lista com os ângulos internos no formato: [ang_1, ang_2, ..., ang_n].
     """
@@ -176,7 +176,7 @@ Inserir o angulo medido no transferidor, sem conversão.
 
 def pedir_angParedes() -> list[float]:
     """Solicita ao usuário os ângulos das paredes extremas.
-    
+
     Returns:
         list: Lista com os ângulos externos no formato: [ang_esq, ang_dir].
     """
@@ -213,7 +213,7 @@ Inserir o angulo medido no transferidor, sem conversão
 
 def pedir_prumos() -> list[float]:
     """Solicita ao usuário os prumos das extremidades.
-    
+
     Returns:
         list: Lista com os prumos no formato: [prumo_esq, prumo_dir].
     """
@@ -240,16 +240,16 @@ def pedir_prumos() -> list[float]:
 
 def definir_juncoes(lcs: list[int], angs_in: list[float]) -> list[list[int]]:
     """Define os tipos de junção para cada seção.
-    
+
     Args:
         lcs: Lista com as linhas de centro das seções.
         angs_in: Lista com os ângulos internos entre as seções.
-    
+
     Returns:
         list: Lista em que cada elemento representa uma seção e cada seção tem 2 elementos:
             - Elemento 0: tipo de junção do lado esquerdo da seção
             - Elemento 1: tipo de junção do lado direito da seção
-            
+
             Tipos de junção:
             - 0: vidro-parede
             - 1: passante
@@ -291,10 +291,10 @@ def definir_juncoes(lcs: list[int], angs_in: list[float]) -> list[list[int]]:
 
 def solicitar_sentido_abertura(quant_vidros: list[int]) -> tuple[list, list[int]]:
     """Solicita ao usuário os sentidos de abertura dos vidros.
-    
+
     Args:
         quant_vidros: Lista com a quantidade de vidros por seção.
-    
+
     Returns:
         tuple: Tupla contendo:
             - Lista de sublistas em que cada sublista representa uma abertura:
@@ -361,8 +361,8 @@ def solicitar_sentido_abertura(quant_vidros: list[int]) -> tuple[list, list[int]
         print(f'Certo, os vidros da {cont}ª abertura irao abrir para a {sentido}.')
         abertura = [v_ini, v_fin, giratorio, adjacente, sentido]
         sentidos.append(abertura)
-        cont += 1 
-        
+        cont += 1
+
         res = ''
 
         while res not in ['s', 'n'] and max(moveis) != sum(quant_vidros):
@@ -380,7 +380,7 @@ def solicitar_sentido_abertura(quant_vidros: list[int]) -> tuple[list, list[int]
 
 def pedir_elevador() -> int:
     """Solicita ao usuário a altura máxima do elevador.
-    
+
     Returns:
         int: Altura máxima do elevador em milímetros.
     """

@@ -19,62 +19,72 @@ from src.vidros import offset_vidros, medida_dos_vidros, definir_folgas_vidros, 
 from src.bocas import definir_aberturas, desenhar_bocas, desenhar_pivos_individuais
 from src.pivos import definir_pivos
 from src.adicionar_informacoes import posicionar_alturas, posicionar_pivos, posicionar_angulos
-from src.captura_erros import aplicar_decorador_em_todas, captura_erros
 import traceback
 from src.logs import log_spev, criar_alfanumerico
 
-if __name__ == "__main__":
+def projetar(arquivo, codigo):
+# if __name__ == "__main__":
     try:
-        id = criar_alfanumerico()
+        id = codigo
         log_spev(f'Inicio da execução ID: {id}')
 
         limpar_tudo()
 
+        with open(arquivo, 'r', encoding='utf-8') as file:
+            dados = file.load()
         # Informações de entrada
 
-        lcs = pedir_linhas_de_centro()
+        # lcs = pedir_linhas_de_centro()
         # lcs = [1000, 3000, 2000]
         # lcs = [590, 2505]
+        lcs = dados['linhas_centro']
 
-        alturas = pedir_alturas(lcs)
+        # alturas = pedir_alturas(lcs)
         # alturas = [[1570, 1574], [1575, 1578, 1582, 1579], [1577, 1580]]
         # alturas = [[1137, 1138], [1138, 1141]]
+        alturas = dados['alturas']
 
-        niveis = pedir_niveis(alturas)
+        # niveis = pedir_niveis(alturas)
         # niveis = [[0, -2], [-4, -9, -12, -12], [-12, -9]]
         # niveis = [[5, 0], [0, -5]]
+        niveis = dados['niveis']
 
-        quant_vidros = pedir_quant_vidros(lcs)
+        # quant_vidros = pedir_quant_vidros(lcs)
         # quant_vidros = [2, 6, 4]
         # quant_vidros = [2, 5]
+        quant_vidros = dados['quantidade_vidros']
 
-        sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
+        # sentidos_abert, fixos = solicitar_sentido_abertura(quant_vidros)
         # sentidos_abert = [[1, 12, 1, 2, 'esquerda']]
         # sentidos_abert = [[1, 5, 1, 2, 'esquerda'], [6, 12, 12, 11, 'direita']]
-        # sentidos_abert = [[1, 2, 2, 1, 'direita'], [3, 7, 3, 4, 'esquerda']]
+        sentidos_abert = dados['aberturas']
 
         giratorios = [sentido[2] for sentido in sentidos_abert]
         adjacentes = [sentido[3] for sentido in sentidos_abert]
         sentidos = [sentido[4] for sentido in sentidos_abert]
 
-        angs_in = pedir_angSecoes(lcs)
+        # angs_in = pedir_angSecoes(lcs)
         # angs_in = [-45.0, -45.0]
         # angs_in = [-90]
+        angs_in = dados['angulos_internos']
 
-        angs_paredes = pedir_angParedes()
+        # angs_paredes = pedir_angParedes()
         # print(f'Angulos de paredes: {angs_paredes}')
         # angs_paredes = [0.0, 0.0]
+        angs_paredes = dados['angulos_paredes']
 
         # prumos = pedir_prumos()
         # prumos = [0, 0]
 
-        juncoes = definir_juncoes(lcs, angs_in)
+        # juncoes = definir_juncoes(lcs, angs_in)
         # juncoes = [[0, 2], [1, 1], [2, 0]]
         # juncoes = [[0, 2], [1, 0]]
+        juncoes = definir_juncoes(lcs, angs_in)
 
         elevador = pedir_elevador()
         # elevador = 2600
 
+        elevador = pedir_elevador()
         espessura_vidro = int(8)
         espessura_ext_perfil_U = int(20)
         carregar_comandos()
@@ -188,13 +198,6 @@ if __name__ == "__main__":
 
         input('A sacada foi desenhada no autocad, aperte qualquer tecla pra fechar essa janela: ')
 
-        # TODO
-        # finalizar interface
-        # adicionar angulos das paredes, prumos
-        # adicionar as ferragens no layout e puxar as formulas
-        # depois de tudo fazer listagem de materiais para cadastrar
-        # cadastrar materiais no ecg
-        # corrigir erros de calculos na funcao de folgas/alturas e niveis
 
     except Exception as e:
         log_spev(f'Erro: {e} não rastreado - {traceback.format_exc()}')

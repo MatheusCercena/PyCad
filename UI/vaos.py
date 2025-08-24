@@ -1,7 +1,7 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QDialog
 
-from widgets.elementos_main import scroll_area
-from widgets.vao import VaoWidget
+from UI.elementos_main import scroll_area
+from UI.vao import VaoWidget
 
 class VaosWidget(QWidget):
     def __init__(self):
@@ -47,15 +47,26 @@ class VaosWidget(QWidget):
             vao_restante.numeracao_vao = i + 1
             vao_restante.titulo.setText(f'VÃO {i + 1}')
 
+    def checar_existencia_vaos(self):
+        if len(self.vaos) == 0:
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Campos não preenchidos")
+            layout = QVBoxLayout()
+
+            msg = "Adicione e prencha os dados de um vao antes de continuar."
+            layout.addWidget(QLabel(msg))
+
+            btn_ok = QPushButton("OK")
+            btn_ok.clicked.connect(dialog.accept)
+            layout.addWidget(btn_ok)
+
+            dialog.setLayout(layout)
+            dialog.exec()
+            return False
+        return True
+
     def get_dados_vaos(self):
-
-        linhas_centro = get_linhas_centro()
-        alturas = get_alturas()
-        niveis = get_niveis()
-        quant_vidros = get_quantidade_vidros()
-        angulos = get_angulos()
-
-        def get_linhas_centro(self):
+        def get_linhas_centro():
             """Retorna lista de linhas de centro no formato esperado"""
             lcs = []
             for vao in self.vaos:
@@ -63,28 +74,28 @@ class VaosWidget(QWidget):
                 lcs.append(dados_vao['linha_centro'])
             return lcs
 
-        def get_alturas(self):
+        def get_alturas():
             alturas = []
             for vao in self.vaos:
                 dados_vao = vao.get_dados_vao()
                 alturas.append(dados_vao['alturas'])
             return alturas
 
-        def get_niveis(self):
+        def get_niveis():
             niveis = []
             for vao in self.vaos:
                 dados_vao = vao.get_dados_vao()
                 niveis.append(dados_vao['niveis'])
             return niveis
 
-        def get_quantidade_vidros(self):
+        def get_quantidade_vidros():
             quant_vidros = []
             for vao in self.vaos:
                 dados_vao = vao.get_dados_vao()
                 quant_vidros.append(dados_vao['quantidade_vidros'])
             return quant_vidros
 
-        def get_angulos(self):
+        def get_angulos():
             angs_in = []
             angs_paredes = []
 
@@ -92,18 +103,30 @@ class VaosWidget(QWidget):
                 dados_vao = vao.get_dados_vao()
                 if i == 0:
                     angs_paredes.append(dados_vao['angulos'][0])
+                if i < len(self.vaos) - 1 and len(self.vaos) > 0:
                     angs_in.append(dados_vao['angulos'][1])
                 if i == len(self.vaos) - 1:
                     angs_paredes.append(dados_vao['angulos'][1])
-                if i > 0 and i < len(self.vaos) - 1:
-                    angs_in.append(dados_vao['angulos'][1])
 
             return angs_paredes, angs_in
 
-        return {
-            'linhas_de_centro': linhas_centro,
+        linhas_centro = get_linhas_centro()
+        alturas = get_alturas()
+        niveis = get_niveis()
+        quant_vidros = get_quantidade_vidros()
+        angulos_paredes, angulos_internos = get_angulos()
+
+        dados = {
+            'linhas_centro': linhas_centro,
             'alturas': alturas,
             'niveis': niveis,
             'quantidade_vidros': quant_vidros,
-            'angulos_secoes': angulos
+            'angulos_paredes': angulos_paredes,
+            'angulos_internos': angulos_internos,
+            'aberturas': ''
         }
+        for dado in dados.values():
+            if dado == None:
+                return None
+
+        return dados

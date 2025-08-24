@@ -1,49 +1,52 @@
 # PyCad
 
-DESENHO PRINCIPAL
+PyCad é uma ferramenta automatizada para auxiliar no desenho e detalhamento de projetos de envidraçamento de sacadas no AutoCAD.
 
-1 Armazenar linhas de centro para uso posterior - feito
-2 Desenhar linhas de centro - Feito
+## Funcionalidades
+- Interface gráfica intuitiva para entrada de dados de medição
+- Cálculo de folgas, alturas, níveis e junções
+- Exportação de relatórios e listagem de materiais
+- Integração com o ECG para cadastro de materiais e dados da obra
 
-3 definir seção principal do layout do projeto de acordo com as linhas de centro definidas - Feito
-4 aplicar fator de redefiniçao de posição de linhas de centro para ajustar layout de acordo com seção principal - Feito
+## Como usar
+Execute a interface principal com o Autocad (preferencialmente versao 2023) aberto com o Drawing1 armazenado na pasta DWGs:
+```sh
+python main_window.py
+```
+Siga as etapas na interface para inserir os dados do projeto e gerar os arquivos necessários.
 
-5 Dar offsets e fillets em linhas de centro pra obter trilhos - Feito
-6 desenhar linhas dos vidros e leitos individuais - Feito
+## Estrutura do Projeto
+- `src/` - Lógica principal, cálculos e integração com AutoCAD
+- `UI/` - Interface gráfica e widgets customizados
+- `dwgs/` - Arquivos DWG de base e exportações
+- `exportacoes/` - Arquivos JSON gerados
 
-7 puxar cotas dos vidros e leitos individuais - Feito
-8 Puxar cotas ( de linhas de centro, trilho, furos, drenos) para cada linha de centro - Feito
+# TODO
+Finalizar interface - adicionar juncoes, prumos e elevador + validacoes
 
------------------------
-MEIO-D0-PROJETO: 
+Adicionar angulos das paredes e prumos no autocad
 
-9 adicionar mtext com pivos e altura dos vidros, painel e vao. - Em andamento
-10 adicionar linhas de sentido de abertura. 
-11 adicionar arcos de porta
-12 adicionar passantes/colantes
-13 adicionar angulos entre seções
-14 adicionar medidas das molduras e quantidade de vidros, já pensando na posição das molas 
-15 adicionar bolinhas de leito
-16 adicionar tabelas com vidro de guarda-corpo
-17 adicionar detalhamentos de corte no trilho
-18 adicionar detalhamentos personalizados
+Adicionar as ferragens no layout e puxar as formulas
 
-------------------
-LAYOUT: 
+Depois de tudo fazer listagem de materiais para cadastrar
 
-19 fazer legenda de componentes e adicionar componentes dinamicamente
-20 pegar dados da obra no ecg e completar cabeçalho
-21 pegar input com dados de perfis e descrição de onde vao, para adicionar nas observacoes
-22 adicionar informaçoes flutuantes para produção, instalação, transporte, usinagem, etc.
+Cadastrar materiais no ecg
 
-Controle de qualidade:
+Corrigir erros de calculos na funcao de folgas/alturas e niveis
 
-23 Conferir se fonte está em tamanho adequado
-24 Encaixar informações na folha
+Pegar dados da obra no ecg e completar cabeçalho
 
-CADASTRO:
+Adicionar linhas de sentido de abertura.
+Adicionar arcos de porta
+Adicionar detalhamentos de passantes/colantes
+Adicionar detalhamentos de  de leito
+Adicionar tabelas com vidro de guarda-corpo
+Adicionar detalhamentos de corte no trilho
 
-25 Cadastrar tudo no ecg conforme projeto
-
-***Melhorar logica de divisao de trilhos pra considerar a largura da secao do lado
-***adicionar logica pra posicionar as cotas de dreno e furo automaticamente sem precisar de intervencao
+Pegar input com dados de perfis e descrição de onde vao, para adicionar nas observacoes
+Adicionar informaçoes flutuantes para produção, instalação, transporte, usinagem, etc.
+Conferir se fonte está em tamanho adequado
+Encaixar informações na folha
+Cadastrar tudo no ecg conforme projeto
+Melhorar logica de divisao de trilhos pra considerar a largura da secao do lado
+Adicionar logica pra posicionar as cotas de dreno e furo automaticamente sem precisar de intervencao

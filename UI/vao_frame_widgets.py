@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QHBoxLayout, QVBoxLa
 from PyQt6.QtCore import Qt, QRegularExpression
 from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator
 
-regex = QRegularExpression(r"^(?:\d{1,2}(?:\.\d)?|1[0-7]\d(?:\.\d)?|179(?:\.[0-9])?)$")
+regex = QRegularExpression(r"^(?:\d{1,2}(?:\.\d)?|-359[0-7]\d(?:\.\d)?|359(?:\.[0-9])?)$")
 validator = QRegularExpressionValidator(regex)
 
 ALTURA_FIXA = 40
@@ -59,7 +59,7 @@ class QuantidadeVidrosLayout(QHBoxLayout):
 		self.addWidget(self.input_quant_vidros)
 
 class AngulosLayout(QHBoxLayout):
-	def __init__(self):
+	def __init__(self, vao_widget):
 		super().__init__()
 		lbl_ang_esq = QLabel('Ângulo esquerdo:')
 		lbl_ang_esq.setFixedWidth(LARGURA_FIXA*2)
@@ -82,6 +82,7 @@ class AngulosLayout(QHBoxLayout):
 		self.input_ang_dir.setFixedWidth(LARGURA_FIXA*2)
 		self.input_ang_dir.setFixedHeight(40)
 		self.input_ang_dir.setValidator(validator)
+		self.input_ang_dir.textChanged.connect(vao_widget.sincronizar_angulos)
 
 		self.addWidget(lbl_ang_esq)
 		self.addWidget(self.input_ang_es)
@@ -97,13 +98,11 @@ class Layout_Frame(QFrame):
 		self.setFixedWidth(850)
 		self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
 
-
 class VaoFrame(QVBoxLayout):
 	def __init__(self):
 		super().__init__()
 		self.setSpacing(4)
 		self.setContentsMargins(5, 5, 5, 5)
-
 
 class BotaoAdicionarAlturas(QPushButton):
 	def __init__(self, funcao_adicionar_altura):

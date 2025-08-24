@@ -3,8 +3,8 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator
 from PyQt6.QtCore import Qt, QRegularExpression
 
-from widgets.vao_frame_widgets import HeaderLayout, LinhaCentroLayout, QuantidadeVidrosLayout, AngulosLayout, VaoFrame, Layout_Frame, BotaoAdicionarAlturas
-from widgets.elementos_main import linha_separadora
+from UI.vao_frame_widgets import HeaderLayout, LinhaCentroLayout, QuantidadeVidrosLayout, AngulosLayout, VaoFrame, Layout_Frame, BotaoAdicionarAlturas
+from UI.elementos_main import linha_separadora
 
 regex = QRegularExpression(r"^(?:\d{1,2}(?:\.\d)?|1[0-7]\d(?:\.\d)?|179(?:\.[0-9])?)$")
 validator = QRegularExpressionValidator(regex)
@@ -32,7 +32,15 @@ class VaoWidget(QWidget):
         self.titulo = self.header_layout.titulo_vao
         self.linhas_centro_layout = LinhaCentroLayout()
         self.quant_vidos_layout = QuantidadeVidrosLayout()
-        self.angulos_layout = AngulosLayout()
+        self.angulos_layout = AngulosLayout(self)
+
+        if self.numeracao_vao > 1:
+            angulo_direito_anterior = self.parent_widget.vaos[self.numeracao_vao-2].angulos_layout.input_ang_dir.text()
+            angulo_direito_anterior = float(angulo_direito_anterior) if angulo_direito_anterior else 0.0
+            self.angulos_layout.input_ang_es.setReadOnly(False)
+            self.angulos_layout.input_ang_es.setText(str(angulo_direito_anterior))
+            self.angulos_layout.input_ang_es.setReadOnly(True)
+
         self.botao_add_altura = BotaoAdicionarAlturas(self.adicionar_altura)
         self.alturas_container = QVBoxLayout()
 
@@ -121,6 +129,8 @@ class VaoWidget(QWidget):
 
             self.alturas_container.removeItem(linha_layout)
 
+            self.alturas.pop(idx)
+            self.niveis.pop(idx)
             self.linha_layouts.pop(idx)
 
             for i, (layout, lbl) in enumerate(self.linha_layouts):
@@ -137,6 +147,15 @@ class VaoWidget(QWidget):
             altura_total = 300
         self.frame.setMinimumHeight(altura_total)
 
+    def sincronizar_angulos(self):
+        ang_dir = self.angulos_layout.input_ang_dir.text()
+        if self.numeracao_vao < len(self.parent_widget.vaos):
+            proximo_vao = self.parent_widget.vaos[self.numeracao_vao]
+
+            proximo_vao.angulos_layout.input_ang_es.blockSignals(True)
+            proximo_vao.angulos_layout.input_ang_es.setText(ang_dir)
+            proximo_vao.angulos_layout.input_ang_es.blockSignals(False)
+
     def checar_campos_preenchidos(self) -> bool:
         """
         Verifica se todos os QLineEdit do vão foram preenchidos.
@@ -148,24 +167,30 @@ class VaoWidget(QWidget):
         campos_vazios = []
 
         if not self.linhas_centro_layout.input_lc.text():
-            campos_vazios.append("Linha de Centro")
+            campos_vazios.append(f"Linha de Centro vão {self.numeracao_vao}")
 
         if not self.quant_vidos_layout.input_quant_vidros.text():
-            campos_vazios.append("Quantidade de Vidros")
+            campos_vazios.append(f"Quantidade de Vidros vão {self.numeracao_vao}")
+
+        if len(self.alturas) == 0:
+            campos_vazios.append(f"Alturas vão {self.numeracao_vao}")
+
+        if len(self.niveis) == 0:
+            campos_vazios.append(f"Níveis vão {self.numeracao_vao}")
 
         for idx, altura in enumerate(self.alturas):
             if not altura.text():
-                campos_vazios.append(f"Altura {idx+1}")
+                campos_vazios.append(f"Altura {idx+1} vão {self.numeracao_vao}")
 
         for idx, nivel in enumerate(self.niveis):
             if not nivel.text():
-                campos_vazios.append(f"Nível {idx+1}")
+                campos_vazios.append(f"Nível {idx+1} vão {self.numeracao_vao}")
 
         if not self.angulos_layout.input_ang_es.text():
-            campos_vazios.append("Ângulo Esquerdo")
+            campos_vazios.append(f"Ângulo Esquerdo vão {self.numeracao_vao}")
 
         if not self.angulos_layout.input_ang_dir.text():
-            campos_vazios.append("Ângulo Direito")
+            campos_vazios.append(f"Ângulo Direito vão {self.numeracao_vao}")
 
         if campos_vazios:
             dialog = QDialog(self)
@@ -183,7 +208,6 @@ class VaoWidget(QWidget):
             dialog.exec()
 
             return False
-
         return True
 
     def get_dados_vao(self):
