@@ -41,6 +41,7 @@ class VaosWidget(QWidget):
                 self.vaos.pop(i)
                 self.renomear_vaos()
                 break
+        self.vaos[0].angulos_layout.input_ang_es.setReadOnly(False)
 
     def renomear_vaos(self):
         for i, vao_restante in enumerate(self.vaos):
