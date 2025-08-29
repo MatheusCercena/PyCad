@@ -36,7 +36,6 @@ class VaoWidget(QWidget):
         self.juncoes_layout = JuncoesLayout(self)
         self.prumos_layout = PrumosLayout(self)
 
-
         if self.numeracao_vao > 1:
             angulo_direito_anterior = self.parent_widget.vaos[self.numeracao_vao-2].angulos_layout.input_ang_dir.text()
             angulo_direito_anterior = float(angulo_direito_anterior) if angulo_direito_anterior else 0.0
